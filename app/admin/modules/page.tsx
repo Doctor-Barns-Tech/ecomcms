@@ -3,17 +3,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
-interface Module {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  color?: string;
-  enabled: boolean;
-  category: string;
-  configUrl?: string; // Optional URL for configuration page
-}
-
 export default function ModulesPage() {
   const [modules, setModules] = useState([
     {

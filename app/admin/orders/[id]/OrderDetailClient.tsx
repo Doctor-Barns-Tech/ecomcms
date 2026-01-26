@@ -67,7 +67,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
       }
     ],
     subtotal: 438.00,
-    shippingCost: 25.00,
+    shipping: 25.00,
     tax: 37.00,
     discount: 50.00,
     total: 450.00,
@@ -144,7 +144,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
                 </div>
                 <div className="flex justify-between text-gray-700">
                   <span>Shipping ({order.shipping.method})</span>
-                  <span>GH₵ {order.shippingCost.toFixed(2)}</span>
+                  <span>GH₵ {order.shipping.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
                   <span>Tax (VAT)</span>

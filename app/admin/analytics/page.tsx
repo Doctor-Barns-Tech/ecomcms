@@ -153,8 +153,8 @@ export default function AnalyticsPage() {
                   key={type}
                   onClick={() => setReportType(type)}
                   className={`px-4 py-2 rounded-md font-medium text-sm transition-colors capitalize whitespace-nowrap ${reportType === type
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
                     }`}
                 >
                   {type}
@@ -201,13 +201,13 @@ export default function AnalyticsPage() {
                     innerRadius={60}
                     outerRadius={100}
                     dataKey="revenue"
-                    label={({ payload }: any) => `${payload.percentage}%`}
+                    label={(entry) => `${entry.percentage}%`}
                   >
                     {categoryRevenue.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value: any) => `GH₵${Number(value).toLocaleString()}`} />
+                  <Tooltip formatter={(value: number) => `GH₵${value.toLocaleString()}`} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -234,7 +234,7 @@ export default function AnalyticsPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis type="number" stroke="#6b7280" />
                 <YAxis dataKey="segment" type="category" stroke="#6b7280" width={100} />
-                <Tooltip formatter={(value: any) => `GH₵${Number(value).toLocaleString()}`} />
+                <Tooltip formatter={(value: number) => `GH₵${value.toLocaleString()}`} />
                 <Bar dataKey="value" name="Customer Value">
                   {customerSegments.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
@@ -319,9 +319,9 @@ export default function AnalyticsPage() {
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center space-x-3">
                     <div className={`w-10 h-10 flex items-center justify-center rounded-lg font-bold text-white ${index === 0 ? 'bg-blue-600' :
-                      index === 1 ? 'bg-emerald-600' :
-                        index === 2 ? 'bg-amber-600' :
-                          index === 3 ? 'bg-orange-600' : 'bg-green-600'
+                        index === 1 ? 'bg-emerald-600' :
+                          index === 2 ? 'bg-amber-600' :
+                            index === 3 ? 'bg-orange-600' : 'bg-green-600'
                       }`}>
                       {index + 1}
                     </div>
@@ -335,9 +335,9 @@ export default function AnalyticsPage() {
                 <div className="w-full bg-gray-200 rounded-full h-6 relative overflow-hidden">
                   <div
                     className={`h-6 rounded-full transition-all duration-700 ${index === 0 ? 'bg-blue-600' :
-                      index === 1 ? 'bg-emerald-600' :
-                        index === 2 ? 'bg-amber-600' :
-                          index === 3 ? 'bg-orange-600' : 'bg-green-600'
+                        index === 1 ? 'bg-emerald-600' :
+                          index === 2 ? 'bg-amber-600' :
+                            index === 3 ? 'bg-orange-600' : 'bg-green-600'
                       }`}
                     style={{ width: `${stage.percentage}%` }}
                   ></div>

@@ -8,8 +8,7 @@ export async function generateStaticParams() {
   ];
 }
 
-export default async function BlogPostPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export default function BlogPostPage({ params }: { params: { id: string } }) {
   const posts: any = {
     '1': {
       title: 'The Ultimate Guide to Online Shopping in Ghana',
@@ -258,24 +257,24 @@ export default async function BlogPostPage({ params }: { params: Promise<{ id: s
     }
   };
 
-  const post = posts[id] || posts['1'];
+  const post = posts[params.id] || posts['1'];
 
   const relatedPosts = [
     {
-      id: id === '1' ? '2' : '1',
-      title: id === '1' ? '10 Must-Have Products for Your Home This Season' : 'The Ultimate Guide to Online Shopping in Ghana',
-      image: id === '1' ?
+      id: params.id === '1' ? '2' : '1',
+      title: params.id === '1' ? '10 Must-Have Products for Your Home This Season' : 'The Ultimate Guide to Online Shopping in Ghana',
+      image: params.id === '1' ?
         'https://readdy.ai/api/search-image?query=Beautiful%20modern%20African%20home%20interior%20with%20stylish%20furniture%20decor%20items%20plants%20bright%20natural%20lighting%20contemporary%20design%20magazine%20quality%20photography&width=600&height=400&seq=related1&orientation=landscape' :
         'https://readdy.ai/api/search-image?query=Modern%20African%20woman%20shopping%20online%20on%20laptop%20in%20bright%20contemporary%20home%20office%20coffee%20cup%20plants%20natural%20light%20relaxed%20lifestyle%20photography%20minimal%20clean%20background&width=600&height=400&seq=related2&orientation=landscape',
-      category: id === '1' ? 'Home & Living' : 'Shopping Tips'
+      category: params.id === '1' ? 'Home & Living' : 'Shopping Tips'
     },
     {
-      id: id === '3' ? '1' : '3',
-      title: id === '3' ? 'The Ultimate Guide to Online Shopping in Ghana' : 'How to Choose Quality Products: A Buyer\'s Guide',
-      image: id === '3' ?
+      id: params.id === '3' ? '1' : '3',
+      title: params.id === '3' ? 'The Ultimate Guide to Online Shopping in Ghana' : 'How to Choose Quality Products: A Buyer\'s Guide',
+      image: params.id === '3' ?
         'https://readdy.ai/api/search-image?query=Modern%20African%20woman%20shopping%20online%20on%20laptop%20in%20bright%20contemporary%20home%20office%20coffee%20cup%20plants%20natural%20light%20relaxed%20lifestyle%20photography%20minimal%20clean%20background&width=600&height=400&seq=related3&orientation=landscape' :
         'https://readdy.ai/api/search-image?query=Person%20examining%20product%20quality%20checking%20labels%20and%20details%20in%20bright%20retail%20setting%20closeup%20hands%20inspecting%20merchandise%20professional%20photography%20clean%20background&width=600&height=400&seq=related4&orientation=landscape',
-      category: id === '3' ? 'Shopping Tips' : 'Buying Guide'
+      category: params.id === '3' ? 'Shopping Tips' : 'Buying Guide'
     }
   ];
 
