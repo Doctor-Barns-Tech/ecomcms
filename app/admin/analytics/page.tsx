@@ -207,7 +207,7 @@ export default function AnalyticsPage() {
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value: number) => `GH₵${value.toLocaleString()}`} />
+                  <Tooltip formatter={(value: any) => `GH₵${(value || 0).toLocaleString()}`} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -234,7 +234,7 @@ export default function AnalyticsPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis type="number" stroke="#6b7280" />
                 <YAxis dataKey="segment" type="category" stroke="#6b7280" width={100} />
-                <Tooltip formatter={(value: number) => `GH₵${value.toLocaleString()}`} />
+                <Tooltip formatter={(value: any) => `GH₵${(value || 0).toLocaleString()}`} />
                 <Bar dataKey="value" name="Customer Value">
                   {customerSegments.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
