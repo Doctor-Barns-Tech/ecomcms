@@ -152,11 +152,10 @@ export default function AnalyticsPage() {
                 <button
                   key={type}
                   onClick={() => setReportType(type)}
-                  className={`px-4 py-2 rounded-md font-medium text-sm transition-colors capitalize whitespace-nowrap ${
-                    reportType === type
+                  className={`px-4 py-2 rounded-md font-medium text-sm transition-colors capitalize whitespace-nowrap ${reportType === type
                       ? 'bg-white text-gray-900 shadow-sm'
                       : 'text-gray-600 hover:text-gray-900'
-                  }`}
+                    }`}
                 >
                   {type}
                 </button>
@@ -167,14 +166,14 @@ export default function AnalyticsPage() {
             <AreaChart data={salesData}>
               <defs>
                 <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="date" stroke="#6b7280" />
               <YAxis stroke="#6b7280" />
-              <Tooltip 
+              <Tooltip
                 contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
               />
               <Legend />
@@ -202,7 +201,7 @@ export default function AnalyticsPage() {
                     innerRadius={60}
                     outerRadius={100}
                     dataKey="revenue"
-                    label={(entry) => `${entry.percentage}%`}
+                    label={({ payload }: any) => `${payload.percentage}%`}
                   >
                     {categoryRevenue.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -319,12 +318,11 @@ export default function AnalyticsPage() {
               <div key={stage.stage} className="relative">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center space-x-3">
-                    <div className={`w-10 h-10 flex items-center justify-center rounded-lg font-bold text-white ${
-                      index === 0 ? 'bg-blue-600' :
-                      index === 1 ? 'bg-emerald-600' :
-                      index === 2 ? 'bg-amber-600' :
-                      index === 3 ? 'bg-orange-600' : 'bg-green-600'
-                    }`}>
+                    <div className={`w-10 h-10 flex items-center justify-center rounded-lg font-bold text-white ${index === 0 ? 'bg-blue-600' :
+                        index === 1 ? 'bg-emerald-600' :
+                          index === 2 ? 'bg-amber-600' :
+                            index === 3 ? 'bg-orange-600' : 'bg-green-600'
+                      }`}>
                       {index + 1}
                     </div>
                     <span className="font-semibold text-gray-900 text-lg">{stage.stage}</span>
@@ -336,12 +334,11 @@ export default function AnalyticsPage() {
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-6 relative overflow-hidden">
                   <div
-                    className={`h-6 rounded-full transition-all duration-700 ${
-                      index === 0 ? 'bg-blue-600' :
-                      index === 1 ? 'bg-emerald-600' :
-                      index === 2 ? 'bg-amber-600' :
-                      index === 3 ? 'bg-orange-600' : 'bg-green-600'
-                    }`}
+                    className={`h-6 rounded-full transition-all duration-700 ${index === 0 ? 'bg-blue-600' :
+                        index === 1 ? 'bg-emerald-600' :
+                          index === 2 ? 'bg-amber-600' :
+                            index === 3 ? 'bg-orange-600' : 'bg-green-600'
+                      }`}
                     style={{ width: `${stage.percentage}%` }}
                   ></div>
                 </div>
