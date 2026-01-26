@@ -67,7 +67,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
       }
     ],
     subtotal: 438.00,
-    shipping: 25.00,
+    shippingCost: 25.00,
     tax: 37.00,
     discount: 50.00,
     total: 450.00,
@@ -144,7 +144,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
                 </div>
                 <div className="flex justify-between text-gray-700">
                   <span>Shipping ({order.shipping.method})</span>
-                  <span>GH₵ {order.shipping.toFixed(2)}</span>
+                  <span>GH₵ {order.shippingCost.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
                   <span>Tax (VAT)</span>
@@ -168,9 +168,8 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
               <div className="space-y-4">
                 {order.timeline.map((event, index) => (
                   <div key={index} className="flex items-start space-x-4">
-                    <div className={`w-10 h-10 flex items-center justify-center rounded-full border-2 ${
-                      event.completed ? 'bg-emerald-700 border-emerald-700' : 'bg-white border-gray-300'
-                    }`}>
+                    <div className={`w-10 h-10 flex items-center justify-center rounded-full border-2 ${event.completed ? 'bg-emerald-700 border-emerald-700' : 'bg-white border-gray-300'
+                      }`}>
                       {event.completed ? (
                         <i className="ri-check-line text-white text-xl"></i>
                       ) : (
@@ -211,9 +210,8 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
                           setOrderStatus(status);
                           setShowStatusMenu(false);
                         }}
-                        className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
-                          status === orderStatus ? 'bg-emerald-50 font-semibold' : ''
-                        }`}
+                        className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors ${status === orderStatus ? 'bg-emerald-50 font-semibold' : ''
+                          }`}
                       >
                         {status}
                       </button>
