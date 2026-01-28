@@ -54,7 +54,7 @@ export default function AdminDashboard() {
         // 1. Fetch Orders Count & Revenue
         const { data: ordersData, error: ordersError } = await supabase
           .from('orders')
-          .select('total, status, created_at');
+          .select('total, status, created_at, email');
 
         if (ordersError) throw ordersError;
 
