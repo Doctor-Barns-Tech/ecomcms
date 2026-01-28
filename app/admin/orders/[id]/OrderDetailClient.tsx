@@ -8,6 +8,14 @@ interface OrderDetailClientProps {
   orderId: string;
 }
 
+
+type RiskLevel = 'low' | 'medium' | 'high';
+
+interface FraudAnalysis {
+  riskLevel: RiskLevel;
+  reasons: string[];
+}
+
 export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
   const [orderStatus, setOrderStatus] = useState('Processing');
   const [showStatusMenu, setShowStatusMenu] = useState(false);
@@ -90,8 +98,8 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
     'Cancelled': 'bg-red-100 text-red-700 border-red-200'
   };
 
-  const fraudAnalysis = {
-    riskLevel: 'medium' as const,
+  const fraudAnalysis: FraudAnalysis = {
+    riskLevel: 'medium',
     reasons: [
       'First-time customer with high-value order',
       'Shipping address different from billing address',
