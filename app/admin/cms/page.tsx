@@ -72,6 +72,15 @@ export default function CMSPage() {
       available: true
     },
     {
+      id: 'banners',
+      name: 'Banners & Promotions',
+      description: 'Create announcement bars, promotional banners, and popups',
+      icon: 'ri-flag-2-line',
+      path: '/admin/cms/banners',
+      color: 'bg-rose-100 text-rose-700',
+      available: true
+    },
+    {
       id: 'media',
       name: 'Media Library',
       description: 'Upload and manage images, banners, and media files',

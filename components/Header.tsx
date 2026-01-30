@@ -6,6 +6,7 @@ import MiniCart from './MiniCart';
 import { useCart } from '@/context/CartContext';
 import { supabase } from '@/lib/supabase';
 import { useCMS } from '@/context/CMSContext';
+import AnnouncementBar from './AnnouncementBar';
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -56,9 +57,7 @@ export default function Header() {
 
   return (
     <>
-      <div className="bg-emerald-800 text-white py-2 text-center text-sm">
-        <p>Free Shipping on Orders Over GH₵200 | Shop Now & Save</p>
-      </div>
+      <AnnouncementBar />
 
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <nav aria-label="Main navigation">
