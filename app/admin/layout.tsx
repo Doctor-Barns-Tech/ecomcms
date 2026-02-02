@@ -84,6 +84,11 @@ export default function AdminLayout({
       badge: ''
     },
     {
+      title: 'POS System',
+      icon: 'ri-store-3-line',
+      path: '/admin/pos'
+    },
+    {
       title: 'Products',
       icon: 'ri-box-3-line',
       path: '/admin/products'
