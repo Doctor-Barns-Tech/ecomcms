@@ -56,7 +56,6 @@ export default function POSPage() {
           categories(name),
           product_images(url)
         `)
-                .eq('is_active', true) // Assuming is_active column exists, remove if not
                 .order('name');
 
             if (prodData) {
@@ -216,8 +215,8 @@ export default function POSPage() {
                                 key={cat}
                                 onClick={() => setActiveCategory(cat)}
                                 className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${activeCategory === cat
-                                        ? 'bg-emerald-700 text-white shadow-md'
-                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                    ? 'bg-emerald-700 text-white shadow-md'
+                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                     }`}
                             >
                                 {cat}
@@ -421,8 +420,8 @@ export default function POSPage() {
                                                     key={method}
                                                     onClick={() => setPaymentMethod(method.toLowerCase())}
                                                     className={`py-3 rounded-lg font-medium border transition-all ${paymentMethod === method.toLowerCase()
-                                                            ? 'border-emerald-600 bg-emerald-50 text-emerald-800 ring-1 ring-emerald-600'
-                                                            : 'border-gray-200 hover:border-gray-300 text-gray-600'
+                                                        ? 'border-emerald-600 bg-emerald-50 text-emerald-800 ring-1 ring-emerald-600'
+                                                        : 'border-gray-200 hover:border-gray-300 text-gray-600'
                                                         }`}
                                                 >
                                                     {method}
