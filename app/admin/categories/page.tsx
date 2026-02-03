@@ -353,7 +353,7 @@ export default function AdminCategoriesPage() {
                     <label className="cursor-pointer block">
                       <i className="ri-upload-cloud-line text-4xl text-gray-400 mb-2 w-10 h-10 flex items-center justify-center mx-auto"></i>
                       <p className="text-gray-700 font-medium">Click to upload image</p>
-                      <p className="text-sm text-gray-500 mt-1">PNG, JPG up to 5MB</p>
+                      <p className="text-sm text-gray-500 mt-1">Square (1:1) Recommended (e.g., 800x800px)</p>
                       <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
                     </label>
                   )}
