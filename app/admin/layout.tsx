@@ -18,6 +18,9 @@ export default function AdminLayout({
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [user, setUser] = useState<any>(null);
 
+  // Module Filtering State
+  const [enabledModules, setEnabledModules] = useState<string[]>([]);
+
   useEffect(() => {
     async function checkAuth() {
       const { data: { session } } = await supabase.auth.getSession();
@@ -30,8 +33,6 @@ export default function AdminLayout({
       if (!session) {
         router.push('/admin/login');
       } else {
-        // Here you would typically check for admin role
-        // if (session.user.role !== 'admin') router.push('/');
         setUser(session.user);
         setIsAuthenticated(true);
       }
@@ -53,26 +54,7 @@ export default function AdminLayout({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showUserMenu]);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push('/admin/login');
-  };
-
-  if (isLoading) {
-    return <div className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-500">Loading Admin...</div>;
-  }
-
-  if (!isAuthenticated && pathname !== '/admin/login') {
-    return null; // Will redirect in useEffect
-  }
-
-  if (pathname === '/admin/login') {
-    return children;
-  }
-
-  // Module Filtering
-  const [enabledModules, setEnabledModules] = useState<string[]>([]);
-
+  // Fetch Modules Effect
   useEffect(() => {
     async function fetchModules() {
       try {
@@ -90,6 +72,15 @@ export default function AdminLayout({
     }
     fetchModules();
   }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/admin/login');
+  };
+
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-500">Loading Admin...</div>;
+  }
 
   const menuItems = [
     {
