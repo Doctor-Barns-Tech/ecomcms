@@ -29,8 +29,8 @@ export default function ProductCard({
   const discount = originalPrice ? Math.round((1 - price / originalPrice) * 100) : 0;
 
   return (
-    <div className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
-      <Link href={`/product/${id}`} className="relative block aspect-square overflow-hidden bg-gray-100">
+    <div className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 h-full flex flex-col">
+      <Link href={`/product/${id}`} className="relative block aspect-square overflow-hidden bg-gray-100 flex-shrink-0">
         <LazyImage
           src={image}
           alt={name}
@@ -53,36 +53,36 @@ export default function ProductCard({
         )}
       </Link>
 
-      <div className="p-4">
+      <div className="p-4 flex flex-col flex-grow">
         <Link href={`/product/${id}`}>
-          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-emerald-700 transition-colors">
+          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-emerald-700 transition-colors h-10 lg:h-auto">
             {name}
           </h3>
         </Link>
 
-        <div className="flex items-center mb-3">
+        <div className="flex items-center mb-2">
           <div className="flex items-center space-x-1 mr-2">
             {[1, 2, 3, 4, 5].map((star) => (
               <i
                 key={star}
-                className={`${star <= rating ? 'ri-star-fill text-amber-400' : 'ri-star-line text-gray-300'} text-sm`}
+                className={`${star <= rating ? 'ri-star-fill text-amber-400' : 'ri-star-line text-gray-300'} text-xs lg:text-sm`}
               ></i>
             ))}
           </div>
-          <span className="text-sm text-gray-500">({reviewCount})</span>
+          <span className="text-xs text-gray-500">({reviewCount})</span>
         </div>
 
-        <div className="flex items-center justify-between">
-          <div className="flex items-baseline space-x-2">
-            <span className="text-xl font-bold text-gray-900">GH₵{price.toFixed(2)}</span>
+        <div className="flex items-center justify-between mt-auto mb-3">
+          <div className="flex flex-wrap items-baseline gap-2">
+            <span className="text-lg lg:text-xl font-bold text-gray-900">GH₵{price.toFixed(2)}</span>
             {originalPrice && (
-              <span className="text-sm text-gray-400 line-through">GH₵{originalPrice.toFixed(2)}</span>
+              <span className="text-xs lg:text-sm text-gray-400 line-through">GH₵{originalPrice.toFixed(2)}</span>
             )}
           </div>
         </div>
 
-        <button 
-          className="mt-4 w-full bg-gray-900 hover:bg-emerald-700 text-white py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2 whitespace-nowrap"
+        <button
+          className="w-full bg-gray-900 hover:bg-emerald-700 text-white py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2 whitespace-nowrap text-sm lg:text-base"
           disabled={!inStock}
         >
           <i className="ri-shopping-cart-line text-lg"></i>
