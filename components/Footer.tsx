@@ -160,20 +160,7 @@ export default function Footer() {
             <p className="text-gray-400 text-sm">
               &copy; {new Date().getFullYear()} {siteName}. All rights reserved.
             </p>
-            <div className="flex gap-6 text-sm text-gray-400">
-              <span className="flex items-center gap-2">
-                <i className="ri-shield-check-line text-emerald-500"></i>
-                Secure Payment
-              </span>
-              <span className="flex items-center gap-2">
-                <i className="ri-store-2-line text-emerald-500"></i>
-                Store Pickup
-              </span>
-              <span className="flex items-center gap-2">
-                <i className="ri-customer-service-line text-emerald-500"></i>
-                24/7 Support
-              </span>
-            </div>
+
           </div>
         </div>
       </div>
