@@ -194,7 +194,17 @@ export default function CheckoutPage() {
 
       if (itemsError) throw itemsError;
 
-      // 3. Clear Cart & Redirect
+      // 4. Send Notifications (Async)
+      fetch('/api/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'order_created',
+          payload: order
+        })
+      }).catch(err => console.error('Notification trigger error:', err));
+
+      // 5. Clear Cart & Redirect
       clearCart();
       router.push(`/order-success?order=${orderNumber}`);
 

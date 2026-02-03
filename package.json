@@ -5,7 +5,8 @@
     "next": "15.1.11",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "recharts": "^3.0.2"
+    "recharts": "^3.0.2",
+    "resend": "^6.9.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

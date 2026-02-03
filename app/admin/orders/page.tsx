@@ -14,6 +14,8 @@ interface Order {
   payment_method: string;
   shipping_method: string;
   created_at: string;
+  phone?: string;
+  shipping_address?: any;
   profiles?: {
     full_name: string;
     email: string;
@@ -67,6 +69,8 @@ export default function AdminOrdersPage() {
           payment_method,
           shipping_method,
           created_at,
+          phone,
+          shipping_address,
           profiles (
             full_name,
             email
@@ -175,6 +179,21 @@ export default function AdminOrdersPage() {
           .in('id', selectedOrders);
 
         if (error) throw error;
+
+
+
+        // Send Notifications
+        const updatedOrders = orders.filter(o => selectedOrders.includes(o.id));
+        updatedOrders.forEach(order => {
+          fetch('/api/notifications', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'order_updated',
+              payload: { order, status: newStatus }
+            })
+          }).catch(err => console.error('Notification error', err));
+        });
 
         await fetchOrders();
         setSelectedOrders([]);
