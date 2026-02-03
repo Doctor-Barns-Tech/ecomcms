@@ -75,9 +75,17 @@ export default function AdminLayout({
 
   useEffect(() => {
     async function fetchModules() {
-      const { data } = await supabase.from('store_modules').select('id, enabled');
-      if (data) {
-        setEnabledModules(data.filter((m: any) => m.enabled).map((m: any) => m.id));
+      try {
+        const { data, error } = await supabase.from('store_modules').select('id, enabled');
+        if (error) {
+          console.warn('Error fetching modules:', error);
+          return;
+        }
+        if (data) {
+          setEnabledModules(data.filter((m: any) => m.enabled).map((m: any) => m.id));
+        }
+      } catch (err) {
+        console.warn('Fetch modules failed:', err);
       }
     }
     fetchModules();

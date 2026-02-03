@@ -13,12 +13,23 @@ interface Module {
   category: string;
 }
 
+const colorMap: Record<string, string> = {
+  red: 'bg-red-100 text-red-600',
+  blue: 'bg-blue-100 text-blue-600',
+  purple: 'bg-purple-100 text-purple-600',
+  emerald: 'bg-emerald-100 text-emerald-600',
+  orange: 'bg-orange-100 text-orange-600',
+  amber: 'bg-amber-100 text-amber-600',
+  yellow: 'bg-yellow-100 text-yellow-600',
+  indigo: 'bg-indigo-100 text-indigo-600',
+  gray: 'bg-gray-100 text-gray-600'
+};
+
 export default function ModulesPage() {
   const [loading, setLoading] = useState(true);
 
   // Base definitions of modules
   const [modules, setModules] = useState<Module[]>([
-    // ... Critical Functionality Modules
     {
       id: 'notifications',
       name: 'Marketing Notifications',
@@ -64,7 +75,6 @@ export default function ModulesPage() {
       enabled: false,
       category: 'Analytics'
     },
-    // ... Placeholder modules for future
     {
       id: 'flash-sales',
       name: 'Flash Sales',
@@ -134,12 +144,8 @@ export default function ModulesPage() {
 
       if (error) {
         throw error;
-        // Revert if needed (omitted for brevity)
       }
 
-      // Force refresh of layout by triggering a custom event or reloading?
-      // Layout uses simple polling or hook?
-      // A simple reload is safest for the user to see menu changes immediately.
       window.location.reload();
 
     } catch (err) {
@@ -204,7 +210,7 @@ export default function ModulesPage() {
                   {items.map(module => (
                     <div key={module.id} className={`bg-white rounded-xl border-2 p-6 transition-all ${module.enabled ? 'border-emerald-500 shadow-md' : 'border-gray-200 opacity-75'}`}>
                       <div className="flex justify-between items-start mb-4">
-                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center bg-${module.color}-100 text-${module.color}-600`}>
+                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${colorMap[module.color] || 'bg-gray-100 text-gray-600'}`}>
                           <i className={`${module.icon} text-2xl`}></i>
                         </div>
                         <button
