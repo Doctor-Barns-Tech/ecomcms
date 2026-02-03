@@ -570,24 +570,7 @@ export default function CheckoutPage() {
                     <i className="ri-bank-card-line text-2xl text-emerald-700"></i>
                   </label>
 
-                  <label className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-colors ${paymentMethod === 'cod' ? 'border-emerald-700 bg-emerald-50' : 'border-gray-300 hover:border-gray-400'
-                    }`}>
-                    <div className="flex items-center space-x-4">
-                      <input
-                        type="radio"
-                        name="payment"
-                        value="cod"
-                        checked={paymentMethod === 'cod'}
-                        onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="w-5 h-5 text-emerald-700"
-                      />
-                      <div>
-                        <p className="font-semibold text-gray-900">Cash on Delivery</p>
-                        <p className="text-sm text-gray-600">Pay when you receive</p>
-                      </div>
-                    </div>
-                    <i className="ri-money-dollar-circle-line text-2xl text-emerald-700"></i>
-                  </label>
+
                 </div>
 
                 <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
