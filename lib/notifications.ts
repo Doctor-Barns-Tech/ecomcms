@@ -85,9 +85,15 @@ export async function sendSMS({ to, message }: { to: string; message: string }) 
 }
 
 export async function sendOrderConfirmation(order: any) {
-    const { id, email, shipping_address, total, created_at, order_number } = order;
-    const name = shipping_address?.firstName || 'Customer';
-    const phone = shipping_address?.phone;
+    const { id, email, phone: orderPhone, shipping_address, total, created_at, order_number } = order;
+
+    // Try to get name from full_name, then firstName, then fallback
+    const name = shipping_address?.full_name || shipping_address?.firstName || 'Customer';
+
+    // Prefer top-level phone, then shipping address phone
+    const phone = orderPhone || shipping_address?.phone;
+
+    console.log(`Preparing confirmation for Order #${order_number}. Phone: ${phone}, Name: ${name}`);
 
     // 1. Email to Customer
     const customerEmailHtml = `
@@ -131,9 +137,13 @@ export async function sendOrderConfirmation(order: any) {
 }
 
 export async function sendOrderStatusUpdate(order: any, newStatus: string) {
-    const { id, email, shipping_address, order_number } = order;
-    const name = shipping_address?.firstName || 'Customer';
-    const phone = shipping_address?.phone;
+    const { id, email, phone: orderPhone, shipping_address, order_number } = order;
+
+    // Consistent name/phone extraction
+    const name = shipping_address?.full_name || shipping_address?.firstName || 'Customer';
+    const phone = orderPhone || shipping_address?.phone;
+
+    console.log(`Sending status update for Order #${order_number} to ${newStatus}. Phone: ${phone}`);
 
     const subject = `Order Update #${order_number || id}`;
     let message = `Your order #${order_number || id} status has been updated to ${newStatus}.`;
