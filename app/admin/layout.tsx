@@ -70,6 +70,19 @@ export default function AdminLayout({
     return children;
   }
 
+  // Module Filtering
+  const [enabledModules, setEnabledModules] = useState<string[]>([]);
+
+  useEffect(() => {
+    async function fetchModules() {
+      const { data } = await supabase.from('store_modules').select('id, enabled');
+      if (data) {
+        setEnabledModules(data.filter((m: any) => m.enabled).map((m: any) => m.id));
+      }
+    }
+    fetchModules();
+  }, []);
+
   const menuItems = [
     {
       title: 'Dashboard',
@@ -126,27 +139,32 @@ export default function AdminLayout({
     {
       title: 'Customer Insights',
       icon: 'ri-user-search-line',
-      path: '/admin/customer-insights'
+      path: '/admin/customer-insights',
+      moduleId: 'customer-insights'
     },
     {
       title: 'Notifications',
       icon: 'ri-notification-3-line',
-      path: '/admin/notifications'
+      path: '/admin/notifications',
+      moduleId: 'notifications'
     },
     {
       title: 'CMS / Pages',
       icon: 'ri-file-list-line',
-      path: '/admin/cms'
+      path: '/admin/cms',
+      moduleId: 'cms'
     },
     {
       title: 'Homepage Config',
       icon: 'ri-home-gear-line',
-      path: '/admin/homepage'
+      path: '/admin/homepage',
+      moduleId: 'homepage'
     },
     {
       title: 'Blog',
       icon: 'ri-article-line',
-      path: '/admin/blog'
+      path: '/admin/blog',
+      moduleId: 'blog'
     },
     {
       title: 'Modules',
@@ -154,6 +172,13 @@ export default function AdminLayout({
       path: '/admin/modules'
     },
   ];
+
+  const visibleMenuItems = menuItems.filter(item => {
+    // @ts-ignore
+    if (!item.moduleId) return true;
+    // @ts-ignore
+    return enabledModules.includes(item.moduleId);
+  });
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -165,7 +190,7 @@ export default function AdminLayout({
           </Link>
 
           <nav className="space-y-1">
-            {menuItems.map((item) => {
+            {visibleMenuItems.map((item) => {
               const isActive = item.exact ? pathname === item.path : pathname.startsWith(item.path);
               return (
                 <Link
