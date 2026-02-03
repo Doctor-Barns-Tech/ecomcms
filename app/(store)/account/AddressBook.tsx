@@ -15,30 +15,7 @@ interface Address {
 }
 
 export default function AddressBook() {
-  const [addresses, setAddresses] = useState<Address[]>([
-    {
-      id: '1',
-      name: 'John Doe',
-      phone: '+233 24 123 4567',
-      street: '123 Oxford Street',
-      city: 'Accra',
-      state: 'Greater Accra',
-      zipCode: '00233',
-      country: 'Ghana',
-      isDefault: true
-    },
-    {
-      id: '2',
-      name: 'John Doe',
-      phone: '+233 24 123 4567',
-      street: '456 Kumasi Road',
-      city: 'Kumasi',
-      state: 'Ashanti',
-      zipCode: '00233',
-      country: 'Ghana',
-      isDefault: false
-    }
-  ]);
+  const [addresses, setAddresses] = useState<Address[]>([]);
 
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -161,9 +138,8 @@ export default function AddressBook() {
         {addresses.map((address) => (
           <div
             key={address.id}
-            className={`bg-white border-2 rounded-lg p-6 relative ${
-              address.isDefault ? 'border-emerald-700' : 'border-gray-200'
-            }`}
+            className={`bg-white border-2 rounded-lg p-6 relative ${address.isDefault ? 'border-emerald-700' : 'border-gray-200'
+              }`}
           >
             {address.isDefault && (
               <div className="absolute top-4 right-4">
