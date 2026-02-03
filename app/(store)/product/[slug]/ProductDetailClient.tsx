@@ -65,7 +65,9 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
           colors: [], // Placeholder until specific attributes implementation
           sizes: productData.product_variants?.map((v: any) => v.name) || [],
           features: ['Premium Quality', 'Authentic Design'], // Placeholder or extract from description/metadata
-          care: 'Handle with care.'
+          featured: ['Premium Quality', 'Authentic Design'], // Placeholder or extract from description/metadata
+          care: 'Handle with care.',
+          isPreorder: productData.metadata?.is_preorder || false
         };
 
         // Ensure at least one image/placeholder
@@ -353,6 +355,12 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                     <i className="ri-truck-line text-xl text-emerald-700 mr-3"></i>
                     <span>Free shipping on orders over GH₵200</span>
                   </div>
+                  {product.isPreorder && (
+                    <div className="flex items-center text-gray-700 font-medium text-amber-700 bg-amber-50 p-2 rounded-lg border border-amber-200">
+                      <i className="ri-time-line text-xl mr-3"></i>
+                      <span>Estimated Shipping Time: 30 Days (Pre-order)</span>
+                    </div>
+                  )}
                   <div className="flex items-center text-gray-700">
                     <i className="ri-arrow-left-right-line text-xl text-emerald-700 mr-3"></i>
                     <span>30-day easy returns and exchanges</span>

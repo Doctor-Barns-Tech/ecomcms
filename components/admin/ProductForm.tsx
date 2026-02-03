@@ -25,6 +25,7 @@ export default function ProductForm({ initialData, isEditMode = false }: Product
     const [description, setDescription] = useState(initialData?.description || '');
     const [status, setStatus] = useState(initialData?.status || 'Active');
     const [featured, setFeatured] = useState(initialData?.featured || false);
+    const [isPreorder, setIsPreorder] = useState(initialData?.metadata?.is_preorder || false);
     const [activeTab, setActiveTab] = useState('general');
 
     // Variants currently simple local state
@@ -141,7 +142,8 @@ export default function ProductForm({ initialData, isEditMode = false }: Product
                 seo_description: metaDescription,
                 tags: (keywords as string).split(',').map((k: string) => k.trim()).filter(Boolean),
                 metadata: {
-                    low_stock_threshold: parseInt(lowStockThreshold) || 5
+                    low_stock_threshold: parseInt(lowStockThreshold) || 5,
+                    is_preorder: isPreorder
                 }
             };
 
@@ -367,6 +369,18 @@ export default function ProductForm({ initialData, isEditMode = false }: Product
                                 />
                                 <label className="text-gray-900 font-medium">
                                     Feature this product on homepage
+                                </label>
+                            </div>
+
+                            <div className="flex items-center space-x-3">
+                                <input
+                                    type="checkbox"
+                                    checked={isPreorder}
+                                    onChange={(e) => setIsPreorder(e.target.checked)}
+                                    className="w-5 h-5 text-emerald-700 border-gray-300 rounded focus:ring-emerald-500 cursor-pointer"
+                                />
+                                <label className="text-gray-900 font-medium">
+                                    Pre-order Item (Ships in 30 days)
                                 </label>
                             </div>
                         </div>
