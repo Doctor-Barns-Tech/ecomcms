@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import OrderHistory from './OrderHistory';
 import AddressBook from './AddressBook';
 import { supabase } from '@/lib/supabase';
@@ -152,7 +150,6 @@ export default function AccountPage() {
 
   return (
     <>
-      <Header />
       <div className="min-h-screen bg-gray-50 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8 flex justify-between items-center">
@@ -435,7 +432,6 @@ export default function AccountPage() {
           </div>
         </div>
       </div>
-      <Footer />
     </>
   );
 }
