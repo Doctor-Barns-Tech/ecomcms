@@ -136,3 +136,56 @@ export async function sendOrderStatusUpdate(order: any, newStatus: string) {
         });
     }
 }
+
+export async function sendWelcomeMessage(user: { email: string, firstName: string, phone?: string }) {
+    const { email, firstName, phone } = user;
+
+    // Email
+    await sendEmail({
+        to: email,
+        subject: `Welcome to Sarah Lawson Imports!`,
+        html: `
+      <h1>Welcome, ${firstName}!</h1>
+      <p>Thank you for joining the Sarah Lawson Imports family.</p>
+      <p>We're thrilled to have you with us. Explore our collection of premium beauty products and enjoy your shopping journey.</p>
+      <br/>
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/shop">Start Shopping</a>
+    `
+    });
+
+    // SMS
+    if (phone) {
+        await sendSMS({
+            to: phone,
+            message: `Welcome ${firstName}! Thanks for joining Sarah Lawson Imports.`
+        });
+    }
+}
+
+export async function sendContactMessage(data: { name: string, email: string, subject: string, message: string }) {
+    const { name, email, subject, message } = data;
+
+    // 1. Acknowledge to User
+    await sendEmail({
+        to: email,
+        subject: `We received your message: ${subject}`,
+        html: `
+      <p>Hi ${name},</p>
+      <p>Thanks for contacting Sarah Lawson Imports.</p>
+      <p>We have received your message regarding "${subject}" and will get back to you shortly.</p>
+    `
+    });
+
+    // 2. Alert Admin
+    await sendEmail({
+        to: ADMIN_EMAIL,
+        subject: `Contact: ${subject}`,
+        html: `
+      <h1>New Contact Message</h1>
+      <p><strong>From:</strong> ${name} (${email})</p>
+      <p><strong>Subject:</strong> ${subject}</p>
+      <p><strong>Message:</strong></p>
+      <p>${message}</p>
+    `
+    });
+}

@@ -55,6 +55,16 @@ export default function ContactPage() {
         console.log('Note: contact_submissions table may not exist');
       }
 
+      // Send Contact Notification
+      fetch('/api/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'contact',
+          payload: formData
+        })
+      }).catch(err => console.error('Contact notification error:', err));
+
       setSubmitStatus('success');
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
     } catch (error) {

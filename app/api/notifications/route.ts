@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { sendOrderConfirmation, sendOrderStatusUpdate } from '@/lib/notifications';
+import { sendOrderConfirmation, sendOrderStatusUpdate, sendWelcomeMessage, sendContactMessage } from '@/lib/notifications';
 
 export async function POST(request: Request) {
     try {
@@ -19,6 +19,16 @@ export async function POST(request: Request) {
             const { order, status } = payload;
             await sendOrderStatusUpdate(order, status);
             return NextResponse.json({ success: true, message: 'Status update sent' });
+        }
+
+        if (type === 'welcome') {
+            await sendWelcomeMessage(payload);
+            return NextResponse.json({ success: true, message: 'Welcome message sent' });
+        }
+
+        if (type === 'contact') {
+            await sendContactMessage(payload);
+            return NextResponse.json({ success: true, message: 'Contact message sent' });
         }
 
         return NextResponse.json({ error: 'Invalid notification type' }, { status: 400 });
