@@ -55,7 +55,7 @@ export default function ProductCard({
 
       <div className="p-4 flex flex-col flex-grow">
         <Link href={`/product/${id}`}>
-          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-emerald-700 transition-colors h-10 lg:h-auto">
+          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-emerald-700 transition-colors h-12 lg:h-auto">
             {name}
           </h3>
         </Link>
