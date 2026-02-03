@@ -22,6 +22,7 @@ interface Customer {
     id: string;
     full_name: string;
     email: string;
+    phone?: string;
 }
 
 export default function POSPage() {
@@ -85,7 +86,7 @@ export default function POSPage() {
             // Fetch Customers (Top 50 for selection)
             const { data: custData } = await supabase
                 .from('profiles')
-                .select('id, full_name, email')
+                .select('id, full_name, email, phone')
                 .limit(50);
 
             if (custData) setCustomers(custData);
@@ -200,6 +201,30 @@ export default function POSPage() {
             // Success
             setCompletedOrder({ id: order.id, total: grandTotal, items: cart });
             setCart([]);
+
+            // Send POS Notification
+            const notifEmail = selectedCustomer ? selectedCustomer.email : guestDetails.email;
+            if (notifEmail) {
+                const notifPhone = selectedCustomer ? selectedCustomer.phone : guestDetails.phone;
+                const notifName = selectedCustomer ? (selectedCustomer.full_name || 'Customer') : guestDetails.firstName;
+
+                fetch('/api/notifications', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: 'order_created',
+                        payload: {
+                            ...order,
+                            order_number: order.id,
+                            email: notifEmail,
+                            shipping_address: {
+                                firstName: notifName.split(' ')[0],
+                                phone: notifPhone
+                            }
+                        }
+                    })
+                }).catch(err => console.error('POS Notification error:', err));
+            }
 
         } catch (error: any) {
             console.error('Checkout failed:', error);
