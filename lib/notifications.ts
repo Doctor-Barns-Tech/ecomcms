@@ -23,17 +23,40 @@ export async function sendEmail({ to, subject, html }: { to: string; subject: st
     }
 }
 
+// Helper to format phone number for SMS (Ghana specific for now)
+function formatPhoneNumber(phone: string): string {
+    // Remove all non-digit characters
+    let cleaned = phone.replace(/\D/g, '');
+
+    // If starts with 0, replace with 233
+    if (cleaned.startsWith('0')) {
+        cleaned = '233' + cleaned.substring(1);
+    }
+
+    // If starts with +, remove it (Moolre usually prefers no +)
+    if (phone.startsWith('+')) {
+        cleaned = phone.replace('+', '');
+    }
+
+    // Ensure it has country code if missing (and length is 9, e.g. 244...)
+    // But 0244 is 10 digits. 244 is 9.
+    if (cleaned.length === 9) {
+        cleaned = '233' + cleaned;
+    }
+
+    return cleaned;
+}
+
 export async function sendSMS({ to, message }: { to: string; message: string }) {
     if (!process.env.MOOLRE_API_KEY) {
         console.warn('MOOLRE_API_KEY is missing. SMS not sent.');
         return null;
     }
 
-    // Basic phone number formatting (ensure it has country code if possible, or assume Moolre handles raw)
-    // Moolre usually expects international format without + or with it, documentation doesn't specify strictly but examples show simple strings.
+    const recipient = formatPhoneNumber(to);
 
     try {
-        console.log(`Sending SMS to ${to}: ${message}`);
+        console.log(`Sending SMS to ${recipient}: ${message}`);
         const response = await fetch('https://api.moolre.com/open/sms/send', {
             method: 'POST',
             headers: {
@@ -42,10 +65,10 @@ export async function sendSMS({ to, message }: { to: string; message: string }) 
             },
             body: JSON.stringify({
                 type: 1,
-                senderid: 'SarahLawson', // Max 11 chars
+                senderid: 'Standard', // Use a generic/short name. Max 11 chars.
                 messages: [
                     {
-                        recipient: to,
+                        recipient: recipient,
                         message: message
                     }
                 ]
