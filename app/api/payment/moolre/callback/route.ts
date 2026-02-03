@@ -10,6 +10,8 @@ const supabase = createClient(
 export async function POST(req: Request) {
     try {
         const body = await req.json();
+        const requestUrl = new URL(req.url);
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || requestUrl.origin;
 
         console.log('Moolre Callback Received:', body);
 
@@ -54,7 +56,7 @@ export async function POST(req: Request) {
             }
 
             // Send order confirmation notification
-            fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/notifications`, {
+            fetch(`${baseUrl}/api/notifications`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

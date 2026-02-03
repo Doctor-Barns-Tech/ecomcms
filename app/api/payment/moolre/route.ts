@@ -15,7 +15,8 @@ export async function POST(req: Request) {
             return NextResponse.json({ success: false, message: 'Payment gateway configuration error' }, { status: 500 });
         }
 
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const requestUrl = new URL(req.url);
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || requestUrl.origin;
 
         // Moolre Payload
         const payload = {
