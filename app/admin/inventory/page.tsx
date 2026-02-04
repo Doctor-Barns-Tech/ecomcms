@@ -124,14 +124,14 @@ export default function InventoryManagementPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Inventory Management</h1>
-            <p className="text-gray-600 mt-2">Track stock levels, manage reorders, and forecast demand</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Inventory Management</h1>
+            <p className="text-gray-600 mt-1 md:mt-2 text-sm md:text-base">Track stock levels, manage reorders, and forecast demand</p>
           </div>
           <Link
             href="/admin"
-            className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap"
+            className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap text-center"
           >
             Back to Dashboard
           </Link>
@@ -209,8 +209,8 @@ export default function InventoryManagementPage() {
                     key={filter}
                     onClick={() => setStockFilter(filter)}
                     className={`px-4 py-2 rounded-md font-medium text-sm transition-colors whitespace-nowrap cursor-pointer ${stockFilter === filter
-                        ? 'bg-white text-gray-900 shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
                       }`}
                   >
                     {filter === 'all' && 'All'}
