@@ -250,22 +250,25 @@ export default function AdminOrdersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Orders</h1>
           <p className="text-gray-600 mt-1">Manage and track all customer orders</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 w-full md:w-auto">
           <button
             onClick={() => setShowProductStats(true)}
-            className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer shadow-sm"
+            className="flex-1 md:flex-none bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer shadow-sm flex items-center justify-center"
           >
             <i className="ri-bar-chart-groupped-line mr-2"></i>
-            Sales Stats
+            Stats
           </button>
-          <button onClick={handleExportAll} className="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer shadow-sm">
+          <button
+            onClick={handleExportAll}
+            className="flex-1 md:flex-none bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer shadow-sm flex items-center justify-center"
+          >
             <i className="ri-download-line mr-2"></i>
-            Export Orders
+            Export
           </button>
         </div>
       </div>
