@@ -1,194 +1,151 @@
-"use client";
+'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useCMS } from '@/context/CMSContext';
-import { supabase } from '@/lib/supabase';
 
 export default function AboutPage() {
-  const { getSetting, getContent } = useCMS();
+  const { getSetting } = useCMS();
   const [activeTab, setActiveTab] = useState('story');
-  const [pageContent, setPageContent] = useState<any>(null);
 
-  useEffect(() => {
-    async function fetchAboutContent() {
-      const { data } = await supabase
-        .from('cms_content')
-        .select('*')
-        .eq('section', 'about')
-        .eq('block_key', 'main')
-        .single();
-
-      if (data) {
-        setPageContent(data);
-      }
-    }
-    fetchAboutContent();
-  }, []);
-
-  const siteName = getSetting('site_name') || 'StandardStore';
+  const siteName = getSetting('site_name') || 'Sarah Lawson Imports';
 
   const values = [
     {
-      icon: 'ri-leaf-line',
-      title: 'Sustainability',
-      description: 'We source responsibly and partner with eco-conscious brands to minimise our environmental footprint.'
+      icon: 'ri-verified-badge-line',
+      title: 'Authenticity',
+      description: 'Handpicked by Sarah herself. We document the sourcing journey so you know exactly what you are buying.'
     },
     {
-      icon: 'ri-hand-heart-line',
-      title: 'Quality First',
-      description: 'Every product is carefully curated and tested to ensure it meets our premium standards.'
+      icon: 'ri-money-dollar-circle-line',
+      title: 'Unbeatable Value',
+      description: 'Direct from the factory to you. We cut out the middleman to offer premium quality at wholesale prices.'
+    },
+    {
+      icon: 'ri-star-smile-line',
+      title: 'Quality Assured',
+      description: 'Sarah inspects products personally. If it doesn’t meet her standards, it doesn’t make it to the store.'
     },
     {
       icon: 'ri-group-line',
-      title: 'Community',
-      description: 'We believe in building lasting relationships with our customers and supporting local artisans.'
-    },
-    {
-      icon: 'ri-shield-check-line',
-      title: 'Transparency',
-      description: 'Honest communication, fair pricing, and ethical practices guide everything we do.'
+      title: 'Community First',
+      description: 'Built on trust and connection. We listen to our followers and find the products you actually want.'
     }
   ];
-
-  const team = [
-    {
-      name: 'Kwame Mensah',
-      role: 'Founder & CEO',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop',
-      bio: 'With over 15 years in retail and ecommerce, Kwame founded our company to bring premium products to Ghana.'
-    },
-    {
-      name: 'Ama Osei',
-      role: 'Head of Operations',
-      image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=500&fit=crop',
-      bio: 'Ama ensures every order is fulfilled perfectly and our customers receive exceptional service.'
-    },
-    {
-      name: 'Yaw Darko',
-      role: 'Product Curator',
-      image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=500&fit=crop',
-      bio: 'Yaw travels the world discovering unique, high-quality products for our discerning customers.'
-    },
-    {
-      name: 'Efua Asante',
-      role: 'Customer Experience',
-      image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=500&fit=crop',
-      bio: 'Efua leads our support team, ensuring every customer interaction exceeds expectations.'
-    }
-  ];
-
-  const milestones = [
-    { year: '2018', event: 'Company founded with a vision to revolutionise online shopping in Ghana' },
-    { year: '2019', event: 'Launched our first collection with 50 carefully curated products' },
-    { year: '2020', event: 'Reached 10,000 happy customers and expanded our warehouse' },
-    { year: '2021', event: 'Introduced same-day delivery in Accra and opened our second fulfilment centre' },
-    { year: '2022', event: 'Partnered with 100+ premium brands and launched our loyalty programme' },
-    { year: '2023', event: 'Expanded nationwide delivery and won Best Ecommerce Platform award' },
-    { year: '2024', event: 'Serving 100,000+ customers with 500+ premium products' }
-  ];
-
-  // Use CMS content if available, otherwise use defaults
-  const heroTitle = pageContent?.title || 'Redefining Premium Shopping in Ghana';
-  const heroSubtitle = pageContent?.subtitle || "We're more than just an online store.";
-  const heroContent = pageContent?.content || "We're a curated marketplace bringing the world's finest products to your doorstep, backed by exceptional service and genuine care.";
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-gradient-to-br from-emerald-50 via-white to-amber-50 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6">
-              {heroTitle}
-            </h1>
-            <p className="text-xl text-gray-600 leading-relaxed">
-              {heroSubtitle} {heroContent}
-            </p>
-          </div>
+      {/* Hero Section */}
+      <div className="relative bg-emerald-900 overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          {/* Pattern or Background Image */}
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+        </div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+            More Than Just An Influencer
+          </h1>
+          <p className="text-xl md:text-2xl text-emerald-100 max-w-3xl mx-auto leading-relaxed">
+            Welcome to Sarah Lawson Imports. Where social media meets smart business, and premium quality meets unbeatable prices.
+          </p>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="flex border-b border-gray-200 mb-12">
+        <div className="flex border-b border-gray-200 mb-12 justify-center">
           <button
             onClick={() => setActiveTab('story')}
-            className={`px-6 py-4 font-medium transition-colors cursor-pointer ${activeTab === 'story'
-                ? 'text-emerald-700 border-b-2 border-emerald-700'
-                : 'text-gray-500 hover:text-gray-700'
+            className={`px-8 py-4 font-medium transition-colors text-lg cursor-pointer ${activeTab === 'story'
+              ? 'text-emerald-700 border-b-4 border-emerald-700 font-bold'
+              : 'text-gray-500 hover:text-gray-700'
               }`}
           >
-            Our Story
+            Sarah's Story
           </button>
           <button
             onClick={() => setActiveTab('mission')}
-            className={`px-6 py-4 font-medium transition-colors cursor-pointer ${activeTab === 'mission'
-                ? 'text-emerald-700 border-b-2 border-emerald-700'
-                : 'text-gray-500 hover:text-gray-700'
+            className={`px-8 py-4 font-medium transition-colors text-lg cursor-pointer ${activeTab === 'mission'
+              ? 'text-emerald-700 border-b-4 border-emerald-700 font-bold'
+              : 'text-gray-500 hover:text-gray-700'
               }`}
           >
-            Mission & Vision
+            Our Mission
           </button>
         </div>
 
         {activeTab === 'story' && (
-          <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="grid md:grid-cols-2 gap-16 items-center animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">How It All Began</h2>
-              <div className="space-y-4 text-gray-600 leading-relaxed">
+              <h2 className="text-4xl font-bold text-gray-900 mb-6">From TikTok to Global Trade</h2>
+              <div className="space-y-6 text-lg text-gray-600 leading-relaxed">
                 <p>
-                  {siteName} was founded with a simple mission: to bring premium quality products to customers who value both quality and convenience.
+                  You might know <strong>Sarah Lawson</strong> as one of the biggest personalities on Snapchat and TikTok, lighting up your feed with energy and style. But behind the camera, she is a sharp, driven businesswoman with a vision.
                 </p>
                 <p>
-                  We saw a gap in the market for a curated shopping experience that combines world-class products with exceptional local service.
+                  Sarah realized that her followers wanted access to the same high-quality products she used, but often couldn't find them at affordable prices. Frustrated by overpriced local options, she decided to take matters into her own hands.
                 </p>
                 <p>
-                  Today, we serve thousands of customers, offering carefully selected products. But our mission remains unchanged: to delight every customer, every time.
+                  <strong>Sarah Lawson Imports</strong> was born from this commitment. Sarah travels directly to China, navigating factories and markets to hand-select products. By managing the supply chain herself, she ensures that every item is not only stylish and durable but also available at a price point that makes sense for everyone.
                 </p>
               </div>
             </div>
-            <div className="relative h-96 rounded-2xl overflow-hidden shadow-2xl">
-              <img
-                src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&h=600&fit=crop"
-                alt="Our warehouse"
-                className="w-full h-full object-cover"
-              />
+            <div className="relative">
+              <div className="aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl bg-gray-100 relative">
+                {/* 
+                   USER ACTION REQUIRED: 
+                   Replace the src beneath with the actual image of Sarah Lawson.
+                   Example: src="/images/sarah-profile.jpg"
+                */}
+                <img
+                  src="/sarah-lawson.jpeg"
+                  alt="Sarah Lawson - Founder"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-8">
+                  <p className="text-white font-bold text-xl">Sarah Lawson</p>
+                  <p className="text-emerald-200">Founder & CEO</p>
+                </div>
+              </div>
+              {/* Decorative Element */}
+              <div className="absolute -z-10 top-10 -right-10 w-full h-full border-4 border-emerald-100 rounded-2xl hidden md:block"></div>
             </div>
           </div>
         )}
 
         {activeTab === 'mission' && (
-          <div className="grid md:grid-cols-2 gap-12">
-            <div className="bg-emerald-50 p-8 rounded-2xl">
-              <div className="w-12 h-12 bg-emerald-700 rounded-full flex items-center justify-center mb-6">
-                <i className="ri-compass-3-line text-2xl text-white"></i>
+          <div className="grid md:grid-cols-2 gap-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="bg-emerald-50 p-10 rounded-3xl border border-emerald-100">
+              <div className="w-16 h-16 bg-emerald-700 rounded-2xl flex items-center justify-center mb-8 shadow-lg">
+                <i className="ri-plane-line text-3xl text-white"></i>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Our Mission</h3>
-              <p className="text-gray-600 leading-relaxed">
-                To provide seamless access to premium products, delivered with exceptional service, transparent pricing, and a commitment to sustainability. We exist to make premium shopping accessible, reliable, and delightful.
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">Direct Sourcing</h3>
+              <p className="text-gray-600 text-lg leading-relaxed">
+                We believe in going to the source. By visiting China personally, Sarah eliminates the middlemen who inflate prices. This hands-on approach guarantees that you aren't paying for invisible markups—just great products.
               </p>
             </div>
-            <div className="bg-amber-50 p-8 rounded-2xl">
-              <div className="w-12 h-12 bg-amber-600 rounded-full flex items-center justify-center mb-6">
-                <i className="ri-eye-line text-2xl text-white"></i>
+            <div className="bg-amber-50 p-10 rounded-3xl border border-amber-100">
+              <div className="w-16 h-16 bg-amber-600 rounded-2xl flex items-center justify-center mb-8 shadow-lg">
+                <i className="ri-heart-line text-3xl text-white"></i>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Our Vision</h3>
-              <p className="text-gray-600 leading-relaxed">
-                To become the most trusted premium ecommerce platform, setting new standards for quality, service, and customer experience. We envision a future where everyone has access to the world's best products, delivered with care.
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">Quality For Everyone</h3>
+              <p className="text-gray-600 text-lg leading-relaxed">
+                "Luxury" shouldn't be exclusive. Our mission is to democratize access to quality goods. Whether it's skincare, fashion, or home essentials, we believe everyone deserves the best, regardless of their budget.
               </p>
             </div>
           </div>
         )}
       </div>
 
-      <div className="bg-gray-50 py-20">
+      {/* Values Section */}
+      <div className="bg-gray-50 py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Core Values</h2>
-            <p className="text-xl text-gray-600">Principles that guide everything we do</p>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Shop With Sarah?</h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">It's not just a store; it's a personal guarantee of quality and value.</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {values.map((value, index) => (
-              <div key={index} className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-lg transition-shadow">
+              <div key={index} className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                 <div className="w-14 h-14 bg-emerald-100 rounded-full flex items-center justify-center mb-6">
                   <i className={`${value.icon} text-2xl text-emerald-700`}></i>
                 </div>
@@ -200,32 +157,16 @@ export default function AboutPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="grid md:grid-cols-3 gap-8 text-center">
-          <div>
-            <div className="text-5xl font-bold text-emerald-700 mb-2">100K+</div>
-            <p className="text-gray-600 font-medium">Happy Customers</p>
-          </div>
-          <div>
-            <div className="text-5xl font-bold text-emerald-700 mb-2">500+</div>
-            <p className="text-gray-600 font-medium">Premium Products</p>
-          </div>
-          <div>
-            <div className="text-5xl font-bold text-emerald-700 mb-2">99.2%</div>
-            <p className="text-gray-600 font-medium">Satisfaction Rate</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-gradient-to-br from-amber-50 to-emerald-50 py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold text-gray-900 mb-6">Join Our Journey</h2>
-          <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-            Every order you place supports our mission to bring premium products and exceptional service. Thank you for being part of our story.
+      {/* CTA */}
+      <div className="bg-emerald-900 py-24">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+          <h2 className="text-4xl md:text-5xl font-bold mb-8">Ready to experience the difference?</h2>
+          <p className="text-xl text-emerald-100 mb-10 leading-relaxed max-w-2xl mx-auto">
+            Join thousands of happy customers who trust Sarah Lawson Imports for their lifestyle needs.
           </p>
           <Link
             href="/shop"
-            className="inline-flex items-center gap-2 bg-emerald-700 text-white px-8 py-4 rounded-full font-medium hover:bg-emerald-800 transition-colors whitespace-nowrap"
+            className="inline-flex items-center gap-3 bg-white text-emerald-900 px-10 py-5 rounded-full font-bold text-lg hover:bg-emerald-50 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
           >
             Start Shopping
             <i className="ri-arrow-right-line"></i>
