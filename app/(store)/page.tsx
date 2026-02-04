@@ -167,7 +167,7 @@ export default function HomePage() {
                 </span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl lg:text-6xl xl:text-7xl font-bold text-gray-900 leading-tight">
+              <h1 className="text-3xl sm:text-4xl lg:text-4xl xl:text-5xl font-bold text-gray-900 leading-tight">
                 {config.hero.headline}
               </h1>
 
