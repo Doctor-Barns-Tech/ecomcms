@@ -15,8 +15,8 @@ export default function HomePage() {
   // Config State - Managed in Code
   const config = {
     hero: {
-      headline: 'Handpicked by Sarah. Priced for You.',
-      subheadline: 'From global factories to your doorstep. Experience premium quality without the premium markup.',
+      headline: 'Mannequins, Kitchen Essentials, Electronics & Dresses — All In One Store',
+      subheadline: 'Sarah Lawson Imports brings you China-sourced products with verified quality and unbeatable pricing perfect for homes, small businesses, and resellers.',
       primaryButtonText: 'Shop Collections',
       primaryButtonLink: '/shop',
       secondaryButtonText: 'Our Story',
