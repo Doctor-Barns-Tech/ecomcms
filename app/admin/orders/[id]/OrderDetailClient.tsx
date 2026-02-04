@@ -46,7 +46,10 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
             quantity,
             unit_price,
             total_price,
-            metadata
+            metadata,
+            products (
+              product_images (url)
+            )
           )
         `)
         .eq('id', orderId);
@@ -68,7 +71,10 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
               quantity,
               unit_price,
               total_price,
-              metadata
+              metadata,
+              products (
+                product_images (url)
+              )
             )
           `)
           .eq('order_number', orderId)
@@ -121,6 +127,31 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
         notes: adminNotes,
         metadata: { ...order.metadata, tracking_number: trackingNumber }
       });
+
+      // Send Notification (Email + SMS)
+      // Only send if status changed OR tracking number was added/changed
+      const statusChanged = statusToUpdate !== order.status;
+      const trackingChanged = trackingNumber !== order.metadata?.tracking_number;
+
+      if (statusChanged || (trackingChanged && trackingNumber)) {
+        fetch('/api/notifications', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'order_status',
+            payload: {
+              email: order.email,
+              name: customerName,
+              orderId: orderId, // This might be UUID, better use order.order_number if available
+              orderNumber: order.order_number || orderId,
+              status: statusToUpdate,
+              trackingNumber: trackingNumber,
+              phone: shippingAddress.phone || order.phone // Ensure phone is passed for SMS
+            }
+          })
+        }).catch(err => console.error('Notification error:', err));
+      }
+
       alert('Order updated successfully');
       setShowStatusMenu(false);
     } catch (err) {
@@ -185,9 +216,16 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
               <div className="space-y-4">
                 {order.order_items?.map((item: any) => (
                   <div key={item.id} className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
-                    <div className="w-20 h-20 bg-white rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center">
-                      {/* Placeholder image since not stored in order items usually, unless joined from products */}
-                      <i className="ri-image-line text-2xl text-gray-300"></i>
+                    <div className="w-20 h-20 bg-white rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center relative">
+                      {item.products?.product_images?.[0]?.url ? (
+                        <img
+                          src={item.products.product_images[0].url}
+                          alt={item.product_name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <i className="ri-image-line text-2xl text-gray-300"></i>
+                      )}
                     </div>
                     <div className="flex-1">
                       <h3 className="font-semibold text-gray-900 mb-1">{item.product_name}</h3>

@@ -113,7 +113,8 @@ export default function AdminDashboard() {
 
         if (recentOrdersData) {
           const formattedRecent = recentOrdersData.map(o => ({
-            id: o.order_number, // Display friendly ID
+            id: o.id, // Use UUID for link
+            displayId: o.order_number, // Display friendly ID
             customer: o.email.split('@')[0], // Fallback name
             email: o.email,
             date: new Date(o.created_at).toLocaleDateString(),
@@ -250,7 +251,7 @@ export default function AdminDashboard() {
                       <tr key={order.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                         <td className="py-4 px-4">
                           <Link href={`/admin/orders/${order.id}`} className="text-emerald-700 hover:text-emerald-800 font-medium whitespace-nowrap cursor-pointer">
-                            {order.id}
+                            {order.displayId}
                           </Link>
                         </td>
                         <td className="py-4 px-4">
