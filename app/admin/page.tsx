@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function AdminDashboard() {
   const [dateRange, setDateRange] = useState('7days'); // logic not implemented for this demo, just UI
@@ -47,6 +48,7 @@ export default function AdminDashboard() {
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
   const [lowStockProducts, setLowStockProducts] = useState<any[]>([]);
   const [topProducts, setTopProducts] = useState<any[]>([]);
+  const [chartData, setChartData] = useState<any[]>([]);
 
   useEffect(() => {
     async function fetchDashboardData() {
@@ -68,6 +70,31 @@ export default function AdminDashboard() {
         // We'll use unique emails from orders as a proxy for "Customers"
         const uniqueCustomers = new Set(ordersData?.map(o => o.email)).size;
 
+
+        // Process Chart Data (Last 7 Days)
+        const last7Days = Array.from({ length: 7 }, (_, i) => {
+          const d = new Date();
+          d.setDate(d.getDate() - (6 - i));
+          return d.toISOString().split('T')[0];
+        });
+
+        const chartMap = last7Days.reduce((acc: any, date) => {
+          acc[date] = 0;
+          return acc;
+        }, {});
+
+        ordersData?.forEach(order => {
+          const date = new Date(order.created_at).toISOString().split('T')[0];
+          if (chartMap[date] !== undefined) {
+            chartMap[date] += (order.total || 0);
+          }
+        });
+
+        const processedChartData = Object.keys(chartMap).map(date => ({
+          date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          revenue: chartMap[date]
+        }));
+        setChartData(processedChartData);
 
         setStats([
           {
@@ -221,6 +248,76 @@ export default function AdminDashboard() {
               <p className="text-gray-600 text-sm">{stat.title}</p>
             </div>
           ))}
+        </div>
+
+        {/* Revenue Chart & Quick Actions */}
+        <div className="grid lg:grid-cols-3 gap-6 mb-8">
+          <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-900">Revenue Trend</h2>
+              <select
+                className="bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block p-2"
+                value={dateRange}
+                onChange={(e) => setDateRange(e.target.value)}
+              >
+                <option value="7days">Last 7 Days</option>
+                <option value="30days">Last 30 Days</option>
+              </select>
+            </div>
+            <div className="h-80 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.1} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} tickFormatter={(value) => `GH₵${value}`} />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                    formatter={(value: number) => [`GH₵${value.toFixed(2)}`, 'Revenue']}
+                  />
+                  <Area type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
+            <div className="space-y-3">
+              <Link href="/admin/products/new" className="flex items-center justify-between p-4 bg-gray-50 hover:bg-emerald-50 text-gray-700 hover:text-emerald-700 rounded-lg transition-colors group">
+                <div className="flex items-center font-medium">
+                  <span className="w-8 h-8 rounded-full bg-white flex items-center justify-center mr-3 group-hover:bg-emerald-100 transition-colors shadow-sm">
+                    <i className="ri-add-line"></i>
+                  </span>
+                  Add Product
+                </div>
+                <i className="ri-arrow-right-line"></i>
+              </Link>
+              <Link href="/admin/pos" className="flex items-center justify-between p-4 bg-gray-50 hover:bg-emerald-50 text-gray-700 hover:text-emerald-700 rounded-lg transition-colors group">
+                <div className="flex items-center font-medium">
+                  <span className="w-8 h-8 rounded-full bg-white flex items-center justify-center mr-3 group-hover:bg-emerald-100 transition-colors shadow-sm">
+                    <i className="ri-computer-line"></i>
+                  </span>
+                  Open POS
+                </div>
+                <i className="ri-arrow-right-line"></i>
+              </Link>
+              <Link href="/admin/orders" className="flex items-center justify-between p-4 bg-gray-50 hover:bg-emerald-50 text-gray-700 hover:text-emerald-700 rounded-lg transition-colors group">
+                <div className="flex items-center font-medium">
+                  <span className="w-8 h-8 rounded-full bg-white flex items-center justify-center mr-3 group-hover:bg-emerald-100 transition-colors shadow-sm">
+                    <i className="ri-file-list-line"></i>
+                  </span>
+                  Manage Orders
+                </div>
+                <i className="ri-arrow-right-line"></i>
+              </Link>
+            </div>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6 mb-8">
