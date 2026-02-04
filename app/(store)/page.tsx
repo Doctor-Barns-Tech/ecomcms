@@ -188,18 +188,29 @@ export default function HomePage() {
               </div>
 
               {/* Stats - Hidden on very small screens if needed, or grid adjusted */}
-              <div className="grid grid-cols-3 gap-4 lg:gap-6 pt-6 lg:pt-8 border-t border-gray-100 lg:border-gray-200">
-                <div>
-                  <p className="text-2xl lg:text-3xl font-bold text-gray-900">500+</p>
-                  <p className="text-xs lg:text-sm text-gray-600 mt-1 font-medium">Products</p>
+              <div className="grid grid-cols-3 gap-4 lg:gap-6 pt-8 border-t border-gray-100 lg:border-gray-200">
+                <div className="flex flex-col items-center lg:items-start text-center lg:text-left group cursor-default">
+                  <div className="w-10 h-10 mb-2 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center group-hover:bg-emerald-100 transition-colors">
+                    <i className="ri-plane-line text-xl"></i>
+                  </div>
+                  <p className="font-bold text-gray-900 leading-tight">Direct Import</p>
+                  <p className="text-xs text-gray-500 mt-1">Sourced from China</p>
                 </div>
-                <div>
-                  <p className="text-2xl lg:text-3xl font-bold text-gray-900">50K+</p>
-                  <p className="text-xs lg:text-sm text-gray-600 mt-1 font-medium">Customers</p>
+
+                <div className="flex flex-col items-center lg:items-start text-center lg:text-left group cursor-default">
+                  <div className="w-10 h-10 mb-2 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                    <i className="ri-shield-check-line text-xl"></i>
+                  </div>
+                  <p className="font-bold text-gray-900 leading-tight">Verified Quality</p>
+                  <p className="text-xs text-gray-500 mt-1">Inspected by hand</p>
                 </div>
-                <div>
-                  <p className="text-2xl lg:text-3xl font-bold text-gray-900">4.9★</p>
-                  <p className="text-xs lg:text-sm text-gray-600 mt-1 font-medium">Rating</p>
+
+                <div className="flex flex-col items-center lg:items-start text-center lg:text-left group cursor-default">
+                  <div className="w-10 h-10 mb-2 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center group-hover:bg-amber-100 transition-colors">
+                    <i className="ri-price-tag-3-line text-xl"></i>
+                  </div>
+                  <p className="font-bold text-gray-900 leading-tight">Best Prices</p>
+                  <p className="text-xs text-gray-500 mt-1">Unbeatable value</p>
                 </div>
               </div>
             </div>
