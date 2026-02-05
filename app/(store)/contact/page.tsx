@@ -84,6 +84,12 @@ export default function ContactPage() {
   const heroSubtitle = pageContent?.subtitle || 'Have a question or need assistance?';
   const heroContent = pageContent?.content || 'Our friendly team is here to help. Reach out through any of our contact channels.';
 
+  const teamContacts = [
+    { name: 'Main Line', phone: '0546014734', role: '' },
+    { name: 'David', phone: '0598922769', role: 'Manager' },
+    { name: 'Caleb', phone: '0592028581', role: 'PR' },
+  ];
+
   const contactMethods = [
     {
       icon: 'ri-phone-line',
@@ -103,7 +109,7 @@ export default function ContactPage() {
       icon: 'ri-whatsapp-line',
       title: 'WhatsApp',
       value: contactPhone,
-      link: `https://wa.me/${contactPhone.replace(/\s/g, '').replace('+', '')}`,
+      link: `https://wa.me/233${contactPhone.replace(/^0/, '')}`,
       description: 'Chat with us instantly'
     },
     {
@@ -155,6 +161,44 @@ export default function ContactPage() {
               <p className="text-sm text-gray-500">{method.description}</p>
             </a>
           ))}
+        </div>
+
+        {/* Direct Phone Lines */}
+        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 rounded-2xl p-8 mb-16">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Reach Our Team Directly</h2>
+          <p className="text-gray-600 mb-6">Call or WhatsApp any of our team members</p>
+          <div className="grid sm:grid-cols-3 gap-4">
+            {teamContacts.map((contact, index) => (
+              <div key={index} className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
+                    <i className={`${index === 0 ? 'ri-phone-line' : 'ri-user-line'} text-lg text-emerald-700`}></i>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">{contact.name}</p>
+                    {contact.role && <p className="text-xs text-emerald-600 font-medium">{contact.role}</p>}
+                  </div>
+                </div>
+                <p className="text-gray-800 font-medium mb-3">{contact.phone}</p>
+                <div className="flex gap-2">
+                  <a
+                    href={`tel:${contact.phone}`}
+                    className="flex-1 flex items-center justify-center gap-1.5 bg-emerald-700 text-white py-2 rounded-lg text-sm font-medium hover:bg-emerald-800 transition-colors"
+                  >
+                    <i className="ri-phone-line"></i> Call
+                  </a>
+                  <a
+                    href={`https://wa.me/233${contact.phone.replace(/^0/, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 flex items-center justify-center gap-1.5 bg-green-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+                  >
+                    <i className="ri-whatsapp-line"></i> WhatsApp
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12">
@@ -298,7 +342,7 @@ export default function ContactPage() {
                 Our customer support team is available Monday to Friday, 8am-6pm GMT. For urgent matters, reach out via WhatsApp.
               </p>
               <a
-                href={`https://wa.me/${contactPhone.replace(/\s/g, '').replace('+', '')}`}
+                href={`https://wa.me/233${contactPhone.replace(/^0/, '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-white text-emerald-700 px-6 py-3 rounded-full font-medium hover:bg-emerald-50 transition-colors whitespace-nowrap"
