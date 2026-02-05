@@ -116,7 +116,7 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
               </div>
 
               <p className="text-sm text-gray-600 mb-4 text-center">
-                Shipping and taxes calculated at checkout
+                Shipping calculated at checkout
               </p>
 
               <div className="space-y-3">

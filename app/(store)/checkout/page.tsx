@@ -62,7 +62,7 @@ export default function CheckoutPage() {
   // Calculate Totals
   const subtotal = cartSubtotal;
   const shippingCost = deliveryMethod === 'express' ? 25 : deliveryMethod === 'standard' ? 15 : 0;
-  const tax = subtotal * 0.125; // 12.5% Tax
+  const tax = 0; // No Tax
   const total = subtotal + shippingCost + tax;
 
   const validateShipping = () => {
