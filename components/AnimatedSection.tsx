@@ -8,7 +8,6 @@ interface AnimatedSectionProps {
   animation?: 'fade-up' | 'fade-left' | 'fade-right' | 'scale' | 'fade';
   delay?: number;
   threshold?: number;
-  as?: keyof JSX.IntrinsicElements;
 }
 
 export default function AnimatedSection({
@@ -17,7 +16,6 @@ export default function AnimatedSection({
   animation = 'fade-up',
   delay = 0,
   threshold = 0.1,
-  as: Component = 'div'
 }: AnimatedSectionProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
