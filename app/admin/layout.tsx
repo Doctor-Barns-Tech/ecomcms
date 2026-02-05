@@ -172,6 +172,11 @@ export default function AdminLayout({
       path: '/admin/analytics'
     },
     {
+      title: 'Traffic',
+      icon: 'ri-line-chart-line',
+      path: '/admin/traffic'
+    },
+    {
       title: 'Coupons',
       icon: 'ri-coupon-2-line',
       path: '/admin/coupons'
