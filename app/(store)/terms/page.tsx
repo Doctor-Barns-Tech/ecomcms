@@ -139,15 +139,11 @@ export default function TermsPage() {
               <ul className="space-y-2 text-gray-600">
                 <li className="flex items-center gap-2">
                   <i className="ri-smartphone-line text-emerald-700"></i>
-                  <span>Mobile Money (MTN, Vodafone, AirtelTigo)</span>
+                  <span>Mobile Money (MTN, Vodafone, AirtelTigo) via Moolre</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <i className="ri-bank-card-line text-emerald-700"></i>
-                  <span>Credit/Debit Cards (Visa, Mastercard)</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <i className="ri-hand-coin-line text-emerald-700"></i>
-                  <span>Cash on Delivery (for orders under GHS 1,000)</span>
+                  <span>Credit/Debit Cards (Visa, Mastercard) via Moolre</span>
                 </li>
               </ul>
             </div>

@@ -532,43 +532,19 @@ export default function CheckoutPage() {
               <div className="bg-white rounded-xl shadow-sm p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-6">Payment Method</h2>
                 <div className="space-y-4">
-                  <label className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-colors ${paymentMethod === 'moolre' ? 'border-emerald-700 bg-emerald-50' : 'border-gray-300 hover:border-gray-400'
-                    }`}>
+                  {/* Moolre Payment - Only active payment method */}
+                  <div className="flex items-center justify-between p-4 border-2 border-emerald-700 bg-emerald-50 rounded-lg">
                     <div className="flex items-center space-x-4">
-                      <input
-                        type="radio"
-                        name="payment"
-                        value="moolre"
-                        checked={paymentMethod === 'moolre'}
-                        onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="w-5 h-5 text-emerald-700"
-                      />
+                      <div className="w-5 h-5 rounded-full border-2 border-emerald-700 flex items-center justify-center">
+                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-700"></div>
+                      </div>
                       <div>
                         <p className="font-semibold text-gray-900">Moolre Payment</p>
                         <p className="text-sm text-gray-600">Mobile money & card payments</p>
                       </div>
                     </div>
                     <i className="ri-smartphone-line text-2xl text-emerald-700"></i>
-                  </label>
-
-                  <label className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-colors ${paymentMethod === 'paystack' ? 'border-emerald-700 bg-emerald-50' : 'border-gray-300 hover:border-gray-400'
-                    }`}>
-                    <div className="flex items-center space-x-4">
-                      <input
-                        type="radio"
-                        name="payment"
-                        value="paystack"
-                        checked={paymentMethod === 'paystack'}
-                        onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="w-5 h-5 text-emerald-700"
-                      />
-                      <div>
-                        <p className="font-semibold text-gray-900">Paystack</p>
-                        <p className="text-sm text-gray-600">Secure card payment</p>
-                      </div>
-                    </div>
-                    <i className="ri-bank-card-line text-2xl text-emerald-700"></i>
-                  </label>
+                  </div>
 
 
                 </div>

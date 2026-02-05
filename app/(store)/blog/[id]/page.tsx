@@ -43,8 +43,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ id: s
         <ul>
           <li><strong>Mobile Money:</strong> MTN, Vodafone, and AirtelTigo offer convenient payment options</li>
           <li><strong>Credit/Debit Cards:</strong> Visa and Mastercard are widely accepted</li>
-          <li><strong>Cash on Delivery:</strong> Pay when you receive your order (usually available for orders under GHS 1,000)</li>
-          <li><strong>Bank Transfer:</strong> Some stores accept direct bank deposits</li>
+          <li><strong>Moolre Payment:</strong> Our integrated payment gateway for seamless mobile money and card payments</li>
         </ul>
 
         <p>Always ensure you're on a secure connection when entering payment details. Avoid using public Wi-Fi for transactions.</p>

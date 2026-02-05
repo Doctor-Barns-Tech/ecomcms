@@ -126,7 +126,7 @@ export default function ContactPage() {
     },
     {
       question: 'What payment methods do you accept?',
-      answer: 'We accept mobile money (MTN, Vodafone, AirtelTigo), credit/debit cards, and cash on delivery.'
+      answer: 'We accept mobile money (MTN, Vodafone, AirtelTigo) and credit/debit cards through our secure Moolre payment gateway.'
     }
   ];
 
