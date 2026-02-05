@@ -135,30 +135,38 @@ export default function HomePage() {
 
       {/* Hero Section */}
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-b from-stone-50 to-white overflow-hidden pb-12 lg:pb-0">
-        {/* Decorative Blobs */}
-        <div className="absolute inset-0 opacity-30 pointer-events-none">
+      <section className="relative w-full overflow-hidden lg:bg-gradient-to-b lg:from-stone-50 lg:via-white lg:to-cream-50">
+
+        {/* Mobile: Full Background Image with Gradient Overlay */}
+        <div className="absolute inset-0 lg:hidden z-0">
+          <img
+            src={getHeroImage()}
+            className="w-full h-full object-cover transition-opacity duration-1000"
+            alt="Hero Background"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10"></div>
+        </div>
+
+        {/* Desktop Blobs */}
+        <div className="hidden lg:block absolute inset-0 opacity-30 pointer-events-none">
           <div className="absolute -top-20 -right-20 w-96 h-96 bg-emerald-100/50 rounded-full blur-3xl"></div>
           <div className="absolute top-40 -left-20 w-72 h-72 bg-amber-50 rounded-full blur-3xl"></div>
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-8 lg:py-24">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 h-[85vh] lg:h-auto lg:py-24 flex flex-col justify-end lg:block pb-16 lg:pb-0">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
 
-            {/* Image Section - Mobile: Top */}
-            <div className="order-first lg:order-last relative">
-              <div className="relative aspect-[3/4] lg:aspect-auto lg:h-[650px] overflow-hidden rounded-t-[2.5rem] lg:rounded-[2rem] shadow-xl">
+            {/* Desktop: Image Layout (Hidden on Mobile) */}
+            <div className="hidden lg:block order-last relative">
+              <div className="relative aspect-[3/4] lg:aspect-auto lg:h-[650px] overflow-hidden rounded-[2rem] shadow-xl">
                 <img
                   src={getHeroImage()}
                   alt="Hero Image"
                   className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-1000"
                 />
 
-                {/* Mobile-only overlay gradient for better text integration if needed, usually cleaner without */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent lg:hidden pointer-events-none"></div>
-
                 {/* Floating Badge (Desktop Only) */}
-                <div className="hidden lg:block absolute bottom-10 left-10 bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-2xl max-w-xs z-20 border border-white/50">
+                <div className="absolute bottom-10 left-10 bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-2xl max-w-xs z-20 border border-white/50">
                   <p className="font-serif text-emerald-800 text-lg italic mb-1">Exclusive Offer</p>
                   <p className="text-3xl font-bold text-gray-900 mb-1">25% Off</p>
                   <p className="text-sm text-gray-600 font-medium">On your first dedicated order</p>
@@ -166,54 +174,49 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Content Section - Mobile: Bottom */}
-            <div className="relative z-10 text-center lg:text-left pt-2 lg:pt-0">
-              <div className="inline-flex items-center space-x-2 mb-6">
-                <span className="h-px w-8 bg-emerald-800"></span>
-                <span className="text-emerald-800 text-sm font-semibold tracking-widest uppercase">
+            {/* Content Column - Adapts color for Mobile (White) vs Desktop (Dark) */}
+            <div className="relative z-10 text-center lg:text-left transition-colors duration-300">
+
+              <div className="inline-flex items-center space-x-2 mb-4 lg:mb-6 justify-center lg:justify-start">
+                <span className="h-px w-8 bg-white/70 lg:bg-emerald-800"></span>
+                <span className="text-white lg:text-emerald-800 text-sm font-semibold tracking-widest uppercase drop-shadow-sm lg:drop-shadow-none">
                   New Collection
                 </span>
-                <span className="h-px w-8 bg-emerald-800 lg:hidden"></span>
+                <span className="h-px w-8 bg-white/70 lg:hidden"></span>
               </div>
 
-              <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl text-gray-900 leading-[1.1] mb-6">
+              <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl text-white lg:text-gray-900 leading-[1.05] mb-6 drop-shadow-lg lg:drop-shadow-none">
                 {config.hero.headline}
               </h1>
 
-              <p className="text-lg text-gray-600 leading-relaxed max-w-lg mx-auto lg:mx-0 font-light mb-8 lg:mb-10">
+              <p className="text-lg text-white/90 lg:text-gray-600 leading-relaxed max-w-lg mx-auto lg:mx-0 font-light mb-8 lg:mb-10 drop-shadow-md lg:drop-shadow-none">
                 {config.hero.subheadline}
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <Link href={config.hero.primaryButtonLink || '/shop'} className="inline-flex items-center justify-center bg-gray-900 hover:bg-emerald-800 text-white px-10 py-4 rounded-full font-medium transition-all text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start px-4 lg:px-0">
+                <Link href={config.hero.primaryButtonLink || '/shop'} className="inline-flex items-center justify-center bg-white lg:bg-gray-900 text-gray-900 lg:text-white hover:bg-emerald-50 lg:hover:bg-emerald-800 px-10 py-4 rounded-full font-medium transition-all text-lg shadow-xl hover:shadow-2xl hover:-translate-y-1">
                   {config.hero.primaryButtonText}
                 </Link>
                 {config.hero.secondaryButtonText && (
-                  <Link href={config.hero.secondaryButtonLink || '/shop'} className="inline-flex items-center justify-center bg-white border border-gray-200 hover:border-emerald-800 text-gray-900 hover:text-emerald-800 px-10 py-4 rounded-full font-medium transition-colors text-lg">
+                  <Link href={config.hero.secondaryButtonLink || '/shop'} className="inline-flex items-center justify-center bg-white/20 backdrop-blur-md border border-white/50 lg:bg-white lg:border-gray-200 text-white lg:text-gray-900 hover:bg-white/30 lg:hover:text-emerald-800 lg:hover:border-emerald-800 px-10 py-4 rounded-full font-medium transition-colors text-lg">
                     {config.hero.secondaryButtonText}
                   </Link>
                 )}
               </div>
 
-              {/* Mobile Stats Scroller */}
-              <div className="mt-12 pt-8 border-t border-gray-100 flex overflow-x-auto pb-4 lg:pb-0 gap-8 no-scrollbar lg:grid lg:grid-cols-3">
-                <div className="flex-shrink-0 flex flex-col items-center lg:items-start text-center lg:text-left min-w-[120px]">
-                  <div className="text-emerald-800 mb-2">
-                    <i className="ri-plane-line text-2xl"></i>
-                  </div>
-                  <p className="font-serif font-bold text-gray-900">Direct Import</p>
+              {/* Stats - Visible on Desktop, Hidden on Mobile Hero */}
+              <div className="mt-12 pt-8 border-t border-gray-200 hidden lg:grid grid-cols-3 gap-6">
+                <div className="flex flex-col items-start text-left">
+                  <p className="font-serif font-bold text-gray-900 text-lg">Direct Import</p>
+                  <p className="text-sm text-gray-500">Sourced from China</p>
                 </div>
-                <div className="flex-shrink-0 flex flex-col items-center lg:items-start text-center lg:text-left min-w-[120px]">
-                  <div className="text-emerald-800 mb-2">
-                    <i className="ri-shield-star-line text-2xl"></i>
-                  </div>
-                  <p className="font-serif font-bold text-gray-900">Verified Quality</p>
+                <div className="flex flex-col items-start text-left">
+                  <p className="font-serif font-bold text-gray-900 text-lg">Verified Quality</p>
+                  <p className="text-sm text-gray-500">Inspected by hand</p>
                 </div>
-                <div className="flex-shrink-0 flex flex-col items-center lg:items-start text-center lg:text-left min-w-[120px]">
-                  <div className="text-emerald-800 mb-2">
-                    <i className="ri-wallet-3-line text-2xl"></i>
-                  </div>
-                  <p className="font-serif font-bold text-gray-900">Best Prices</p>
+                <div className="flex flex-col items-start text-left">
+                  <p className="font-serif font-bold text-gray-900 text-lg">Best Prices</p>
+                  <p className="text-sm text-gray-500">Unbeatable value</p>
                 </div>
               </div>
 
