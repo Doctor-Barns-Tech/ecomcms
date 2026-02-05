@@ -13,7 +13,26 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
 
   // Config State - Managed in Code
-  const config = {
+  const config: {
+    hero: {
+      headline: string;
+      subheadline: string;
+      primaryButtonText: string;
+      primaryButtonLink: string;
+      secondaryButtonText: string;
+      secondaryButtonLink: string;
+      backgroundImage: string;
+    };
+    sections: {
+      newArrivals: {
+        enabled: boolean;
+        title: string;
+        subtitle: string;
+        count: number;
+      };
+    };
+    banners?: Array<{ text: string; active: boolean }>;
+  } = {
     hero: {
       headline: 'Mannequins, Kitchen Essentials, Electronics & Dresses — All In One Store',
       subheadline: 'Verified quality China-sourced products at unbeatable prices. Perfect for homes, businesses, and resellers.',
@@ -30,7 +49,8 @@ export default function HomePage() {
         subtitle: 'Handpicked for you',
         count: 8
       }
-    }
+    },
+    banners: [] // Add promotional banners here when needed
   };
 
   useEffect(() => {

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 const articles: any = {
   '1': {
@@ -152,7 +153,7 @@ export default function ArticlePage() {
 
             <article
               className="prose prose-emerald max-w-none"
-              dangerouslySetInnerHTML={{ __html: article.content }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(article.content) }}
               style={{
                 lineHeight: '1.8'
               }}

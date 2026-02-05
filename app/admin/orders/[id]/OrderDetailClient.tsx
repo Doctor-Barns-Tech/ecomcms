@@ -134,15 +134,22 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
       const trackingChanged = trackingNumber !== order.metadata?.tracking_number;
 
       if (statusChanged || (trackingChanged && trackingNumber)) {
+        // Get auth token for notification API
+        const { data: { session } } = await supabase.auth.getSession();
+        const authToken = session?.access_token;
+
         fetch('/api/notifications', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            ...(authToken && { 'Authorization': `Bearer ${authToken}` })
+          },
           body: JSON.stringify({
             type: 'order_status',
             payload: {
               email: order.email,
               name: customerName,
-              orderId: orderId, // This might be UUID, better use order.order_number if available
+              orderId: orderId,
               orderNumber: order.order_number || orderId,
               status: statusToUpdate,
               trackingNumber: trackingNumber,
@@ -159,6 +166,53 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
       alert('Failed to update order');
     } finally {
       setStatusUpdating(false);
+    }
+  };
+
+  const [resendingNotification, setResendingNotification] = useState(false);
+
+  const handleResendNotification = async () => {
+    if (!order) return;
+    
+    try {
+      setResendingNotification(true);
+      
+      // Get auth token
+      const { data: { session } } = await supabase.auth.getSession();
+      const authToken = session?.access_token;
+      
+      const shippingAddress = order.shipping_address || {};
+      const customerName = shippingAddress.full_name || shippingAddress.firstName || order.email?.split('@')[0] || 'Customer';
+      
+      const response = await fetch('/api/notifications', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(authToken && { 'Authorization': `Bearer ${authToken}` })
+        },
+        body: JSON.stringify({
+          type: 'order_status',
+          payload: {
+            email: order.email,
+            name: customerName,
+            orderNumber: order.order_number || order.id,
+            status: order.status,
+            trackingNumber: order.metadata?.tracking_number || '',
+            phone: order.phone || shippingAddress.phone
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send notification');
+      }
+
+      alert('Notification sent successfully! (Email + SMS if phone available)');
+    } catch (err) {
+      console.error('Error resending notification:', err);
+      alert('Failed to resend notification');
+    } finally {
+      setResendingNotification(false);
     }
   };
 
@@ -389,6 +443,33 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
                   </span>
                 </div>
               </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <h2 className="text-lg font-bold text-gray-900 mb-4">Notifications</h2>
+              <p className="text-sm text-gray-600 mb-4">
+                Resend email and SMS notifications to the customer about the current order status.
+              </p>
+              <button
+                onClick={handleResendNotification}
+                disabled={resendingNotification}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors whitespace-nowrap disabled:opacity-50 flex items-center justify-center"
+              >
+                {resendingNotification ? (
+                  <>
+                    <i className="ri-loader-4-line animate-spin mr-2"></i>
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <i className="ri-notification-3-line mr-2"></i>
+                    Resend Notifications
+                  </>
+                )}
+              </button>
+              <p className="text-xs text-gray-500 mt-2">
+                Phone: {order.phone || shippingAddress.phone || 'Not provided'}
+              </p>
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

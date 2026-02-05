@@ -2,18 +2,23 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function CustomerDetailsPage({ params }: { params: { id: string } }) {
+export default function CustomerDetailsPage() {
     const router = useRouter();
+    const params = useParams();
+    const customerId = params.id as string;
+    
     const [customer, setCustomer] = useState<any>(null);
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchCustomerData();
-    }, []);
+        if (customerId) {
+            fetchCustomerData();
+        }
+    }, [customerId]);
 
     const fetchCustomerData = async () => {
         try {
@@ -21,7 +26,7 @@ export default function CustomerDetailsPage({ params }: { params: { id: string }
             const { data: profile, error: profileError } = await supabase
                 .from('profiles')
                 .select('*')
-                .eq('id', params.id)
+                .eq('id', customerId)
                 .single();
 
             if (profileError) throw profileError;
@@ -30,7 +35,7 @@ export default function CustomerDetailsPage({ params }: { params: { id: string }
             const { data: ordersData, error: ordersError } = await supabase
                 .from('orders')
                 .select('*')
-                .eq('user_id', params.id)
+                .eq('user_id', customerId)
                 .order('created_at', { ascending: false });
 
             if (ordersError && ordersError.code !== 'PGRST116') { // Ignore not found if simply no orders? No, select returns empty array usually

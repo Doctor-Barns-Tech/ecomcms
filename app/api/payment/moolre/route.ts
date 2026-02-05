@@ -1,7 +1,25 @@
 import { NextResponse } from 'next/server';
+import { checkRateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
 
 export async function POST(req: Request) {
     try {
+        // Rate limiting
+        const clientId = getClientIdentifier(req);
+        const rateLimitResult = checkRateLimit(`payment:${clientId}`, RATE_LIMITS.payment);
+        
+        if (!rateLimitResult.success) {
+            return NextResponse.json(
+                { success: false, message: 'Too many requests. Please try again later.' },
+                { 
+                    status: 429,
+                    headers: {
+                        'X-RateLimit-Remaining': '0',
+                        'X-RateLimit-Reset': rateLimitResult.resetIn.toString()
+                    }
+                }
+            );
+        }
+
         const body = await req.json();
         const { orderId, amount, customerEmail } = body;
 
@@ -34,7 +52,7 @@ export async function POST(req: Request) {
             }
         };
 
-        console.log('Initiating Moolre Payment:', payload);
+        console.log('[Payment] Initiating for order:', orderId, '| Amount:', amount);
 
         const response = await fetch('https://api.moolre.com/embed/link', {
             method: 'POST',
@@ -47,7 +65,7 @@ export async function POST(req: Request) {
         });
 
         const result = await response.json();
-        console.log('Moolre Response:', result);
+        console.log('[Payment] Response status:', result.status, '| Has URL:', !!result.data?.authorization_url);
 
         if (result.status === 1 && result.data?.authorization_url) {
             return NextResponse.json({ success: true, url: result.data.authorization_url, reference: result.data.reference });

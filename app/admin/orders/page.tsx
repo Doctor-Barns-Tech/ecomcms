@@ -180,12 +180,18 @@ export default function AdminOrdersPage() {
 
 
 
-        // Send Notifications
+        // Send Notifications with auth token
+        const { data: { session } } = await supabase.auth.getSession();
+        const authToken = session?.access_token;
+        
         const updatedOrders = orders.filter(o => selectedOrders.includes(o.id));
         updatedOrders.forEach(order => {
           fetch('/api/notifications', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+              'Content-Type': 'application/json',
+              ...(authToken && { 'Authorization': `Bearer ${authToken}` })
+            },
             body: JSON.stringify({
               type: 'order_updated',
               payload: { order, status: newStatus }

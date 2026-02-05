@@ -1,13 +1,67 @@
 import { NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 import { sendOrderConfirmation, sendOrderStatusUpdate, sendWelcomeMessage, sendContactMessage, sendEmail, sendSMS } from '@/lib/notifications';
+import { checkRateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 export async function POST(request: Request) {
     try {
+        // Rate limiting
+        const clientId = getClientIdentifier(request);
+        const rateLimitResult = checkRateLimit(`notification:${clientId}`, RATE_LIMITS.notification);
+        
+        if (!rateLimitResult.success) {
+            return NextResponse.json(
+                { error: 'Too many requests. Please try again later.' },
+                { 
+                    status: 429,
+                    headers: {
+                        'X-RateLimit-Remaining': '0',
+                        'X-RateLimit-Reset': rateLimitResult.resetIn.toString()
+                    }
+                }
+            );
+        }
+
         const body = await request.json();
         const { type, payload } = body;
 
         if (!payload) {
             return NextResponse.json({ error: 'Payload required' }, { status: 400 });
+        }
+
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        // Authentication requirements based on notification type
+        // 'campaign' requires admin/staff role
+        // 'order_updated', 'order_status' requires admin/staff role (status updates from admin)
+        // 'order_created', 'welcome', 'contact' can be triggered from checkout/forms
+        
+        const requiresAdminAuth = ['campaign', 'order_updated', 'order_status'].includes(type);
+
+        if (requiresAdminAuth) {
+            const authToken = request.headers.get('authorization')?.replace('Bearer ', '');
+            if (!authToken) {
+                return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            }
+
+            const { data: { user }, error } = await supabase.auth.getUser(authToken);
+            if (error || !user) {
+                return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            }
+
+            // Verify admin/staff role
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', user.id)
+                .single();
+
+            if (!profile || (profile.role !== 'admin' && profile.role !== 'staff')) {
+                return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
+            }
         }
 
         if (type === 'order_created') {
@@ -18,6 +72,20 @@ export async function POST(request: Request) {
         if (type === 'order_updated') {
             const { order, status } = payload;
             await sendOrderStatusUpdate(order, status);
+            return NextResponse.json({ success: true, message: 'Status update sent' });
+        }
+
+        // Handle order_status from admin panel (different payload structure)
+        if (type === 'order_status') {
+            const { email, name, orderNumber, status, trackingNumber, phone } = payload;
+            // Build order object for sendOrderStatusUpdate
+            const orderData = {
+                order_number: orderNumber,
+                email: email,
+                phone: phone,
+                shipping_address: { firstName: name, phone: phone }
+            };
+            await sendOrderStatusUpdate(orderData, status);
             return NextResponse.json({ success: true, message: 'Status update sent' });
         }
 

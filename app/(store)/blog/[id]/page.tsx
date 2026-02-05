@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 export async function generateStaticParams() {
   return [
@@ -316,7 +317,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ id: s
         <article className="prose prose-lg max-w-none">
           <div
             className="text-gray-600 leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
             style={{
               fontSize: '1.125rem',
               lineHeight: '1.8'

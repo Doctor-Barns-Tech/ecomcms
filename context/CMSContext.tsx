@@ -47,6 +47,8 @@ interface Banner {
     button_url: string | null;
     is_active: boolean;
     position: string;
+    start_date: string | null;
+    end_date: string | null;
 }
 
 interface CMSContextType {

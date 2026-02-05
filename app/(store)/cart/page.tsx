@@ -26,10 +26,9 @@ export default function CartPage() {
   const moveToCart = (id: string) => {
     const item = savedItems.find(item => item.id === id);
     if (item) {
-      // Assuming addToCart can handle adding an existing item back
-      // and that the item structure from savedItems is compatible with addToCart
-      addToCart(item, item.quantity); // Add item back to cart
-      setSavedItems(savedItems.filter(item => item.id !== id)); // Remove from saved items
+      // addToCart expects a CartItem object which already includes quantity
+      addToCart(item);
+      setSavedItems(savedItems.filter(item => item.id !== id));
     }
   };
 

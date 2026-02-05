@@ -17,6 +17,7 @@ export default function AdminLayout({
   const [isLoading, setIsLoading] = useState(true);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   // Module Filtering State
   const [enabledModules, setEnabledModules] = useState<string[]>([]);
@@ -32,10 +33,33 @@ export default function AdminLayout({
 
       if (!session) {
         router.push('/admin/login');
-      } else {
-        setUser(session.user);
-        setIsAuthenticated(true);
+        return;
       }
+
+      // Check user role from profiles table
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+
+      if (profileError || !profile) {
+        console.error('Failed to fetch user profile');
+        router.push('/admin/login');
+        return;
+      }
+
+      // Only allow admin and staff roles
+      if (profile.role !== 'admin' && profile.role !== 'staff') {
+        console.warn('User does not have admin/staff role');
+        await supabase.auth.signOut();
+        router.push('/admin/login?error=unauthorized');
+        return;
+      }
+
+      setUser(session.user);
+      setUserRole(profile.role);
+      setIsAuthenticated(true);
       setIsLoading(false);
     }
 
@@ -288,7 +312,7 @@ export default function AdminLayout({
                     {user?.email?.charAt(0).toUpperCase() || 'A'}
                   </div>
                   <div className="text-left hidden md:block">
-                    <p className="text-sm font-semibold text-gray-900">Admin</p>
+                    <p className="text-sm font-semibold text-gray-900 capitalize">{userRole || 'Admin'}</p>
                     <p className="text-xs text-gray-500 max-w-[100px] truncate">{user?.email}</p>
                   </div>
                   <i className="ri-arrow-down-s-line text-gray-600"></i>

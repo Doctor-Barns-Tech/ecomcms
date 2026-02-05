@@ -2,23 +2,30 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY || 'missing_api_key');
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@standardecom.com';
+const EMAIL_FROM = process.env.EMAIL_FROM || 'Sarah Lawson Imports <noreply@sarahlawsonimports.com>';
+
+// Helper to mask sensitive data in logs
+function maskPhone(phone: string): string {
+    if (!phone || phone.length < 6) return '***';
+    return phone.slice(0, 4) + '****' + phone.slice(-2);
+}
 
 export async function sendEmail({ to, subject, html }: { to: string; subject: string; html: string }) {
     if (!process.env.RESEND_API_KEY) {
-        console.warn('RESEND_API_KEY is missing. Email not sent.');
+        console.warn('[Email] RESEND_API_KEY not configured');
         return null;
     }
     try {
         const data = await resend.emails.send({
-            from: 'Sarah Lawson Imports <orders@yourdomain.com>', // User needs to configure this
+            from: EMAIL_FROM,
             to,
             subject,
             html,
         });
-        console.log('Email sent:', data);
+        console.log('[Email] Sent successfully to:', to.split('@')[0] + '@***');
         return data;
-    } catch (error) {
-        console.error('Email Error:', error);
+    } catch (error: any) {
+        console.error('[Email] Failed:', error.message);
         return null;
     }
 }
@@ -63,14 +70,14 @@ export async function sendSMS({ to, message }: { to: string; message: string }) 
     }
 
     if (!smsVasKey || !smsUser) {
-        console.warn('Missing Moolre credentials (VASKEY or USER) for SMS.');
+        console.warn('[SMS] Missing Moolre credentials');
         return null;
     }
 
     const recipient = formatPhoneNumber(to);
 
     try {
-        console.log(`Sending SMS to ${recipient}: ${message}`);
+        console.log(`[SMS] Sending to ${maskPhone(recipient)}`);
         const response = await fetch('https://api.moolre.com/open/sms/send', {
             method: 'POST',
             headers: {
@@ -92,10 +99,13 @@ export async function sendSMS({ to, message }: { to: string; message: string }) 
         });
 
         const result = await response.json();
-        console.log('SMS Result:', result);
+        console.log('[SMS] Result:', result.status === 1 ? 'Success' : 'Failed', '| Code:', result.status);
+        if (result.status !== 1) {
+            console.log('[SMS] Full Response:', JSON.stringify(result, null, 2));
+        }
         return result;
-    } catch (error) {
-        console.error('SMS Error:', error);
+    } catch (error: any) {
+        console.error('[SMS] Error:', error.message);
         return null;
     }
 }
@@ -109,7 +119,7 @@ export async function sendOrderConfirmation(order: any) {
     // Prefer top-level phone, then shipping address phone
     const phone = orderPhone || shipping_address?.phone;
 
-    console.log(`Preparing confirmation for Order #${order_number}. Phone: ${phone}, Name: ${name}`);
+    console.log(`[Notification] Preparing for Order #${order_number} | Phone: ${phone ? 'Present' : 'Missing'}`);
 
     // 1. Email to Customer
     const customerEmailHtml = `
@@ -159,7 +169,7 @@ export async function sendOrderStatusUpdate(order: any, newStatus: string) {
     const name = shipping_address?.full_name || shipping_address?.firstName || 'Customer';
     const phone = orderPhone || shipping_address?.phone;
 
-    console.log(`Sending status update for Order #${order_number} to ${newStatus}. Phone: ${phone}`);
+    console.log(`[Notification] Status update for Order #${order_number} to ${newStatus}`);
 
     const subject = `Order Update #${order_number || id}`;
     let message = `Your order #${order_number || id} status has been updated to ${newStatus}.`;
