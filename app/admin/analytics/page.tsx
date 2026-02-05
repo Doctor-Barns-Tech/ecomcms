@@ -43,12 +43,13 @@ export default function AnalyticsPage() {
 
       const isoStart = startDate.toISOString();
 
-      // Fetch Orders for Revenue & Count
+      // Fetch Orders for Revenue & Count - only PAID orders count as revenue
       const { data: orders, error: orderError } = await supabase
         .from('orders')
-        .select('id, created_at, total')
+        .select('id, created_at, total, payment_status')
         .gte('created_at', isoStart)
-        .neq('status', 'cancelled') // Exclude cancelled
+        .eq('payment_status', 'paid') // Only count paid orders as revenue
+        .neq('status', 'cancelled')
         .order('created_at');
 
       if (orderError) throw orderError;

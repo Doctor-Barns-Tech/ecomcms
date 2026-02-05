@@ -53,25 +53,28 @@ export default function AdminDashboard() {
   useEffect(() => {
     async function fetchDashboardData() {
       try {
-        // 1. Fetch Orders Count & Revenue
-        const { data: ordersData, error: ordersError } = await supabase
+        // 1. Fetch ALL Orders for count & customers
+        const { data: allOrdersData, error: ordersError } = await supabase
           .from('orders')
-          .select('total, status, created_at, email');
+          .select('total, status, payment_status, created_at, email');
 
         if (ordersError) throw ordersError;
 
-        const totalRevenue = ordersData?.reduce((sum, order) => sum + (order.total || 0), 0) || 0;
-        const totalOrders = ordersData?.length || 0;
-        const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+        // Only count PAID orders for revenue & avg order value
+        const paidOrders = allOrdersData?.filter(o => o.payment_status === 'paid') || [];
+        const totalRevenue = paidOrders.reduce((sum, order) => sum + (order.total || 0), 0);
+        const totalOrders = allOrdersData?.length || 0;
+        const paidOrderCount = paidOrders.length;
+        const avgOrderValue = paidOrderCount > 0 ? totalRevenue / paidOrderCount : 0;
 
         // 2. Fetch Customers Count (approximation using orders unique emails if we don't have user metrics access)
         // Since we can't query auth.users directly from client, we'll estimate active customers via orders or just keep it 0 if we can't.
         // Actually, best to just show "Orders" or "Recent Signups" if we had a public profiles table.
         // We'll use unique emails from orders as a proxy for "Customers"
-        const uniqueCustomers = new Set(ordersData?.map(o => o.email)).size;
+        const uniqueCustomers = new Set(allOrdersData?.map(o => o.email)).size;
 
 
-        // Process Chart Data (Last 7 Days)
+        // Process Chart Data (Last 7 Days) - only count PAID orders as revenue
         const last7Days = Array.from({ length: 7 }, (_, i) => {
           const d = new Date();
           d.setDate(d.getDate() - (6 - i));
@@ -83,7 +86,7 @@ export default function AdminDashboard() {
           return acc;
         }, {});
 
-        ordersData?.forEach(order => {
+        paidOrders.forEach(order => {
           const date = new Date(order.created_at).toISOString().split('T')[0];
           if (chartMap[date] !== undefined) {
             chartMap[date] += (order.total || 0);
