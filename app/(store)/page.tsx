@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import ProductCard from '@/components/ProductCard';
+import AnimatedSection, { AnimatedGrid } from '@/components/AnimatedSection';
 
 
 export default function HomePage() {
@@ -197,7 +198,7 @@ export default function HomePage() {
             {/* Content Column - Adapts color for Mobile (White) vs Desktop (Dark) */}
             <div className="relative z-10 text-center lg:text-left transition-colors duration-300">
 
-              <div className="inline-flex items-center space-x-2 mb-4 lg:mb-6 justify-center lg:justify-start">
+              <div className="inline-flex items-center space-x-2 mb-4 lg:mb-6 justify-center lg:justify-start animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
                 <span className="h-px w-8 bg-white/70 lg:bg-emerald-800"></span>
                 <span className="text-white lg:text-emerald-800 text-sm font-semibold tracking-widest uppercase drop-shadow-sm lg:drop-shadow-none">
                   New Collection
@@ -205,20 +206,20 @@ export default function HomePage() {
                 <span className="h-px w-8 bg-white/70 lg:hidden"></span>
               </div>
 
-              <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-white lg:text-gray-900 leading-[1.1] mb-4 lg:mb-6 drop-shadow-lg lg:drop-shadow-none">
+              <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-white lg:text-gray-900 leading-[1.1] mb-4 lg:mb-6 drop-shadow-lg lg:drop-shadow-none animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
                 {config.hero.headline}
               </h1>
 
-              <p className="text-lg text-white/90 lg:text-gray-600 leading-relaxed max-w-lg mx-auto lg:mx-0 font-light mb-8 lg:mb-10 drop-shadow-md lg:drop-shadow-none">
+              <p className="text-lg text-white/90 lg:text-gray-600 leading-relaxed max-w-lg mx-auto lg:mx-0 font-light mb-8 lg:mb-10 drop-shadow-md lg:drop-shadow-none animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
                 {config.hero.subheadline}
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start px-4 lg:px-0">
-                <Link href={config.hero.primaryButtonLink || '/shop'} className="inline-flex items-center justify-center bg-white lg:bg-gray-900 text-gray-900 lg:text-white hover:bg-emerald-50 lg:hover:bg-emerald-800 px-10 py-4 rounded-full font-medium transition-all text-lg shadow-xl hover:shadow-2xl hover:-translate-y-1">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start px-4 lg:px-0 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+                <Link href={config.hero.primaryButtonLink || '/shop'} className="inline-flex items-center justify-center bg-white lg:bg-gray-900 text-gray-900 lg:text-white hover:bg-emerald-50 lg:hover:bg-emerald-800 px-10 py-4 rounded-full font-medium transition-all text-lg shadow-xl hover:shadow-2xl hover:-translate-y-1 btn-animate">
                   {config.hero.primaryButtonText}
                 </Link>
                 {config.hero.secondaryButtonText && (
-                  <Link href={config.hero.secondaryButtonLink || '/shop'} className="inline-flex items-center justify-center bg-white/20 backdrop-blur-md border border-white/50 lg:bg-white lg:border-gray-200 text-white lg:text-gray-900 hover:bg-white/30 lg:hover:text-emerald-800 lg:hover:border-emerald-800 px-10 py-4 rounded-full font-medium transition-colors text-lg">
+                  <Link href={config.hero.secondaryButtonLink || '/shop'} className="inline-flex items-center justify-center bg-white/20 backdrop-blur-md border border-white/50 lg:bg-white lg:border-gray-200 text-white lg:text-gray-900 hover:bg-white/30 lg:hover:text-emerald-800 lg:hover:border-emerald-800 px-10 py-4 rounded-full font-medium transition-colors text-lg btn-animate">
                     {config.hero.secondaryButtonText}
                   </Link>
                 )}
@@ -249,7 +250,7 @@ export default function HomePage() {
       {/* Categories Section */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-end justify-between mb-12">
+          <AnimatedSection className="flex items-end justify-between mb-12">
             <div>
               <h2 className="text-3xl lg:text-4xl font-serif font-bold text-gray-900 mb-2">Shop by Category</h2>
               <p className="text-lg text-gray-600 max-w-2xl font-light">Explore our carefully curated collections</p>
@@ -258,14 +259,14 @@ export default function HomePage() {
               View All
               <i className="ri-arrow-right-line ml-2"></i>
             </Link>
-          </div>
+          </AnimatedSection>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
             {categories.map((category, index) => (
+              <AnimatedSection key={index} delay={index * 100}>
               <Link
-                key={index}
                 href={`/shop?category=${category.slug}`}
-                className="group relative aspect-[4/5] lg:aspect-square rounded-[1.5rem] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 cursor-pointer"
+                className="group relative aspect-[4/5] lg:aspect-square rounded-[1.5rem] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 cursor-pointer block"
               >
                 <img
                   src={category.image}
@@ -284,6 +285,7 @@ export default function HomePage() {
                   </div>
                 </div>
               </Link>
+              </AnimatedSection>
             ))}
           </div>
 
@@ -299,7 +301,7 @@ export default function HomePage() {
       {config.sections?.newArrivals?.enabled && (
         <section className="py-20 bg-stone-50" data-product-shop>
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
-            <div className="flex items-end justify-between mb-12">
+            <AnimatedSection className="flex items-end justify-between mb-12">
               <div>
                 <h2 className="text-3xl lg:text-4xl font-serif font-bold text-gray-900 mb-2">{config.sections.newArrivals.title}</h2>
                 <p className="text-lg text-gray-600 font-light">{config.sections.newArrivals.subtitle}</p>
@@ -308,7 +310,7 @@ export default function HomePage() {
                 View All
                 <i className="ri-arrow-right-line ml-2"></i>
               </Link>
-            </div>
+            </AnimatedSection>
 
             {loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -323,11 +325,14 @@ export default function HomePage() {
                 ))}
               </div>
             ) : featuredProducts.length > 0 ? (
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8 gap-y-10 lg:gap-y-12">
+              <AnimatedGrid 
+                className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8 gap-y-10 lg:gap-y-12"
+                staggerDelay={100}
+              >
                 {featuredProducts.map((product) => (
                   <ProductCard key={product.id} {...product} />
                 ))}
-              </div>
+              </AnimatedGrid>
             ) : (
               <div className="text-center py-12">
                 <p className="text-gray-500">No products found. Start adding products from the Admin Dashboard!</p>
@@ -357,13 +362,15 @@ export default function HomePage() {
               { icon: 'ri-customer-service-2-line', title: '24/7 Support', description: 'Dedicated service' },
               { icon: 'ri-shield-check-line', title: 'Secure Payment', description: 'Safe checkout' }
             ].map((item, index) => (
-              <div key={index} className="text-center p-4 rounded-lg bg-gray-50 lg:bg-transparent">
-                <div className="w-12 h-12 lg:w-16 lg:h-16 flex items-center justify-center mx-auto mb-3 bg-emerald-100 rounded-full">
-                  <i className={`${item.icon} text-2xl lg:text-3xl text-emerald-700`}></i>
+              <AnimatedSection key={index} delay={index * 100} animation="scale">
+                <div className="text-center p-4 rounded-lg bg-gray-50 lg:bg-transparent hover:bg-emerald-50 transition-colors duration-300">
+                  <div className="w-12 h-12 lg:w-16 lg:h-16 flex items-center justify-center mx-auto mb-3 bg-emerald-100 rounded-full group-hover:bg-emerald-200 transition-colors">
+                    <i className={`${item.icon} text-2xl lg:text-3xl text-emerald-700`}></i>
+                  </div>
+                  <h3 className="font-semibold text-gray-900 mb-1 text-sm lg:text-base">{item.title}</h3>
+                  <p className="text-xs lg:text-sm text-gray-600 leading-tight">{item.description}</p>
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-1 text-sm lg:text-base">{item.title}</h3>
-                <p className="text-xs lg:text-sm text-gray-600 leading-tight">{item.description}</p>
-              </div>
+              </AnimatedSection>
             ))}
           </div>
         </div>
