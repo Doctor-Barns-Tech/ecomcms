@@ -210,8 +210,7 @@ export default function CheckoutPage() {
 
       if (itemsError) throw itemsError;
 
-      // 2b. Reduce stock for ordered products
-      await supabase.rpc('reduce_stock_on_order', { p_order_id: order.id });
+      // Note: Stock reduction happens in mark_order_paid when payment is confirmed
 
       // 3. Upsert Customer Record (for both guest and registered users)
       const fullName = `${shippingData.firstName} ${shippingData.lastName}`.trim();
