@@ -27,9 +27,29 @@ export default function CheckoutPage() {
     phone: '',
     address: '',
     city: '',
-    region: '',
-    postalCode: ''
+    region: ''
   });
+
+  // Ghana Regions for dropdown
+  const ghanaRegions = [
+    'Greater Accra',
+    'Ashanti',
+    'Western',
+    'Central',
+    'Eastern',
+    'Northern',
+    'Volta',
+    'Upper East',
+    'Upper West',
+    'Brong-Ahafo',
+    'Ahafo',
+    'Bono',
+    'Bono East',
+    'North East',
+    'Savannah',
+    'Oti',
+    'Western North'
+  ];
 
   const [deliveryMethod, setDeliveryMethod] = useState('standard');
   const [paymentMethod, setPaymentMethod] = useState('moolre');
@@ -416,29 +436,19 @@ export default function CheckoutPage() {
                         <label className="block text-sm font-semibold text-gray-900 mb-2">
                           Region *
                         </label>
-                        <input
-                          type="text"
+                        <select
                           value={shippingData.region}
                           onChange={(e) => setShippingData({ ...shippingData, region: e.target.value })}
-                          className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${errors.region ? 'border-red-500' : 'border-gray-300'
+                          className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white ${errors.region ? 'border-red-500' : 'border-gray-300'
                             }`}
-                          placeholder="Greater Accra"
-                        />
+                        >
+                          <option value="">Select Region</option>
+                          {ghanaRegions.map((region) => (
+                            <option key={region} value={region}>{region}</option>
+                          ))}
+                        </select>
                         {errors.region && <p className="text-sm text-red-600 mt-1">{errors.region}</p>}
                       </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-900 mb-2">
-                        Postal Code
-                      </label>
-                      <input
-                        type="text"
-                        value={shippingData.postalCode}
-                        onChange={(e) => setShippingData({ ...shippingData, postalCode: e.target.value })}
-                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        placeholder="Optional"
-                      />
                     </div>
 
                     {checkoutType === 'account' && (
