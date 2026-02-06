@@ -106,91 +106,46 @@ export default function Home() {
       {renderBanners()}
 
       {/* Hero Section */}
-      <section className="relative w-full overflow-hidden lg:bg-gradient-to-b lg:from-stone-50 lg:via-white lg:to-cream-50">
-
-        {/* Mobile: Full Background Image with Gradient Overlay */}
-        <div className="absolute inset-0 lg:hidden z-0">
+      <section className="relative w-full overflow-hidden h-[85vh] lg:h-[90vh]">
+        {/* Full Background Image */}
+        <div className="absolute inset-0 z-0">
           <img
             src={getHeroImage()}
-            className="w-full h-full object-cover transition-opacity duration-1000"
+            className="w-full h-full object-cover object-top"
             alt="Hero Background"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/5"></div>
         </div>
 
-        {/* Desktop Blobs */}
-        <div className="hidden lg:block absolute inset-0 opacity-30 pointer-events-none">
-          <div className="absolute -top-20 -right-20 w-96 h-96 bg-emerald-100/50 rounded-full blur-3xl"></div>
-          <div className="absolute top-40 -left-20 w-72 h-72 bg-amber-50 rounded-full blur-3xl"></div>
-        </div>
+        {/* Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 h-full flex flex-col justify-end pb-16 lg:pb-20">
+          <div className="text-center max-w-2xl mx-auto">
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 h-[85vh] lg:h-auto lg:py-24 flex flex-col justify-end lg:block pb-16 lg:pb-0">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-
-            {/* Desktop: Image Layout (Hidden on Mobile) */}
-            <div className="hidden lg:block order-last relative">
-              <div className="relative aspect-[3/4] lg:aspect-auto lg:h-[650px] overflow-hidden rounded-[2rem] shadow-xl">
-                <img
-                  src={getHeroImage()}
-                  alt="Hero Image"
-                  className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-1000"
-                />
-
-                {/* Floating Badge (Desktop Only) */}
-                <div className="absolute bottom-10 left-10 bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-2xl max-w-xs z-20 border border-white/50">
-                  <p className="font-serif text-emerald-800 text-lg italic mb-1">Exclusive Offer</p>
-                  <p className="text-3xl font-bold text-gray-900 mb-1">25% Off</p>
-                  <p className="text-sm text-gray-600 font-medium">On your first dedicated order</p>
-                </div>
-              </div>
+            <div className="inline-flex items-center space-x-2 mb-4 justify-center animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+              <span className="h-px w-8 bg-white/70"></span>
+              <span className="text-white text-sm font-semibold tracking-widest uppercase drop-shadow-sm">
+                New Collection
+              </span>
+              <span className="h-px w-8 bg-white/70"></span>
             </div>
 
-            {/* Content Column - Adapts color for Mobile (White) vs Desktop (Dark) */}
-            <div className="relative z-10 text-center lg:text-left transition-colors duration-300">
+            <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-5xl text-white leading-[1.15] mb-4 lg:mb-5 drop-shadow-lg animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+              {config.hero.headline}
+            </h1>
 
-              <div className="inline-flex items-center space-x-2 mb-4 lg:mb-6 justify-center lg:justify-start animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-                <span className="h-px w-8 bg-white/70 lg:bg-emerald-800"></span>
-                <span className="text-white lg:text-emerald-800 text-sm font-semibold tracking-widest uppercase drop-shadow-sm lg:drop-shadow-none">
-                  New Collection
-                </span>
-                <span className="h-px w-8 bg-white/70 lg:hidden"></span>
-              </div>
+            <p className="text-base lg:text-lg text-white/85 leading-relaxed max-w-lg mx-auto font-light mb-8 drop-shadow-md animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+              {config.hero.subheadline}
+            </p>
 
-              <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[3.2rem] xl:text-5xl text-white lg:text-gray-900 leading-[1.15] mb-4 lg:mb-6 drop-shadow-lg lg:drop-shadow-none animate-fade-in-up max-w-xl" style={{ animationDelay: '0.2s' }}>
-                {config.hero.headline}
-              </h1>
-
-              <p className="text-lg text-white/90 lg:text-gray-600 leading-relaxed max-w-md mx-auto lg:mx-0 font-light mb-8 lg:mb-10 drop-shadow-md lg:drop-shadow-none animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-                {config.hero.subheadline}
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start px-4 lg:px-0 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-                <Link href={config.hero.primaryButtonLink || '/shop'} className="inline-flex items-center justify-center bg-white lg:bg-gray-900 text-gray-900 lg:text-white hover:bg-emerald-50 lg:hover:bg-emerald-800 px-10 py-4 rounded-full font-medium transition-all text-lg shadow-xl hover:shadow-2xl hover:-translate-y-1 btn-animate">
-                  {config.hero.primaryButtonText}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center px-4 lg:px-0 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+              <Link href={config.hero.primaryButtonLink || '/shop'} className="inline-flex items-center justify-center bg-white text-gray-900 hover:bg-emerald-50 px-10 py-4 rounded-full font-medium transition-all text-lg shadow-xl hover:shadow-2xl hover:-translate-y-1 btn-animate">
+                {config.hero.primaryButtonText}
+              </Link>
+              {config.hero.secondaryButtonText && (
+                <Link href={config.hero.secondaryButtonLink || '/shop'} className="inline-flex items-center justify-center bg-white/15 backdrop-blur-md border border-white/40 text-white hover:bg-white/25 px-10 py-4 rounded-full font-medium transition-colors text-lg btn-animate">
+                  {config.hero.secondaryButtonText}
                 </Link>
-                {config.hero.secondaryButtonText && (
-                  <Link href={config.hero.secondaryButtonLink || '/shop'} className="inline-flex items-center justify-center bg-white/20 backdrop-blur-md border border-white/50 lg:bg-white lg:border-gray-200 text-white lg:text-gray-900 hover:bg-white/30 lg:hover:text-emerald-800 lg:hover:border-emerald-800 px-10 py-4 rounded-full font-medium transition-colors text-lg btn-animate">
-                    {config.hero.secondaryButtonText}
-                  </Link>
-                )}
-              </div>
-
-              {/* Stats - Visible on Desktop, Hidden on Mobile Hero */}
-              <div className="mt-12 pt-8 border-t border-gray-200 hidden lg:grid grid-cols-3 gap-6">
-                <div className="flex flex-col items-start text-left">
-                  <p className="font-serif font-bold text-gray-900 text-lg">Direct Import</p>
-                  <p className="text-sm text-gray-500">Sourced from China</p>
-                </div>
-                <div className="flex flex-col items-start text-left">
-                  <p className="font-serif font-bold text-gray-900 text-lg">Verified Quality</p>
-                  <p className="text-sm text-gray-500">Inspected by hand</p>
-                </div>
-                <div className="flex flex-col items-start text-left">
-                  <p className="font-serif font-bold text-gray-900 text-lg">Best Prices</p>
-                  <p className="text-sm text-gray-500">Unbeatable value</p>
-                </div>
-              </div>
-
+              )}
             </div>
 
           </div>
