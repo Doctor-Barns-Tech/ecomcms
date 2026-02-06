@@ -52,7 +52,7 @@ export default function CheckoutPage() {
     'Western North'
   ];
 
-  const [deliveryMethod, setDeliveryMethod] = useState('accra');
+  const [deliveryMethod, setDeliveryMethod] = useState('pickup');
   const [paymentMethod, setPaymentMethod] = useState('moolre');
   const [errors, setErrors] = useState<any>({});
 
@@ -87,7 +87,7 @@ export default function CheckoutPage() {
 
   // Calculate Totals
   const subtotal = cartSubtotal;
-  const shippingCost = deliveryMethod === 'accra' ? 40 : deliveryMethod === 'outside-accra' ? 30 : 0;
+  const shippingCost = 0; // Delivery options temporarily disabled
   const tax = 0; // No Tax
   const total = subtotal + shippingCost + tax;
 
@@ -507,6 +507,8 @@ export default function CheckoutPage() {
             {currentStep === 2 && (
               <>
                 <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+                  {/* Delivery options temporarily hidden - will be re-enabled later */}
+                  {/*
                   <h2 className="text-xl font-bold text-gray-900 mb-6">Delivery Method</h2>
                   <div className="space-y-4">
                     <label className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-colors ${deliveryMethod === 'accra' ? 'border-emerald-700 bg-emerald-50' : 'border-gray-300 hover:border-gray-400'
@@ -566,6 +568,7 @@ export default function CheckoutPage() {
                       <p className="font-bold text-emerald-700">FREE</p>
                     </label>
                   </div>
+                  */}
 
                   <div className="flex flex-col-reverse md:flex-row gap-4 mt-6">
                     <button
