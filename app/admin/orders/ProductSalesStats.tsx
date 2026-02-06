@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { supabase } from '@/lib/supabase';
 
 interface SalesStat {
@@ -8,12 +8,20 @@ interface SalesStat {
     itemsSold: number;
     totalRevenue: number;
     _orderIds: Set<string>;
+    variants: Map<string, { quantity: number; revenue: number }>;
+}
+
+interface VariantDisplay {
+    name: string;
+    quantity: number;
+    revenue: number;
 }
 
 export default function ProductSalesStats({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
     const [period, setPeriod] = useState<'24h' | '7d' | '30d' | 'all'>('7d');
     const [loading, setLoading] = useState(false);
-    const [stats, setStats] = useState<Omit<SalesStat, '_orderIds'>[]>([]);
+    const [stats, setStats] = useState<(Omit<SalesStat, '_orderIds' | 'variants'> & { variants: VariantDisplay[] })[]>([]);
+    const [expandedProduct, setExpandedProduct] = useState<string | null>(null);
 
     useEffect(() => {
         if (isOpen) fetchStats();
@@ -49,19 +57,18 @@ export default function ProductSalesStats({ isOpen, onClose }: { isOpen: boolean
           quantity,
           product_name,
           product_id,
+          variant_name,
           total_price,
           orders!inner (
             id,
             created_at,
-            status
+            status,
+            payment_status
           )
         `);
 
-            // Ideally we filter by status too (exclude cancelled?)
-            // User didn't specify, but usually "sales" implies completed/processing.
-            // I'll filter out 'cancelled' and 'pending' (if pending means abandoned cart? No, pending usually means placed).
-            // I'll just filter out 'cancelled'.
-            query = query.neq('orders.status', 'cancelled');
+            // Only include paid orders (confirmed) and exclude cancelled
+            query = query.eq('orders.payment_status', 'paid').neq('orders.status', 'cancelled');
 
             if (startDate) {
                 query = query.gte('orders.created_at', startDate);
@@ -84,13 +91,21 @@ export default function ProductSalesStats({ isOpen, onClose }: { isOpen: boolean
                             ordersCount: 0,
                             itemsSold: 0,
                             totalRevenue: 0,
-                            _orderIds: new Set()
+                            _orderIds: new Set(),
+                            variants: new Map()
                         });
                     }
 
                     const entry = map.get(pid)!;
                     entry.itemsSold += (item.quantity || 0);
                     entry.totalRevenue += (item.total_price || 0);
+
+                    // Track variants
+                    const variantName = item.variant_name || 'Default';
+                    const existing = entry.variants.get(variantName) || { quantity: 0, revenue: 0 };
+                    existing.quantity += (item.quantity || 0);
+                    existing.revenue += (item.total_price || 0);
+                    entry.variants.set(variantName, existing);
 
                     const orderId = item.orders?.id;
                     if (orderId && !entry._orderIds.has(orderId)) {
@@ -101,7 +116,12 @@ export default function ProductSalesStats({ isOpen, onClose }: { isOpen: boolean
 
                 // Convert to array and sort by items sold
                 const result = Array.from(map.values())
-                    .map(({ _orderIds, ...rest }) => rest) // Remove Set from state
+                    .map(({ _orderIds, variants, ...rest }) => ({
+                        ...rest,
+                        variants: Array.from(variants.entries())
+                            .map(([name, data]) => ({ name, ...data }))
+                            .sort((a, b) => b.quantity - a.quantity)
+                    }))
                     .sort((a, b) => b.itemsSold - a.itemsSold);
 
                 setStats(result);
@@ -177,8 +197,30 @@ export default function ProductSalesStats({ isOpen, onClose }: { isOpen: boolean
                                 </tr>
                             ) : (
                                 stats.map((s) => (
-                                    <tr key={s.productId} className="hover:bg-emerald-50/30 transition-colors">
-                                        <td className="p-4 pl-6 font-medium text-gray-900">{s.productName}</td>
+                                    <Fragment key={s.productId}>
+                                    {(() => {
+                                        const hasVariants = s.variants.length > 1 || (s.variants.length === 1 && s.variants[0].name !== 'Default');
+                                        return (
+                                    <>
+                                    <tr 
+                                        className={`hover:bg-emerald-50/30 transition-colors ${hasVariants ? 'cursor-pointer' : ''}`}
+                                        onClick={() => hasVariants && setExpandedProduct(expandedProduct === s.productId ? null : s.productId)}
+                                    >
+                                        <td className="p-4 pl-6 font-medium text-gray-900">
+                                            <div className="flex items-center space-x-2">
+                                                {hasVariants ? (
+                                                    <i className={`ri-arrow-${expandedProduct === s.productId ? 'down' : 'right'}-s-line text-gray-400`}></i>
+                                                ) : (
+                                                    <span className="w-4"></span>
+                                                )}
+                                                <span>{s.productName}</span>
+                                                {hasVariants && (
+                                                    <span className="text-[10px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full font-semibold">
+                                                        {s.variants.length} variants
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </td>
                                         <td className="p-4 text-center">
                                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                                 {s.ordersCount}
@@ -191,6 +233,27 @@ export default function ProductSalesStats({ isOpen, onClose }: { isOpen: boolean
                                             {s.totalRevenue > 0 ? s.totalRevenue.toLocaleString() : '-'}
                                         </td>
                                     </tr>
+                                    {expandedProduct === s.productId && hasVariants && (
+                                        s.variants.map((v) => (
+                                            <tr key={`${s.productId}-${v.name}`} className="bg-gray-50/80 border-l-2 border-purple-200">
+                                                <td className="p-3 pl-14 text-gray-600 text-xs">
+                                                    <span className="inline-flex items-center space-x-1.5">
+                                                        <i className="ri-price-tag-3-line text-purple-400"></i>
+                                                        <span className="font-medium">{v.name}</span>
+                                                    </span>
+                                                </td>
+                                                <td className="p-3 text-center text-xs text-gray-400">—</td>
+                                                <td className="p-3 text-center text-xs font-semibold text-gray-700">{v.quantity}</td>
+                                                <td className="p-3 text-right pr-6 text-xs text-gray-500 font-mono">
+                                                    {v.revenue > 0 ? v.revenue.toLocaleString() : '-'}
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                    </>
+                                        );
+                                    })()}
+                                    </Fragment>
                                 ))
                             )}
                         </tbody>
@@ -198,7 +261,7 @@ export default function ProductSalesStats({ isOpen, onClose }: { isOpen: boolean
                 </div>
 
                 <div className="p-4 border-t border-gray-100 bg-gray-50 text-xs text-gray-500 flex justify-between">
-                    <span>* Excludes cancelled orders</span>
+                    <span>* Only paid/confirmed orders · Click a row to see variant breakdown</span>
                     <span>Showing top {stats.length} products</span>
                 </div>
             </div>
