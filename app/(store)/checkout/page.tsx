@@ -59,6 +59,11 @@ export default function CheckoutPage() {
     return () => clearTimeout(timer);
   }, [cart, router, isLoading]);
 
+  // Scroll to top when step changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentStep]);
+
   // Calculate Totals
   const subtotal = cartSubtotal;
   const shippingCost = deliveryMethod === 'express' ? 25 : deliveryMethod === 'standard' ? 15 : 0;

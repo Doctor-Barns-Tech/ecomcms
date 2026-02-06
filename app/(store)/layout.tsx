@@ -12,6 +12,7 @@ import NetworkStatusMonitor from '@/components/NetworkStatusMonitor';
 import UpdatePrompt from '@/components/UpdatePrompt';
 import LiveSalesNotification from '@/components/LiveSalesNotification';
 import FlashSaleBanner from '@/components/FlashSaleBanner';
+import ScrollToTop from '@/components/ScrollToTop';
 
 import CookieConsent from '@/components/CookieConsent';
 import { CMSProvider } from '@/context/CMSContext';
@@ -23,6 +24,7 @@ export default function StoreLayout({
 }) {
   return (
     <CMSProvider>
+      <ScrollToTop />
       <div className="min-h-screen bg-gray-50">
         <PWAInstaller />
         <Header />
