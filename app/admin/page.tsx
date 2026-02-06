@@ -134,10 +134,11 @@ export default function AdminDashboard() {
           }
         ]);
 
-        // 3. Fetch Recent Orders
+        // 3. Fetch Recent Orders (only paid orders)
         const { data: recentOrdersData } = await supabase
           .from('orders')
-          .select('id, order_number, user_id, email, created_at, total, status') // add shipping_address for name if json supported easily
+          .select('id, order_number, user_id, email, created_at, total, status')
+          .eq('payment_status', 'paid')
           .order('created_at', { ascending: false })
           .limit(5);
 
