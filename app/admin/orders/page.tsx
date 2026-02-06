@@ -11,11 +11,13 @@ interface Order {
   email: string;
   total: number;
   status: string;
+  payment_status: string;
   payment_method: string;
   shipping_method: string;
   created_at: string;
   phone?: string;
   shipping_address?: any;
+  metadata?: any;
   profiles?: {
     full_name: string;
     email: string;
@@ -39,6 +41,8 @@ export default function AdminOrdersPage() {
   const [sortBy, setSortBy] = useState('date');
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [orderViewTab, setOrderViewTab] = useState<'confirmed' | 'abandoned'>('confirmed');
+  const [sendingPaymentLink, setSendingPaymentLink] = useState<string | null>(null);
   const [orderStats, setOrderStats] = useState<OrderStats[]>([
     { label: 'All Orders', count: 0, status: 'all' },
     { label: 'Pending', count: 0, status: 'pending' },
@@ -47,6 +51,8 @@ export default function AdminOrdersPage() {
     { label: 'Delivered', count: 0, status: 'delivered' },
     { label: 'Cancelled', count: 0, status: 'cancelled' }
   ]);
+  const [abandonedCount, setAbandonedCount] = useState(0);
+  const [confirmedCount, setConfirmedCount] = useState(0);
   const [showProductStats, setShowProductStats] = useState(false);
 
   useEffect(() => {
@@ -66,11 +72,13 @@ export default function AdminOrdersPage() {
           email,
           total,
           status,
+          payment_status,
           payment_method,
           shipping_method,
           created_at,
           phone,
           shipping_address,
+          metadata,
           order_items (
             quantity
           )
@@ -81,14 +89,21 @@ export default function AdminOrdersPage() {
 
       setOrders(ordersData || []);
 
-      // Calculate stats
+      // Separate confirmed (paid) from abandoned (pending payment)
+      const confirmedOrders = ordersData?.filter(o => o.payment_status === 'paid') || [];
+      const abandonedOrders = ordersData?.filter(o => o.payment_status !== 'paid') || [];
+      
+      setConfirmedCount(confirmedOrders.length);
+      setAbandonedCount(abandonedOrders.length);
+
+      // Calculate stats based on confirmed orders only
       const stats = [
-        { label: 'All Orders', count: ordersData?.length || 0, status: 'all' },
-        { label: 'Pending', count: ordersData?.filter(o => o.status === 'pending').length || 0, status: 'pending' },
-        { label: 'Processing', count: ordersData?.filter(o => o.status === 'processing').length || 0, status: 'processing' },
-        { label: 'Shipped', count: ordersData?.filter(o => o.status === 'shipped').length || 0, status: 'shipped' },
-        { label: 'Delivered', count: ordersData?.filter(o => o.status === 'delivered').length || 0, status: 'delivered' },
-        { label: 'Cancelled', count: ordersData?.filter(o => o.status === 'cancelled').length || 0, status: 'cancelled' }
+        { label: 'All Orders', count: confirmedOrders.length, status: 'all' },
+        { label: 'Pending', count: confirmedOrders.filter(o => o.status === 'pending').length, status: 'pending' },
+        { label: 'Processing', count: confirmedOrders.filter(o => o.status === 'processing').length, status: 'processing' },
+        { label: 'Shipped', count: confirmedOrders.filter(o => o.status === 'shipped').length, status: 'shipped' },
+        { label: 'Delivered', count: confirmedOrders.filter(o => o.status === 'delivered').length, status: 'delivered' },
+        { label: 'Cancelled', count: confirmedOrders.filter(o => o.status === 'cancelled').length, status: 'cancelled' }
       ];
       setOrderStats(stats);
 
@@ -242,16 +257,43 @@ export default function AdminOrdersPage() {
     window.open(`/admin/orders/${orderId}?print=true`, '_blank');
   };
 
+  const handleResendPaymentLink = async (order: Order) => {
+    setSendingPaymentLink(order.id);
+    try {
+      const response = await fetch('/api/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'payment_link',
+          payload: order
+        })
+      });
+      
+      if (!response.ok) throw new Error('Failed to send');
+      
+      alert(`Payment link sent to ${order.phone || order.email}`);
+    } catch (error) {
+      console.error('Error sending payment link:', error);
+      alert('Failed to send payment link');
+    } finally {
+      setSendingPaymentLink(null);
+    }
+  };
+
   const filteredOrders = orders.filter(order => {
     const customerName = getCustomerName(order).toLowerCase();
     const customerEmail = getCustomerEmail(order).toLowerCase();
     const orderId = (order.order_number || order.id).toLowerCase();
 
+    // First filter by view tab (confirmed vs abandoned)
+    const isConfirmed = order.payment_status === 'paid';
+    const matchesViewTab = orderViewTab === 'confirmed' ? isConfirmed : !isConfirmed;
+
     const matchesSearch = orderId.includes(searchQuery.toLowerCase()) ||
       customerName.includes(searchQuery.toLowerCase()) ||
       customerEmail.includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    return matchesViewTab && matchesSearch && matchesStatus;
   });
 
   return (
@@ -279,6 +321,33 @@ export default function AdminOrdersPage() {
         </div>
       </div>
 
+      {/* View Tabs: Confirmed Orders vs Abandoned Carts */}
+      <div className="flex border-b border-gray-200">
+        <button
+          onClick={() => { setOrderViewTab('confirmed'); setStatusFilter('all'); }}
+          className={`px-6 py-3 font-semibold text-sm border-b-2 transition-colors cursor-pointer ${
+            orderViewTab === 'confirmed'
+              ? 'border-emerald-700 text-emerald-700'
+              : 'border-transparent text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          <i className="ri-check-double-line mr-2"></i>
+          Confirmed Orders ({confirmedCount})
+        </button>
+        <button
+          onClick={() => { setOrderViewTab('abandoned'); setStatusFilter('all'); }}
+          className={`px-6 py-3 font-semibold text-sm border-b-2 transition-colors cursor-pointer ${
+            orderViewTab === 'abandoned'
+              ? 'border-amber-600 text-amber-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          <i className="ri-shopping-cart-2-line mr-2"></i>
+          Abandoned Carts ({abandonedCount})
+        </button>
+      </div>
+
+      {orderViewTab === 'confirmed' && (
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {orderStats.map((stat) => (
           <button
@@ -294,6 +363,22 @@ export default function AdminOrdersPage() {
           </button>
         ))}
       </div>
+      )}
+
+      {/* Abandoned carts info banner */}
+      {orderViewTab === 'abandoned' && abandonedCount > 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+          <div className="flex items-start space-x-3">
+            <i className="ri-information-line text-xl text-amber-600 mt-0.5"></i>
+            <div>
+              <p className="text-sm font-semibold text-amber-800">Abandoned Carts</p>
+              <p className="text-sm text-amber-700 mt-1">
+                These orders were created but payment was not completed. You can resend payment links to customers.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="p-6 border-b border-gray-200">
@@ -457,7 +542,16 @@ export default function AdminOrdersPage() {
                     <td className="py-4 px-4 text-gray-700 text-sm whitespace-nowrap">{formatDate(order.created_at)}</td>
                     <td className="py-4 px-4 text-gray-700">{getItemCount(order)}</td>
                     <td className="py-4 px-4 font-semibold text-gray-900 whitespace-nowrap">GH₵ {order.total?.toFixed(2) || '0.00'}</td>
-                    <td className="py-4 px-4 text-gray-700 text-sm whitespace-nowrap">{order.payment_method || 'N/A'}</td>
+                    <td className="py-4 px-4 text-sm whitespace-nowrap">
+                      <div className="flex flex-col">
+                        <span className="text-gray-700">{order.payment_method || 'N/A'}</span>
+                        {orderViewTab === 'abandoned' && (
+                          <span className={`text-xs mt-1 ${order.payment_status === 'failed' ? 'text-red-600' : 'text-amber-600'}`}>
+                            {order.payment_status === 'failed' ? 'Failed' : 'Pending'}
+                          </span>
+                        )}
+                      </div>
+                    </td>
                     <td className="py-4 px-4">
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold border whitespace-nowrap ${statusColors[order.status] || 'bg-gray-100 text-gray-700 border-gray-200'}`}>
                         {formatStatus(order.status)}
@@ -468,12 +562,28 @@ export default function AdminOrdersPage() {
                         <Link
                           href={`/admin/orders/${order.id}`}
                           className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
+                          title="View Order"
                         >
                           <i className="ri-eye-line text-lg w-4 h-4 flex items-center justify-center"></i>
                         </Link>
+                        {orderViewTab === 'abandoned' && order.payment_status !== 'paid' && (
+                          <button
+                            onClick={() => handleResendPaymentLink(order)}
+                            disabled={sendingPaymentLink === order.id}
+                            className="w-8 h-8 flex items-center justify-center text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                            title="Resend Payment Link"
+                          >
+                            {sendingPaymentLink === order.id ? (
+                              <i className="ri-loader-4-line text-lg w-4 h-4 flex items-center justify-center animate-spin"></i>
+                            ) : (
+                              <i className="ri-send-plane-line text-lg w-4 h-4 flex items-center justify-center"></i>
+                            )}
+                          </button>
+                        )}
                         <button
                           onClick={() => handlePrintInvoice(order.id)}
                           className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
+                          title="Print Invoice"
                         >
                           <i className="ri-printer-line text-lg w-4 h-4 flex items-center justify-center"></i>
                         </button>

@@ -274,6 +274,63 @@ export async function sendWelcomeMessage(user: { email: string, firstName: strin
     }
 }
 
+export async function sendPaymentLink(order: any) {
+    const { id, email, phone: orderPhone, shipping_address, total, order_number, metadata } = order;
+
+    const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/+$/, '');
+    const paymentUrl = `${baseUrl}/pay/${id}`;
+
+    // Build customer name from available sources
+    const getName = () => {
+        if (shipping_address?.full_name) return shipping_address.full_name;
+        if (shipping_address?.firstName) {
+            return shipping_address.lastName 
+                ? `${shipping_address.firstName} ${shipping_address.lastName}` 
+                : shipping_address.firstName;
+        }
+        if (metadata?.first_name) {
+            return metadata.last_name 
+                ? `${metadata.first_name} ${metadata.last_name}` 
+                : metadata.first_name;
+        }
+        return 'Customer';
+    };
+    const name = getName();
+    const phone = orderPhone || shipping_address?.phone;
+
+    console.log(`[Notification] Sending payment link for Order #${order_number} | Phone: ${phone ? 'Present' : 'Missing'}`);
+
+    // Email with payment link
+    const emailHtml = `
+    <h1>Complete Your Order</h1>
+    <p>Hi ${name},</p>
+    <p>Your order #${order_number} is waiting for payment.</p>
+    <p><strong>Total:</strong> GH₵${Number(total).toFixed(2)}</p>
+    <br/>
+    <p><a href="${paymentUrl}" style="background-color: #047857; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">Complete Payment</a></p>
+    <br/>
+    <p>Or copy this link: ${paymentUrl}</p>
+    <br/>
+    <p>This link will remain active until your order is completed or cancelled.</p>
+  `;
+
+    await sendEmail({
+        to: email,
+        subject: `Complete Your Order #${order_number}`,
+        html: emailHtml
+    });
+
+    // SMS with payment link
+    if (phone) {
+        const smsMessage = `Hi ${name}, complete your order #${order_number} (GH₵${Number(total).toFixed(2)}) here: ${paymentUrl}`;
+        
+        await sendSMS({
+            to: phone,
+            message: smsMessage
+        });
+    }
+}
+
 export async function sendContactMessage(data: { name: string, email: string, subject: string, message: string }) {
     const { name, email, subject, message } = data;
 

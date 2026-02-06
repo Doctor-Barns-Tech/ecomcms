@@ -228,6 +228,16 @@ export default function CheckoutPage() {
       // 4. Handle Payment Redirects or Completion
       if (paymentMethod === 'moolre') {
         try {
+          // Send payment link notification BEFORE redirect (in case user drops off)
+          fetch('/api/notifications', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'payment_link',
+              payload: order
+            })
+          }).catch(err => console.error('Payment link notification error:', err));
+
           const paymentRes = await fetch('/api/payment/moolre', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

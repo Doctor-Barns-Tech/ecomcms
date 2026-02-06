@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { sendOrderConfirmation, sendOrderStatusUpdate, sendWelcomeMessage, sendContactMessage, sendEmail, sendSMS } from '@/lib/notifications';
+import { sendOrderConfirmation, sendOrderStatusUpdate, sendWelcomeMessage, sendContactMessage, sendPaymentLink, sendEmail, sendSMS } from '@/lib/notifications';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -120,6 +120,11 @@ export async function POST(request: Request) {
         if (type === 'contact') {
             await sendContactMessage(payload);
             return NextResponse.json({ success: true, message: 'Contact message sent' });
+        }
+
+        if (type === 'payment_link') {
+            await sendPaymentLink(payload);
+            return NextResponse.json({ success: true, message: 'Payment link sent' });
         }
 
         if (type === 'campaign') {
