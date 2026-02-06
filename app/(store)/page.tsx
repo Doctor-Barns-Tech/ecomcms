@@ -54,15 +54,19 @@ export default function Home() {
         if (productsError) throw productsError;
         setFeaturedProducts(productsData || []);
 
-        // Fetch featured categories only
+        // Fetch featured categories only (featured is stored in metadata JSONB)
         const { data: categoriesData, error: categoriesError } = await supabase
           .from('categories')
-          .select('id, name, slug, image_url')
-          .eq('featured', true)
+          .select('id, name, slug, image_url, metadata')
           .order('name');
 
         if (categoriesError) throw categoriesError;
-        setCategories(categoriesData || []);
+        
+        // Filter by metadata.featured = true on client side
+        const featuredCategories = (categoriesData || []).filter(
+          (cat: any) => cat.metadata?.featured === true
+        );
+        setCategories(featuredCategories);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
