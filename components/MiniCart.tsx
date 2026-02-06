@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 
 interface MiniCartProps {
@@ -11,6 +12,18 @@ interface MiniCartProps {
 export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
   const { cart, removeFromCart, updateQuantity, subtotal } = useCart();
 
+  // Lock body scroll when cart is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
@@ -20,7 +33,7 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
         onClick={onClose}
       ></div>
 
-      <div className="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-50 flex flex-col slide-in-right">
+      <div className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-white shadow-2xl z-50 flex flex-col slide-in-right">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-bold text-gray-900">
             Shopping Cart ({cart.reduce((sum, i) => sum + i.quantity, 0)})
@@ -79,9 +92,12 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity - 1, item.variant)}
                             className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors cursor-pointer"
-                            disabled={item.quantity <= 1}
                           >
-                            <i className="ri-subtract-line text-gray-700"></i>
+                            {item.quantity <= (item.moq || 1) ? (
+                              <i className="ri-delete-bin-line text-red-500"></i>
+                            ) : (
+                              <i className="ri-subtract-line text-gray-700"></i>
+                            )}
                           </button>
                           <span className="w-10 text-center font-semibold text-gray-900">{item.quantity}</span>
                           <button
