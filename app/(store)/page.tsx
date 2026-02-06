@@ -46,7 +46,7 @@ export default function Home() {
         const { data, error } = await supabase
           .from('products')
           .select('*, product_variants(*), product_images(*)')
-          .eq('status', 'Active')
+          .ilike('status', 'active')
           .limit(8);
 
         if (error) throw error;
@@ -62,10 +62,10 @@ export default function Home() {
   }, []);
 
   const categories = [
-    { name: 'Mannequins', image: 'https://readdy.ai/api/search-image?query=high%20quality%20retail%20mannequins%20display%20dummy%20fashion%20store%20setup%20professional%20lighting%20elegant%20pose&width=600&height=800&seq=1&orientation=portrait', link: '/shop?category=mannequins' },
-    { name: 'Kitchen Utensiles', image: 'https://readdy.ai/api/search-image?query=modern%20premium%20kitchen%20utensils%20set%20stainless%20steel%20cooking%20tools%20marble%20countertop%20culinary%20essentials&width=600&height=800&seq=2&orientation=portrait', link: '/shop?category=kitchen-utensiles' },
-    { name: 'Kitchen Appliances', image: 'https://readdy.ai/api/search-image?query=sleek%20modern%20kitchen%20appliances%20blender%20toaster%20coffee%20maker%20luxury%20kitchen%20interior&width=600&height=800&seq=3&orientation=portrait', link: '/shop?category=kitchen-appliances' },
-    { name: 'Dresses', image: 'https://readdy.ai/api/search-image?query=elegant%20fashion%20dresses%20on%20rack%20boutique%20store%20interior%20stylish%20clothing%20collection&width=600&height=800&seq=4&orientation=portrait', link: '/shop?category=dresses' },
+    { name: 'Mannequins', image: 'https://images.unsplash.com/photo-1558171813-4c088753af8f?w=600&h=800&fit=crop', link: '/shop?category=mannequins' },
+    { name: 'Kitchen Utensils', image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&h=800&fit=crop', link: '/shop?category=kitchen-utensiles' },
+    { name: 'Kitchen Appliances', image: 'https://images.unsplash.com/photo-1556909172-8c2f041fca1e?w=600&h=800&fit=crop', link: '/shop?category=kitchen-appliances' },
+    { name: 'Dresses', image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=800&fit=crop', link: '/shop?category=dresses' },
   ];
 
   const features = [
