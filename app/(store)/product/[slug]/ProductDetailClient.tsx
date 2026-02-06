@@ -68,7 +68,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
           features: ['Premium Quality', 'Authentic Design'], // Placeholder or extract from description/metadata
           featured: ['Premium Quality', 'Authentic Design'], // Placeholder or extract from description/metadata
           care: 'Handle with care.',
-          isPreorder: productData.metadata?.is_preorder || false
+          preorderShipping: productData.metadata?.preorder_shipping || null
         };
 
         // Ensure at least one image/placeholder
@@ -369,10 +369,10 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                     <i className="ri-store-2-line text-xl text-emerald-700 mr-3"></i>
                     <span>Free store pickup available</span>
                   </div>
-                  {product.isPreorder && (
+                  {product.preorderShipping && (
                     <div className="flex items-center text-gray-700 font-medium text-amber-700 bg-amber-50 p-2 rounded-lg border border-amber-200">
                       <i className="ri-time-line text-xl mr-3"></i>
-                      <span>Estimated Shipping Time: 30 Days (Pre-order)</span>
+                      <span>{product.preorderShipping}</span>
                     </div>
                   )}
                   <div className="flex items-center text-gray-700">

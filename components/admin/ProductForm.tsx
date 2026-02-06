@@ -26,7 +26,7 @@ export default function ProductForm({ initialData, isEditMode = false }: Product
     const [description, setDescription] = useState(initialData?.description || '');
     const [status, setStatus] = useState(initialData?.status || 'Active');
     const [featured, setFeatured] = useState(initialData?.featured || false);
-    const [isPreorder, setIsPreorder] = useState(initialData?.metadata?.is_preorder || false);
+    const [preorderShipping, setPreorderShipping] = useState(initialData?.metadata?.preorder_shipping || '');
     const [activeTab, setActiveTab] = useState('general');
 
     // Auto-generate SKU function
@@ -160,7 +160,7 @@ export default function ProductForm({ initialData, isEditMode = false }: Product
                 tags: (keywords as string).split(',').map((k: string) => k.trim()).filter(Boolean),
                 metadata: {
                     low_stock_threshold: parseInt(lowStockThreshold) || 5,
-                    is_preorder: isPreorder
+                    preorder_shipping: preorderShipping.trim() || null
                 }
             };
 
@@ -389,16 +389,18 @@ export default function ProductForm({ initialData, isEditMode = false }: Product
                                 </label>
                             </div>
 
-                            <div className="flex items-center space-x-3">
-                                <input
-                                    type="checkbox"
-                                    checked={isPreorder}
-                                    onChange={(e) => setIsPreorder(e.target.checked)}
-                                    className="w-5 h-5 text-emerald-700 border-gray-300 rounded focus:ring-emerald-500 cursor-pointer"
-                                />
-                                <label className="text-gray-900 font-medium">
-                                    Pre-order Item (Ships in 30 days)
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-900 mb-2">
+                                    Pre-order / Estimated Shipping
                                 </label>
+                                <input
+                                    type="text"
+                                    value={preorderShipping}
+                                    onChange={(e) => setPreorderShipping(e.target.value)}
+                                    placeholder="e.g., Ships in 14 days, Available March 15"
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                />
+                                <p className="text-xs text-gray-500 mt-1">Leave empty if product ships immediately. Otherwise, enter estimated shipping time.</p>
                             </div>
                         </div>
                     )}
