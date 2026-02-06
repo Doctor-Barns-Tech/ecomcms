@@ -164,11 +164,33 @@ export default function CheckoutPage() {
 
       if (orderError) throw orderError;
 
-      // 2. Create Order Items
-      const orderItems = [
-        ...cart.map(item => ({
+      // 2. Create Order Items (with UUID validation)
+      // Helper to check if string is a valid UUID
+      const isValidUUID = (str: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+      
+      // Build order items, resolving slugs to UUIDs if needed
+      const orderItems = [];
+      for (const item of cart) {
+        let productId = item.id;
+        
+        // If id is not a valid UUID, it might be a slug - try to resolve it
+        if (!isValidUUID(productId)) {
+          const { data: product } = await supabase
+            .from('products')
+            .select('id')
+            .or(`slug.eq.${productId},id.eq.${productId}`)
+            .single();
+          
+          if (product) {
+            productId = product.id;
+          } else {
+            throw new Error(`Product not found: ${item.name}. Please remove it from your cart and try again.`);
+          }
+        }
+        
+        orderItems.push({
           order_id: order.id,
-          product_id: item.id, // Assuming cart item id is product id
+          product_id: productId,
           product_name: item.name,
           variant_name: item.variant,
           quantity: item.quantity,
@@ -178,8 +200,8 @@ export default function CheckoutPage() {
             image: item.image,
             slug: item.slug
           }
-        }))
-      ];
+        });
+      }
 
       const { error: itemsError } = await supabase
         .from('order_items')
