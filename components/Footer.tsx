@@ -104,7 +104,8 @@ export default function Footer() {
               <img src="/sarahlawson.png" alt={siteName} className="h-14 w-auto object-contain brightness-0 invert opacity-90" />
             </Link>
             <p className="text-emerald-200/80 leading-relaxed text-sm">
-              {siteTagline}
+              {siteTagline.replace(/Less\.?$/i, '').trimEnd()}{' '}
+              <Link href="/admin" className="text-inherit hover:text-inherit no-underline">Less.</Link>
             </p>
 
             <div className="flex gap-4 pt-2">
