@@ -22,31 +22,57 @@ export default function NotificationsPage() {
         setSuccess('');
 
         try {
-            // 1. Fetch Recipients (Client-side to use Admin session)
-            let recipients: any[] = [];
-            if (form.audience === 'all' || form.audience === 'newsletter') {
-                const { data, error } = await supabase
-                    .from('profiles')
-                    .select('email, phone, full_name');
-
-                if (error) throw error;
-                recipients = data.map(u => ({ email: u.email, phone: u.phone, name: u.full_name }));
+            // 1. Get auth token for admin verification
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session?.access_token) {
+                throw new Error('You must be logged in as admin to send campaigns');
             }
 
-            if (recipients.length === 0) throw new Error('No recipients found in selected audience');
+            // 2. Fetch Recipients from the customers table (has actual phone numbers)
+            let recipients: any[] = [];
+            const { data: customers, error: fetchError } = await supabase
+                .from('customers')
+                .select('email, phone, full_name');
 
-            // 2. Call API
+            if (fetchError) throw fetchError;
+
+            recipients = (customers || [])
+                .map(c => ({ email: c.email, phone: c.phone, name: c.full_name }))
+                .filter(r => {
+                    // Filter based on selected channels
+                    if (form.channels.sms && !form.channels.email) return r.phone;
+                    if (form.channels.email && !form.channels.sms) return r.email;
+                    return r.email || r.phone;
+                });
+
+            if (recipients.length === 0) throw new Error('No recipients found with valid contact info');
+
+            // Confirm before sending
+            const smsCount = recipients.filter(r => r.phone).length;
+            const emailCount = recipients.filter(r => r.email).length;
+            const summary = [];
+            if (form.channels.sms) summary.push(`${smsCount} SMS`);
+            if (form.channels.email) summary.push(`${emailCount} emails`);
+
+            if (!window.confirm(`This will send ${summary.join(' and ')} to your customers. Continue?`)) {
+                setLoading(false);
+                return;
+            }
+
+            // 3. Call API with auth token
             const res = await fetch('/api/notifications', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}`
+                },
                 body: JSON.stringify({
                     type: 'campaign',
                     payload: {
-                        recipients, // Array of { email, phone, name }
+                        recipients,
                         subject: form.subject,
                         message: form.message,
                         channels: form.channels,
-                        // audience: form.audience // Audience is now handled client-side for recipient fetching
                     }
                 })
             });
@@ -55,7 +81,6 @@ export default function NotificationsPage() {
             if (!res.ok) throw new Error(data.error || 'Failed to send');
 
             setSuccess(`Campaign sent successfully! ${data.message || ''}`);
-            // Clear sensitive fields
             setForm(prev => ({ ...prev, subject: '', message: '' }));
         } catch (err: any) {
             setError(err.message);

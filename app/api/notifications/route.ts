@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { sendOrderConfirmation, sendOrderStatusUpdate, sendWelcomeMessage, sendContactMessage, sendPaymentLink, sendEmail, sendSMS } from '@/lib/notifications';
+import { sendOrderConfirmation, sendOrderStatusUpdate, sendWelcomeMessage, sendContactMessage, sendPaymentLink, sendEmail, sendSMS, emailLayout } from '@/lib/notifications';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -131,29 +131,41 @@ export async function POST(request: Request) {
             const { recipients, subject, message, channels } = payload;
 
             // recipients is array of { email, phone, name }
-            // Basic loop - in production use a queue
-            const results = { email: 0, sms: 0 };
+            const results = { email: 0, sms: 0, errors: 0 };
 
             for (const recipient of recipients) {
-                if (channels.email && recipient.email) {
-                    await sendEmail({
-                        to: recipient.email,
-                        subject: subject,
-                        html: `<h1>${subject}</h1><p>Hi ${recipient.name || 'Customer'},</p><p>${message.replace(/\n/g, '<br/>')}</p>`
-                    });
-                    results.email++;
-                }
+                try {
+                    if (channels.email && recipient.email) {
+                        const brandedHtml = emailLayout(`
+<h2 style="margin:0 0 16px;color:#111827;font-size:22px;text-align:center;">${subject}</h2>
+<p style="color:#374151;font-size:14px;line-height:1.7;margin:16px 0;">Hi ${recipient.name || 'Valued Customer'},</p>
+<p style="color:#374151;font-size:14px;line-height:1.7;margin:0 0 16px;">${message.replace(/\n/g, '</p><p style="color:#374151;font-size:14px;line-height:1.7;margin:0 0 16px;">')}</p>
+`, subject);
+                        await sendEmail({
+                            to: recipient.email,
+                            subject: subject,
+                            html: brandedHtml
+                        });
+                        results.email++;
+                    }
 
-                if (channels.sms && recipient.phone) {
-                    await sendSMS({
-                        to: recipient.phone,
-                        message: message
-                    });
-                    results.sms++;
+                    if (channels.sms && recipient.phone) {
+                        await sendSMS({
+                            to: recipient.phone,
+                            message: message
+                        });
+                        results.sms++;
+                    }
+                } catch (err: any) {
+                    console.error(`[Campaign] Failed for ${recipient.email || recipient.phone}:`, err.message);
+                    results.errors++;
                 }
             }
 
-            return NextResponse.json({ success: true, message: `Campaign sent to ${results.email} emails and ${results.sms} numbers.` });
+            return NextResponse.json({ 
+                success: true, 
+                message: `Campaign sent: ${results.email} emails, ${results.sms} SMS.${results.errors > 0 ? ` (${results.errors} failed)` : ''}` 
+            });
         }
 
         return NextResponse.json({ error: 'Invalid notification type' }, { status: 400 });

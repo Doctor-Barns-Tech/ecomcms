@@ -14,7 +14,7 @@ const BRAND = {
 };
 
 // Reusable branded email layout
-function emailLayout(body: string, preheader?: string): string {
+export function emailLayout(body: string, preheader?: string): string {
     return `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
