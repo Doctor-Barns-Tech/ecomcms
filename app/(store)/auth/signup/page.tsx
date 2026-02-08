@@ -1,13 +1,34 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import PasswordStrengthMeter from '@/components/PasswordStrengthMeter';
 import { supabase } from '@/lib/supabase';
 
+function getFriendlyError(message: string): string {
+  const lower = message.toLowerCase();
+  if (lower.includes('email rate limit exceeded') || lower.includes('over_email_send_rate_limit')) {
+    return 'Our system is experiencing high demand. Please wait a few minutes and try again, or contact us for help.';
+  }
+  if (lower.includes('user already registered') || lower.includes('already been registered')) {
+    return 'An account with this email already exists. Try signing in instead.';
+  }
+  if (lower.includes('password') && lower.includes('weak')) {
+    return 'Your password is too weak. Please use at least 8 characters with a mix of letters, numbers, and symbols.';
+  }
+  if (lower.includes('invalid email')) {
+    return 'Please enter a valid email address.';
+  }
+  if (lower.includes('network') || lower.includes('fetch')) {
+    return 'Connection error. Please check your internet and try again.';
+  }
+  return message;
+}
+
 export default function SignupPage() {
   const router = useRouter();
+  const errorRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -15,7 +36,7 @@ export default function SignupPage() {
     phone: '',
     password: '',
     confirmPassword: '',
-    acceptTerms: false, // Fixed key name mismatch from original (was agreeToTerms locally vs acceptTerms in logic)
+    acceptTerms: false,
     newsletter: false
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -24,6 +45,13 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [authError, setAuthError] = useState('');
   const [success, setSuccess] = useState(false);
+
+  // Auto-scroll to error when it appears
+  useEffect(() => {
+    if (authError && errorRef.current) {
+      errorRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [authError]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,7 +128,7 @@ export default function SignupPage() {
       }
     } catch (err: any) {
       console.error('Signup error:', err);
-      setAuthError(err.message || 'Failed to sign up.');
+      setAuthError(getFriendlyError(err.message || 'Failed to sign up. Please try again.'));
     } finally {
       setIsLoading(false);
     }
@@ -136,8 +164,9 @@ export default function SignupPage() {
 
         <div className="bg-white rounded-xl shadow-sm p-8">
           {authError && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
-              {authError}
+            <div ref={errorRef} className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm flex items-start gap-3">
+              <i className="ri-error-warning-line text-red-500 text-lg flex-shrink-0 mt-0.5"></i>
+              <span>{authError}</span>
             </div>
           )}
 
