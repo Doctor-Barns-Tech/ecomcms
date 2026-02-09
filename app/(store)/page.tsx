@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { supabase } from '@/lib/supabase';
 import ProductCard from '@/components/ProductCard';
 import AnimatedSection, { AnimatedGrid } from '@/components/AnimatedSection';
 import { usePageTitle } from '@/hooks/usePageTitle';
@@ -46,29 +45,25 @@ export default function Home() {
   useEffect(() => {
     async function fetchData() {
       try {
-        // Fetch products
-        const { data: productsData, error: productsError } = await supabase
-          .from('products')
-          .select('*, product_variants(*), product_images(*)')
-          .eq('status', 'active')
-          .limit(8);
+        // Fetch from cached API routes instead of Supabase directly
+        const [productsRes, categoriesRes] = await Promise.all([
+          fetch('/api/storefront/products?featured=true&limit=8'),
+          fetch('/api/storefront/categories')
+        ]);
 
-        if (productsError) throw productsError;
-        setFeaturedProducts(productsData || []);
+        if (productsRes.ok) {
+          const productsData = await productsRes.json();
+          setFeaturedProducts(productsData || []);
+        }
 
-        // Fetch featured categories only (featured is stored in metadata JSONB)
-        const { data: categoriesData, error: categoriesError } = await supabase
-          .from('categories')
-          .select('id, name, slug, image_url, metadata')
-          .order('name');
-
-        if (categoriesError) throw categoriesError;
-        
-        // Filter by metadata.featured = true on client side
-        const featuredCategories = (categoriesData || []).filter(
-          (cat: any) => cat.metadata?.featured === true
-        );
-        setCategories(featuredCategories);
+        if (categoriesRes.ok) {
+          const categoriesData = await categoriesRes.json();
+          // Filter featured categories client-side
+          const featuredCategories = (categoriesData || []).filter(
+            (cat: any) => cat.is_featured === true
+          );
+          setCategories(featuredCategories);
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -117,10 +112,14 @@ export default function Home() {
 
         {/* Mobile: Full Background Image with Gradient Overlay */}
         <div className="absolute inset-0 lg:hidden z-0">
-          <img
+          <Image
             src={getHeroImage()}
-            className="w-full h-full object-cover transition-opacity duration-1000"
+            fill
+            className="object-cover transition-opacity duration-1000"
             alt="Hero Background"
+            priority
+            sizes="100vw"
+            quality={75}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10"></div>
         </div>
@@ -137,10 +136,14 @@ export default function Home() {
             {/* Desktop: Image Layout (Hidden on Mobile) */}
             <div className="hidden lg:block order-last relative">
               <div className="relative aspect-[3/4] lg:aspect-auto lg:h-[650px] overflow-hidden rounded-[2rem] shadow-xl">
-                <img
+                <Image
                   src={getHeroImage()}
                   alt="Hero Image"
-                  className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-1000"
+                  fill
+                  className="object-cover object-top hover:scale-105 transition-transform duration-1000"
+                  priority
+                  sizes="50vw"
+                  quality={80}
                 />
 
                 {/* Floating Badge (Desktop Only) */}
@@ -221,10 +224,13 @@ export default function Home() {
             {categories.map((category) => (
               <Link href={`/shop?category=${category.slug}`} key={category.id} className="group cursor-pointer block">
                 <div className="aspect-[3/4] rounded-2xl overflow-hidden mb-4 relative shadow-md">
-                  <img
-                    src={category.image_url || 'https://via.placeholder.com/600x800?text=' + category.name}
+                  <Image
+                    src={category.image || category.image_url || 'https://via.placeholder.com/600x800?text=' + encodeURIComponent(category.name)}
                     alt={category.name}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    sizes="(max-width: 768px) 50vw, 25vw"
+                    quality={75}
                   />
                   <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
                   <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm p-4 rounded-xl text-center transform translate-y-2 opacity-90 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">

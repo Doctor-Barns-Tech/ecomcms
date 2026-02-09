@@ -63,7 +63,7 @@ export default function ProductsPage() {
 
       if (data) {
         // Transform data for UI
-        const transformedProducts = data.map(p => ({
+        const transformedProducts = data.map((p: any) => ({
           ...p,
           category: p.categories?.name || 'Uncategorized',
           image: p.product_images?.find((img: any) => img.position === 0)?.url

@@ -143,7 +143,7 @@ export default function AdminDashboard() {
           .limit(5);
 
         if (recentOrdersData) {
-          const formattedRecent = recentOrdersData.map(o => {
+          const formattedRecent = recentOrdersData.map((o: any) => {
             const addr = o.shipping_address || {};
             const customerName = (addr.firstName && addr.lastName)
               ? `${addr.firstName.trim()} ${addr.lastName.trim()}`
@@ -170,7 +170,7 @@ export default function AdminDashboard() {
           .limit(5);
 
         if (lowStockData) {
-          setLowStockProducts(lowStockData.map(p => ({
+          setLowStockProducts(lowStockData.map((p: any) => ({
             name: p.name,
             stock: p.quantity,
             status: p.quantity === 0 ? 'critical' : 'low'
@@ -182,7 +182,7 @@ export default function AdminDashboard() {
         // real top selling requires aggregation on order_items which is complex for client-side)
         const { data: productData } = await supabase.from('products').select('*, product_images(url)').limit(4);
         if (productData) {
-          setTopProducts(productData.map(p => ({
+          setTopProducts(productData.map((p: any) => ({
             id: p.slug, // Use slug for link
             name: p.name,
             image: p.product_images?.[0]?.url || 'https://via.placeholder.com/200',

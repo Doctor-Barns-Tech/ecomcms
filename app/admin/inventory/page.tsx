@@ -35,7 +35,7 @@ export default function InventoryManagementPage() {
       if (error) throw error;
 
       if (data) {
-        const mapped = data.map(p => {
+        const mapped = data.map((p: any) => {
           const stock = p.quantity || 0;
           let status = 'good';
           if (stock === 0) status = 'out';

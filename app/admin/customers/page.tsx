@@ -19,7 +19,7 @@ export default function AdminCustomersPage() {
   const fetchCustomers = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch from new customers table (includes both guests and registered users)
       const { data: customerData, error: cError } = await supabase
         .from('customers')
@@ -34,19 +34,19 @@ export default function AdminCustomersPage() {
       }
 
       if (customerData) {
-        const processed = customerData.map(customer => {
+        const processed = customerData.map((customer: any) => {
           // Determine status dynamically
           let status = 'New';
           const totalSpent = Number(customer.total_spent) || 0;
           const totalOrders = customer.total_orders || 0;
-          
+
           if (totalSpent > 1000) status = 'VIP';
           else if (totalOrders > 0) status = 'Active';
           else if (new Date(customer.created_at).getTime() < Date.now() - 30 * 24 * 60 * 60 * 1000) status = 'Inactive';
 
-          const displayName = customer.full_name || 
+          const displayName = customer.full_name ||
             (customer.first_name && customer.last_name ? `${customer.first_name} ${customer.last_name}` : null) ||
-            customer.first_name || 
+            customer.first_name ||
             'No Name';
 
           return {
@@ -89,7 +89,7 @@ export default function AdminCustomersPage() {
         .select('id, user_id, email, total, created_at, status, shipping_address');
 
       // Process registered users
-      const registeredCustomers = (profiles || []).map(profile => {
+      const registeredCustomers = (profiles || []).map((profile: any) => {
         const userOrders = orders?.filter(o => o.user_id === profile.id && o.status !== 'cancelled') || [];
         const totalSpent = userOrders.reduce((sum, o) => sum + Number(o.total || 0), 0);
         let lastOrderDate: Date | null = null;
@@ -122,12 +122,12 @@ export default function AdminCustomersPage() {
       // Process guest orders (no user_id)
       const guestOrders = orders?.filter(o => !o.user_id && o.email) || [];
       const guestMap = new Map<string, any>();
-      
+
       guestOrders.forEach(order => {
         const existing = guestMap.get(order.email);
         const orderTotal = Number(order.total) || 0;
         const orderDate = new Date(order.created_at);
-        
+
         const firstName = order.shipping_address?.firstName || '';
         const lastName = order.shipping_address?.lastName || '';
         const fullName = order.shipping_address?.full_name || `${firstName} ${lastName}`.trim();

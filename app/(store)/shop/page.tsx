@@ -141,7 +141,7 @@ function ShopContent() {
         if (error) throw error;
 
         if (data) {
-          const formattedProducts = data.map(p => {
+          const formattedProducts = data.map((p: any) => {
             const variants = p.product_variants || [];
             const hasVariants = variants.length > 0;
             const minVariantPrice = hasVariants ? Math.min(...variants.map((v: any) => v.price || p.price)) : undefined;

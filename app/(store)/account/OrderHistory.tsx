@@ -41,7 +41,7 @@ export default function OrderHistory() {
         if (error) throw error;
 
         if (data) {
-          const formattedOrders = data.map(order => ({
+          const formattedOrders = data.map((order: any) => ({
             id: order.id,
             orderNumber: order.order_number,
             date: order.created_at,

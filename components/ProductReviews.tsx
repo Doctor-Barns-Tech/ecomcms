@@ -66,7 +66,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
         // without complicated RLS/joins in client, we might fallback to generic name or metadata if stored.
         // For this demo, we'll try to use a "clean" name or just "Verified Customer"
 
-        const formattedReviews = data.map(r => ({
+        const formattedReviews = data.map((r: any) => ({
           id: r.id,
           author: 'Verified Customer', // or fetch from profiles if we had it joined
           rating: r.rating,
@@ -208,8 +208,8 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
               <button
                 onClick={() => setFilter('all')}
                 className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${filter === 'all'
-                    ? 'bg-emerald-700 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-emerald-700 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
               >
                 All Reviews ({reviews.length})

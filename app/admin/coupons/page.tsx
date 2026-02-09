@@ -25,7 +25,7 @@ export default function AdminCouponsPage() {
       if (error) {
         console.warn('Coupons table might not exist or error fetching:', error);
       } else if (data) {
-        setCoupons(data.map(c => ({
+        setCoupons(data.map((c: any) => ({
           id: c.id,
           code: c.code,
           type: c.discount_type || 'Percentage', // Adjust key if needed (e.g. type)
