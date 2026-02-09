@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
+import Image from 'next/image';
 
 interface LazyImageProps {
   src: string;
@@ -10,6 +11,7 @@ interface LazyImageProps {
   height?: number;
   priority?: boolean;
   onLoad?: () => void;
+  sizes?: string;
 }
 
 export default function LazyImage({
@@ -19,58 +21,48 @@ export default function LazyImage({
   width,
   height,
   priority = false,
-  onLoad
+  onLoad,
+  sizes = '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw'
 }: LazyImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isInView, setIsInView] = useState(priority);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (priority) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsInView(true);
-            observer.disconnect();
-          }
-        });
-      },
-      {
-        rootMargin: '100px',
-        threshold: 0.01
-      }
-    );
-
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [priority]);
+  const [hasError, setHasError] = useState(false);
 
   const handleLoad = () => {
     setIsLoaded(true);
     onLoad?.();
   };
 
+  const handleError = () => {
+    setHasError(true);
+    setIsLoaded(true);
+    onLoad?.();
+  };
+
+  // Fallback for invalid/empty URLs
+  if (!src || hasError) {
+    return (
+      <div className={`relative overflow-hidden bg-gray-200 flex items-center justify-center ${className}`} style={{ width, height }}>
+        <span className="text-gray-400 text-xs">No Image</span>
+      </div>
+    );
+  }
+
   return (
-    <div ref={containerRef} className={`relative overflow-hidden ${className}`} style={{ width, height }}>
+    <div className={`relative overflow-hidden ${className}`} style={{ width, height }}>
       {!isLoaded && (
-        <div className="absolute inset-0 bg-gray-200 animate-pulse"></div>
+        <div className="absolute inset-0 bg-gray-200 animate-pulse z-10"></div>
       )}
-      {isInView && (
-        <img
-          src={src}
-          alt={alt}
-          className={`w-full h-full transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'
-            }`}
-          onLoad={handleLoad}
-          onError={handleLoad} // treat error as loaded to remove skeleton
-          loading={priority ? 'eager' : 'lazy'}
-        />
-      )}
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        sizes={sizes}
+        className={`object-cover transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+        onLoad={handleLoad}
+        onError={handleError}
+        priority={priority}
+        quality={75}
+      />
     </div>
   );
 }
