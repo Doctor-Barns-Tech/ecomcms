@@ -31,7 +31,7 @@ export default function ProductForm({ initialData, isEditMode = false }: Product
 
     // Auto-generate SKU function
     const generateSku = () => {
-        const prefix = 'SLI'; // Sarah Lawson Imports
+        const prefix = process.env.NEXT_PUBLIC_SKU_PREFIX || 'SKU';
         const timestamp = Date.now().toString(36).toUpperCase().slice(-4);
         const random = Math.random().toString(36).substring(2, 6).toUpperCase();
         return `${prefix}-${timestamp}-${random}`;
@@ -716,11 +716,10 @@ export default function ProductForm({ initialData, isEditMode = false }: Product
                                             <button
                                                 key={color.name}
                                                 onClick={() => toggleColor(color)}
-                                                className={`flex items-center space-x-2 px-3 py-2 rounded-lg border-2 transition-all text-sm font-medium ${
-                                                    isSelected
+                                                className={`flex items-center space-x-2 px-3 py-2 rounded-lg border-2 transition-all text-sm font-medium ${isSelected
                                                         ? 'border-emerald-600 bg-emerald-50 ring-1 ring-emerald-600'
                                                         : 'border-gray-200 hover:border-gray-300 bg-white'
-                                                }`}
+                                                    }`}
                                                 title={color.name}
                                             >
                                                 <span
@@ -796,11 +795,10 @@ export default function ProductForm({ initialData, isEditMode = false }: Product
                                             <button
                                                 key={size}
                                                 onClick={() => toggleSize(size)}
-                                                className={`px-5 py-2.5 rounded-lg border-2 font-semibold text-sm transition-all ${
-                                                    isSelected
+                                                className={`px-5 py-2.5 rounded-lg border-2 font-semibold text-sm transition-all ${isSelected
                                                         ? 'border-blue-600 bg-blue-50 text-blue-800 ring-1 ring-blue-600'
                                                         : 'border-gray-200 hover:border-gray-300 bg-white text-gray-700'
-                                                }`}
+                                                    }`}
                                             >
                                                 {size}
                                                 {isSelected && <i className="ri-check-line ml-1.5 text-blue-600"></i>}

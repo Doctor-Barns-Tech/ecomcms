@@ -210,7 +210,7 @@ export const defaultSettings: SiteSettings = {
     // Hero
     hero_headline: 'Premium Products, Direct to You',
     hero_subheadline: 'Verified quality products at unbeatable prices.',
-    hero_image: '/sarah-lawson.jpeg',
+    hero_image: '/hero.jpg',
     hero_badge_label: 'Exclusive Offer',
     hero_badge_text: '25% Off',
     hero_badge_subtext: 'On your first dedicated order',
@@ -245,7 +245,7 @@ export const defaultSettings: SiteSettings = {
     about_hero_subtitle: 'Learn about who we are and what we do.',
     about_story_title: 'From Passion to Business',
     about_story_content: 'Our journey started with a vision to bring quality products to everyone at affordable prices.',
-    about_story_image: '/sarah-lawson.jpeg',
+    about_story_image: '/about.jpg',
     about_founder_name: 'Founder',
     about_founder_title: 'CEO',
     about_mission1_title: 'Direct Sourcing',
@@ -279,7 +279,7 @@ export const defaultSettings: SiteSettings = {
     header_show_account: 'true',
 
     // Footer
-    footer_logo: '/sarahlawson.png',
+    footer_logo: '/logo.png',
     footer_logo_height: '56',
     footer_newsletter_title: 'Join Our Community',
     footer_newsletter_subtitle: 'Get exclusive access to new arrivals, secret sales, and more.',

@@ -16,8 +16,13 @@ export default function PaymentPage() {
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [storeName, setStoreName] = useState('My Store');
 
   useEffect(() => {
+    // Fetch store name
+    supabase.from('store_settings').select('value').eq('key', 'site_name').single()
+      .then(({ data }) => { if (data?.value) setStoreName(typeof data.value === 'string' ? data.value : String(data.value)); });
+
     async function fetchOrder() {
       try {
         // Fetch order by ID (UUID) or order_number
@@ -58,7 +63,7 @@ export default function PaymentPage() {
 
   const handlePayNow = async () => {
     if (!order) return;
-    
+
     setProcessing(true);
     setError(null);
 
@@ -109,7 +114,7 @@ export default function PaymentPage() {
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-3">Order Not Found</h1>
           <p className="text-gray-600 mb-6">{error}</p>
-          <Link 
+          <Link
             href="/"
             className="inline-flex items-center px-6 py-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg font-semibold transition-colors"
           >
@@ -130,7 +135,7 @@ export default function PaymentPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-block mb-6">
-            <span className="text-2xl font-['Pacifico'] text-emerald-700">Sarah Lawson</span>
+            <span className="text-2xl font-bold text-emerald-700">{storeName}</span>
           </Link>
           <h1 className="text-2xl font-bold text-gray-900">Complete Your Payment</h1>
           <p className="text-gray-600 mt-2">Hi {customerName}, your order is waiting for payment.</p>

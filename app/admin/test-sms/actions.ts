@@ -39,7 +39,7 @@ export async function testSmsAction(phone: string, message: string) {
             },
             body: JSON.stringify({
                 type: 1,
-                senderid: 'SarahLawson',
+                senderid: process.env.SMS_SENDER_ID || 'MyStore',
                 messages: [
                     {
                         recipient: recipient,

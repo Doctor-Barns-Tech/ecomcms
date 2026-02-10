@@ -19,7 +19,7 @@ export default function AboutPage() {
   const heroSubtitle = getSetting('about_hero_subtitle') || 'Learn about who we are and what we do.';
   const storyTitle = getSetting('about_story_title') || 'From Passion to Business';
   const storyContent = getSetting('about_story_content') || '';
-  const storyImage = getSetting('about_story_image') || '/sarah-lawson.jpeg';
+  const storyImage = getSetting('about_story_image') || '/about.jpg';
   const founderName = getSetting('about_founder_name') || 'Founder';
   const founderTitle = getSetting('about_founder_title') || 'CEO';
   const mission1Title = getSetting('about_mission1_title') || 'Direct Sourcing';

@@ -4,30 +4,23 @@ import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import "./globals.css";
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.sarahlawsonimports.com';
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://localhost:3000';
+const siteName = process.env.NEXT_PUBLIC_SITE_NAME || 'My Store';
+const siteDescription = process.env.NEXT_PUBLIC_SITE_DESCRIPTION || 'Your one-stop online store for premium quality products.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Sarah Lawson Imports | Premium Quality Mannequins & Home Essentials in Ghana",
-    template: "%s | Sarah Lawson Imports"
+    default: siteName,
+    template: `%s | ${siteName}`
   },
-  description: "Ghana's trusted source for premium quality mannequins, home essentials, electronics, and fashion. Sourced directly from China with verified quality. Fast delivery across Ghana.",
+  description: siteDescription,
   keywords: [
-    "Sarah Lawson Imports",
-    "Mannequins Ghana",
-    "Home Essentials Ghana", 
-    "China Sourcing Ghana",
-    "Electronics Ghana",
-    "Wholesale Ghana",
-    "Premium Quality Products",
-    "Fashion Accessories Ghana",
-    "Buy Mannequins Online Ghana",
-    "Accra Shopping"
+    "Online Store",
+    "eCommerce",
+    "Premium Products",
+    "Shop Online",
   ],
-  authors: [{ name: "Sarah Lawson" }],
-  creator: "Sarah Lawson",
-  publisher: "Sarah Lawson Imports",
   robots: {
     index: true,
     follow: true,
@@ -40,35 +33,33 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: '/sarahlawson.png',
-    apple: '/sarahlawson.png',
+    icon: '/favicon.png',
+    apple: '/favicon.png',
   },
   verification: {
-    // Add your Google Search Console verification code here
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || '',
   },
   openGraph: {
     type: "website",
-    locale: "en_GH",
+    locale: "en_US",
     url: siteUrl,
-    title: "Sarah Lawson Imports | Premium Quality Mannequins & Home Essentials in Ghana",
-    description: "Ghana's trusted source for premium quality mannequins, home essentials, electronics, and fashion. Direct from China with fast delivery.",
-    siteName: "Sarah Lawson Imports",
+    title: siteName,
+    description: siteDescription,
+    siteName: siteName,
     images: [
       {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Sarah Lawson Imports - Premium Quality Products",
+        alt: siteName,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sarah Lawson Imports | Premium Quality in Ghana",
-    description: "Ghana's trusted source for mannequins, home essentials & electronics. Fast delivery!",
+    title: siteName,
+    description: siteDescription,
     images: ["/og-image.jpg"],
-    creator: "@sarahlawsonimports",
   },
   alternates: {
     canonical: siteUrl,
@@ -95,23 +86,17 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-        
-        {/* Structured Data - Organization */}
+
+        {/* Structured Data - Organization (dynamically populated client-side or via env vars) */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
-              "name": "Sarah Lawson Imports",
-              "url": "https://www.sarahlawsonimports.com",
-              "logo": "https://www.sarahlawsonimports.com/sarahlogo.png",
-              "description": "Ghana's trusted source for premium quality mannequins, home essentials, electronics, and fashion.",
-              "address": {
-                "@type": "PostalAddress",
-                "addressCountry": "GH",
-                "addressLocality": "Accra"
-              },
+              "name": siteName,
+              "url": siteUrl,
+              "description": siteDescription,
               "contactPoint": {
                 "@type": "ContactPoint",
                 "contactType": "customer service",
@@ -121,7 +106,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      
+
       {/* Google Analytics */}
       {GA_MEASUREMENT_ID && (
         <>
@@ -141,7 +126,7 @@ export default function RootLayout({
           </Script>
         </>
       )}
-      
+
       {/* Google reCAPTCHA v3 */}
       {RECAPTCHA_SITE_KEY && (
         <Script
@@ -149,7 +134,7 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
       )}
-      
+
       <body className="antialiased font-sans overflow-x-hidden">
         <a
           href="#main-content"

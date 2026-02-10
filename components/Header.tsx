@@ -19,7 +19,7 @@ export default function Header() {
   const { getSetting, getSettingJSON } = useCMS();
 
   const siteName = getSetting('site_name') || 'StandardStore';
-  const siteLogo = getSetting('site_logo') || '/sarahlogo.png';
+  const siteLogo = getSetting('site_logo') || '/logo.png';
   const showSearch = getSetting('header_show_search') !== 'false';
   const showWishlist = getSetting('header_show_wishlist') !== 'false';
   const showCart = getSetting('header_show_cart') !== 'false';

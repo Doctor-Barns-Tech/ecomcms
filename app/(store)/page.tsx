@@ -55,7 +55,7 @@ export default function Home() {
   // ── CMS-driven config ────────────────────────────────────────────
   const heroHeadline = getSetting('hero_headline');
   const heroSubheadline = getSetting('hero_subheadline');
-  const heroImage = getSetting('hero_image') || '/sarah-lawson.jpeg';
+  const heroImage = getSetting('hero_image') || '/hero.jpg';
   const heroPrimaryText = getSetting('hero_primary_btn_text');
   const heroPrimaryLink = getSetting('hero_primary_btn_link') || '/shop';
   const heroSecondaryText = getSetting('hero_secondary_btn_text');

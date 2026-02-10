@@ -38,7 +38,7 @@ The SMS notification system has been updated with improved security, better erro
 ### App Configuration
 | Variable | Purpose | Required |
 |----------|---------|----------|
-| `NEXT_PUBLIC_APP_URL` | Production URL (`https://www.sarahlawsonimports.com/`) | Yes |
+| `NEXT_PUBLIC_APP_URL` | Production URL (e.g., `https://www.yourdomain.com/`) | Yes |
 
 ## 3. Important Setup Steps
 
@@ -51,7 +51,7 @@ The SMS notification system has been updated with improved security, better erro
 ### Step 2: Verify Moolre Callback URL
 The callback URL configured during payment should be:
 ```
-https://www.sarahlawsonimports.com/api/payment/moolre/callback
+https://<YOUR_DOMAIN>/api/payment/moolre/callback
 ```
 
 **Note:** This URL is automatically set from the `NEXT_PUBLIC_APP_URL` environment variable.

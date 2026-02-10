@@ -24,6 +24,8 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
   const [trackingNumber, setTrackingNumber] = useState('');
   const [adminNotes, setAdminNotes] = useState('');
   const [statusUpdating, setStatusUpdating] = useState(false);
+  const [storeName, setStoreName] = useState('My Store');
+  const [storeEmail, setStoreEmail] = useState('');
 
   const handlePrint = () => {
     window.print();
@@ -46,6 +48,11 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
 
   useEffect(() => {
     fetchOrderDetails();
+    // Fetch store name from settings
+    supabase.from('store_settings').select('value').eq('key', 'site_name').single()
+      .then(({ data }) => { if (data?.value) setStoreName(typeof data.value === 'string' ? data.value : String(data.value)); });
+    supabase.from('store_settings').select('value').eq('key', 'contact_email').single()
+      .then(({ data }) => { if (data?.value) setStoreEmail(typeof data.value === 'string' ? data.value : String(data.value)); });
   }, [orderId]);
 
   const fetchOrderDetails = async () => {
@@ -159,7 +166,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
 
         fetch('/api/notifications', {
           method: 'POST',
-          headers: { 
+          headers: {
             'Content-Type': 'application/json',
             ...(authToken && { 'Authorization': `Bearer ${authToken}` })
           },
@@ -192,22 +199,22 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
 
   const handleResendNotification = async () => {
     if (!order) return;
-    
+
     try {
       setResendingNotification(true);
-      
+
       // Get auth token
       const { data: { session } } = await supabase.auth.getSession();
       const authToken = session?.access_token;
-      
+
       const shippingAddress = order.shipping_address || {};
       const customerName = (shippingAddress.firstName && shippingAddress.lastName)
         ? `${shippingAddress.firstName.trim()} ${shippingAddress.lastName.trim()}`
         : shippingAddress.full_name || shippingAddress.firstName || order.email?.split('@')[0] || 'Customer';
-      
+
       const response = await fetch('/api/notifications', {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           ...(authToken && { 'Authorization': `Bearer ${authToken}` })
         },
@@ -225,7 +232,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
       });
 
       const result = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(result.error || 'Failed to send notification');
       }
@@ -284,7 +291,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
           {/* Header */}
           <div className="flex justify-between items-start border-b-2 border-gray-800 pb-4 mb-4">
             <div>
-              <h1 className="text-2xl font-bold">Sarah Lawson Imports</h1>
+              <h1 className="text-2xl font-bold">{storeName}</h1>
               <p className="text-sm text-gray-600">Order Packing Slip</p>
             </div>
             <div className="text-right">
@@ -345,8 +352,8 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
 
           {/* Footer */}
           <div className="border-t-2 border-gray-800 pt-4 text-center text-sm text-gray-600">
-            <p>Thank you for shopping with Sarah Lawson Imports!</p>
-            <p>Questions? Contact us at support@sarahlawsonimports.com</p>
+            <p>Thank you for shopping with {storeName}!</p>
+            {storeEmail && <p>Questions? Contact us at {storeEmail}</p>}
           </div>
         </div>
       </div>

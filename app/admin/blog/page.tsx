@@ -12,7 +12,7 @@ export default function AdminBlogPage() {
       id: 1,
       title: '10 Essential Tips for Creating a Minimalist Home',
       slug: '10-essential-tips-minimalist-home',
-      author: 'Sarah Johnson',
+      author: 'Admin',
       category: 'Interior Design',
       image: 'https://readdy.ai/api/search-image?query=modern%20minimalist%20living%20room%20interior%20design%20with%20clean%20lines%20natural%20light%20and%20simple%20elegant%20furniture%20in%20neutral%20tones&width=600&height=400&seq=blogadm1&orientation=landscape',
       excerpt: 'Discover how to transform your living space into a serene minimalist haven with these practical tips...',
@@ -68,7 +68,7 @@ export default function AdminBlogPage() {
       id: 5,
       title: 'Gift Guide: Thoughtful Home Accessories',
       slug: 'gift-guide-thoughtful-home-accessories',
-      author: 'Sarah Johnson',
+      author: 'Admin',
       category: 'Gift Ideas',
       image: 'https://readdy.ai/api/search-image?query=curated%20collection%20of%20elegant%20home%20accessories%20and%20decor%20items%20beautifully%20arranged%20as%20gift%20ideas%20on%20clean%20white%20background&width=600&height=400&seq=blogadm5&orientation=landscape',
       excerpt: 'Find the perfect gifts for home lovers with our carefully curated selection...',
@@ -174,17 +174,15 @@ export default function AdminBlogPage() {
             <div className="flex border-2 border-gray-300 rounded-lg overflow-hidden">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`w-10 h-10 flex items-center justify-center transition-colors ${
-                  viewMode === 'grid' ? 'bg-emerald-700 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'
-                }`}
+                className={`w-10 h-10 flex items-center justify-center transition-colors ${viewMode === 'grid' ? 'bg-emerald-700 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
               >
                 <i className="ri-grid-line text-xl"></i>
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`w-10 h-10 flex items-center justify-center border-l-2 border-gray-300 transition-colors ${
-                  viewMode === 'list' ? 'bg-emerald-700 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'
-                }`}
+                className={`w-10 h-10 flex items-center justify-center border-l-2 border-gray-300 transition-colors ${viewMode === 'list' ? 'bg-emerald-700 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
               >
                 <i className="ri-list-check text-xl"></i>
               </button>

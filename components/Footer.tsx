@@ -67,7 +67,7 @@ export default function Footer() {
   const socialYoutube = getSetting('social_youtube') || '';
 
   // CMS-driven footer config
-  const footerLogo = getSetting('footer_logo') || getSetting('site_logo') || '/sarahlawson.png';
+  const footerLogo = getSetting('footer_logo') || getSetting('site_logo') || '/logo.png';
   const showNewsletter = getSetting('footer_show_newsletter') !== 'false';
   const newsletterTitle = getSetting('footer_newsletter_title') || 'Join Our Community';
   const newsletterSubtitle = getSetting('footer_newsletter_subtitle') || 'Get exclusive access to new arrivals, secret sales, and more.';

@@ -21,6 +21,7 @@ export default function AdminLayout({
 
   // Module Filtering State
   const [enabledModules, setEnabledModules] = useState<string[]>([]);
+  const [storeName, setStoreName] = useState('My Store');
 
   useEffect(() => {
     async function checkAuth() {
@@ -95,6 +96,10 @@ export default function AdminLayout({
       }
     }
     fetchModules();
+
+    // Fetch store name
+    supabase.from('store_settings').select('value').eq('key', 'site_name').single()
+      .then(({ data }) => { if (data?.value) setStoreName(typeof data.value === 'string' ? data.value : String(data.value)); });
   }, []);
 
   // Screen size check for initial state
@@ -246,7 +251,7 @@ export default function AdminLayout({
       >
         <div className="h-full px-4 py-6 overflow-y-auto">
           <Link href="/admin" className="flex items-center mb-8 px-2 cursor-pointer">
-            <span className="text-xl font-['Pacifico'] text-emerald-700">Sarah Lawson</span>
+            <span className="text-xl font-bold text-emerald-700">{storeName}</span>
             <span className="ml-3 text-sm font-semibold text-gray-500">ADMIN</span>
           </Link>
 

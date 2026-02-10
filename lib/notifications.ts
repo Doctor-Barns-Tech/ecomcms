@@ -2,15 +2,17 @@ import { Resend } from 'resend';
 import { supabase } from '@/lib/supabase';
 
 const resend = new Resend(process.env.RESEND_API_KEY || 'missing_api_key');
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@standardecom.com';
-const EMAIL_FROM = process.env.EMAIL_FROM || 'Sarah Lawson Imports <noreply@sarahlawsonimports.com>';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@store.com';
+const STORE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || 'My Store';
+const EMAIL_FROM = process.env.EMAIL_FROM || `${STORE_NAME} <noreply@store.com>`;
+const SMS_SENDER_ID = process.env.SMS_SENDER_ID || 'MyStore';
 const BRAND = {
-    name: 'Sarah Lawson Imports',
+    name: STORE_NAME,
     color: '#047857',
     colorLight: '#ecfdf5',
     colorDark: '#064e3b',
     url: (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/+$/, ''),
-    phone: '0546014734',
+    phone: process.env.STORE_PHONE || '',
 };
 
 // Reusable branded email layout
@@ -153,7 +155,7 @@ export async function sendSMS({ to, message }: { to: string; message: string }) 
             },
             body: JSON.stringify({
                 type: 1,
-                senderid: 'SarahLawson',
+                senderid: SMS_SENDER_ID,
                 messages: [
                     {
                         recipient: recipient,
@@ -192,14 +194,14 @@ export async function sendOrderConfirmation(order: any) {
         // Try shipping_address first
         if (shipping_address?.full_name) return shipping_address.full_name;
         if (shipping_address?.firstName) {
-            return shipping_address.lastName 
-                ? `${shipping_address.firstName} ${shipping_address.lastName}` 
+            return shipping_address.lastName
+                ? `${shipping_address.firstName} ${shipping_address.lastName}`
                 : shipping_address.firstName;
         }
         // Fall back to metadata
         if (metadata?.first_name) {
-            return metadata.last_name 
-                ? `${metadata.first_name} ${metadata.last_name}` 
+            return metadata.last_name
+                ? `${metadata.first_name} ${metadata.last_name}`
                 : metadata.first_name;
         }
         return 'Customer';
@@ -295,8 +297,8 @@ ${emailButton('View Order in Admin', `${baseUrl}/admin/orders/${id}`)}
     if (phone) {
         const smsMessage = trackingNumber
             ? `Hi ${name}, your order #${order_number || id} is confirmed! Tracking: ${trackingNumber}. Track here: ${trackingUrl}${shippingNotesSms}`
-            : `Hi ${name}, your order #${order_number || id} at Sarah Lawson Imports is confirmed! Track here: ${trackingUrl}${shippingNotesSms}`;
-        
+            : `Hi ${name}, your order #${order_number || id} at ${BRAND.name} is confirmed! Track here: ${trackingUrl}${shippingNotesSms}`;
+
         await sendSMS({
             to: phone,
             message: smsMessage
@@ -313,13 +315,13 @@ export async function sendOrderStatusUpdate(order: any, newStatus: string) {
     const getName = () => {
         if (shipping_address?.full_name) return shipping_address.full_name;
         if (shipping_address?.firstName) {
-            return shipping_address.lastName 
-                ? `${shipping_address.firstName} ${shipping_address.lastName}` 
+            return shipping_address.lastName
+                ? `${shipping_address.firstName} ${shipping_address.lastName}`
                 : shipping_address.firstName;
         }
         if (metadata?.first_name) {
-            return metadata.last_name 
-                ? `${metadata.first_name} ${metadata.last_name}` 
+            return metadata.last_name
+                ? `${metadata.first_name} ${metadata.last_name}`
                 : metadata.first_name;
         }
         return 'Customer';
@@ -437,7 +439,7 @@ ${emailButton('Start Shopping', `${BRAND.url}/shop`)}
     if (phone) {
         await sendSMS({
             to: phone,
-            message: `Welcome ${firstName}! Thanks for joining Sarah Lawson Imports.`
+            message: `Welcome ${firstName}! Thanks for joining ${BRAND.name}.`
         });
     }
 }
@@ -452,13 +454,13 @@ export async function sendPaymentLink(order: any) {
     const getName = () => {
         if (shipping_address?.full_name) return shipping_address.full_name;
         if (shipping_address?.firstName) {
-            return shipping_address.lastName 
-                ? `${shipping_address.firstName} ${shipping_address.lastName}` 
+            return shipping_address.lastName
+                ? `${shipping_address.firstName} ${shipping_address.lastName}`
                 : shipping_address.firstName;
         }
         if (metadata?.first_name) {
-            return metadata.last_name 
-                ? `${metadata.first_name} ${metadata.last_name}` 
+            return metadata.last_name
+                ? `${metadata.first_name} ${metadata.last_name}`
                 : metadata.first_name;
         }
         return 'Customer';
@@ -495,7 +497,7 @@ ${emailButton('Pay Now — GH₵' + Number(total).toFixed(2), paymentUrl, '#d977
     // SMS with payment link
     if (phone) {
         const smsMessage = `Hi ${name}, complete your order #${order_number} (GH₵${Number(total).toFixed(2)}) here: ${paymentUrl}`;
-        
+
         await sendSMS({
             to: phone,
             message: smsMessage

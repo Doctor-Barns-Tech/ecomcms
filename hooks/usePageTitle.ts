@@ -1,11 +1,13 @@
 'use client';
 
 import { useEffect } from 'react';
-
-const SITE_NAME = 'Sarah Lawson Imports';
+import { useCMS } from '@/context/CMSContext';
 
 export function usePageTitle(title: string) {
+  const { getSetting } = useCMS();
+  const siteName = getSetting('site_name') || 'My Store';
+
   useEffect(() => {
-    document.title = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} | Premium Quality Mannequins & Home Essentials in Ghana`;
-  }, [title]);
+    document.title = title ? `${title} | ${siteName}` : siteName;
+  }, [title, siteName]);
 }
