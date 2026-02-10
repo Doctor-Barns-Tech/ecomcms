@@ -25,7 +25,7 @@ function FooterSection({ title, children }: { title: string, children: React.Rea
 }
 
 export default function Footer() {
-  const { getSetting } = useCMS();
+  const { getSetting, getSettingJSON } = useCMS();
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -56,53 +56,87 @@ export default function Footer() {
     }
   };
 
-  const siteName = getSetting('site_name') || 'Sarah Lawson Imports';
-  const siteTagline = getSetting('site_tagline') || 'Premium Quality Products For Less.';
+  const siteName = getSetting('site_name') || 'StandardStore';
+  const siteTagline = getSetting('site_tagline') || 'Premium Shopping Experience';
   const contactEmail = getSetting('contact_email') || '';
-  const contactPhone = getSetting('contact_phone') || '0546014734';
+  const contactPhone = getSetting('contact_phone') || '';
   const socialFacebook = getSetting('social_facebook') || '';
   const socialInstagram = getSetting('social_instagram') || '';
   const socialTwitter = getSetting('social_twitter') || '';
+  const socialTiktok = getSetting('social_tiktok') || '';
+  const socialYoutube = getSetting('social_youtube') || '';
+
+  // CMS-driven footer config
+  const footerLogo = getSetting('footer_logo') || getSetting('site_logo') || '/sarahlawson.png';
+  const showNewsletter = getSetting('footer_show_newsletter') !== 'false';
+  const newsletterTitle = getSetting('footer_newsletter_title') || 'Join Our Community';
+  const newsletterSubtitle = getSetting('footer_newsletter_subtitle') || 'Get exclusive access to new arrivals, secret sales, and more.';
+  const poweredBy = getSetting('footer_powered_by') || 'Doctor Barns Tech';
+  const poweredByLink = getSetting('footer_powered_by_link') || 'https://doctorbarns.com';
+
+  const col1Title = getSetting('footer_col1_title') || 'Shop';
+  const col1Links = getSettingJSON<{ label: string; href: string }[]>('footer_col1_links_json', [
+    { label: 'All Products', href: '/shop' },
+    { label: 'Categories', href: '/categories' },
+    { label: 'New Arrivals', href: '/shop?sort=newest' },
+    { label: 'Best Sellers', href: '/shop?sort=bestsellers' }
+  ]);
+  const col2Title = getSetting('footer_col2_title') || 'Customer Care';
+  const col2Links = getSettingJSON<{ label: string; href: string }[]>('footer_col2_links_json', [
+    { label: 'Contact Us', href: '/contact' },
+    { label: 'Track My Order', href: '/order-tracking' },
+    { label: 'Shipping Info', href: '/shipping' },
+    { label: 'Returns Policy', href: '/returns' }
+  ]);
+  const col3Title = getSetting('footer_col3_title') || 'Company';
+  const col3Links = getSettingJSON<{ label: string; href: string }[]>('footer_col3_links_json', [
+    { label: 'Our Story', href: '/about' },
+    { label: 'Blog', href: '/blog' },
+    { label: 'Privacy Policy', href: '/privacy' },
+    { label: 'Terms of Service', href: '/terms' }
+  ]);
 
   return (
     <footer className="bg-emerald-950 text-white rounded-t-[2.5rem] mt-8 lg:mt-0 overflow-hidden">
 
       {/* Newsletter Section */}
-      <div className="bg-emerald-900/30 py-12 md:py-16 px-4">
-        <div className="max-w-7xl mx-auto text-center">
-          <div className="w-16 h-16 bg-emerald-800/50 rounded-2xl flex items-center justify-center mx-auto mb-6 rotate-3">
-            <i className="ri-mail-star-line text-3xl text-emerald-300"></i>
-          </div>
-          <h3 className="text-2xl md:text-3xl font-bold mb-3 font-serif">Join Our Community</h3>
-          <p className="text-emerald-200 mb-8 max-w-md mx-auto leading-relaxed">
-            Get exclusive access to new arrivals, secret sales, and sourcing stories from Sarah.
-          </p>
-
-          <form onSubmit={handleSubmit} className="max-w-md mx-auto relative">
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email address"
-              className="w-full pl-6 pr-32 py-4 bg-white/10 border border-emerald-500/30 rounded-full text-white placeholder-emerald-200/50 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:bg-white/20 transition-all backdrop-blur-sm"
-            />
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="absolute right-1.5 top-1.5 bottom-1.5 bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold px-6 rounded-full transition-all disabled:opacity-75 disabled:cursor-not-allowed shadow-lg"
-            >
-              {isSubmitting ? '...' : 'Join'}
-            </button>
-          </form>
-
-          {submitStatus === 'success' && (
-            <p className="text-emerald-300 text-sm mt-4 animate-in fade-in slide-in-from-bottom-2">
-              <i className="ri-checkbox-circle-line mr-1 align-middle"></i> You're on the list!
+      {showNewsletter && (
+        <div className="bg-emerald-900/30 py-12 md:py-16 px-4">
+          <div className="max-w-7xl mx-auto text-center">
+            <div className="w-16 h-16 bg-emerald-800/50 rounded-2xl flex items-center justify-center mx-auto mb-6 rotate-3">
+              <i className="ri-mail-star-line text-3xl text-emerald-300"></i>
+            </div>
+            <h3 className="text-2xl md:text-3xl font-bold mb-3 font-serif">{newsletterTitle}</h3>
+            <p className="text-emerald-200 mb-8 max-w-md mx-auto leading-relaxed">
+              {newsletterSubtitle}
             </p>
-          )}
+
+            <form onSubmit={handleSubmit} className="max-w-md mx-auto relative">
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email address"
+                className="w-full pl-6 pr-32 py-4 bg-white/10 border border-emerald-500/30 rounded-full text-white placeholder-emerald-200/50 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:bg-white/20 transition-all backdrop-blur-sm"
+              />
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="absolute right-1.5 top-1.5 bottom-1.5 bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold px-6 rounded-full transition-all disabled:opacity-75 disabled:cursor-not-allowed shadow-lg"
+              >
+                {isSubmitting ? '...' : 'Join'}
+              </button>
+            </form>
+
+            {submitStatus === 'success' && (
+              <p className="text-emerald-300 text-sm mt-4 animate-in fade-in slide-in-from-bottom-2">
+                <i className="ri-checkbox-circle-line mr-1 align-middle"></i> You're on the list!
+              </p>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-6 py-12 lg:py-16">
         <div className="grid lg:grid-cols-4 gap-12">
@@ -110,8 +144,7 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="lg:col-span-1 space-y-6">
             <Link href="/" className="inline-block">
-              {/* Using the logo directly can be nice, or text if needed. Assuming white version exists or adjusting brightness. */}
-              <img src="/sarahlawson.png" alt={siteName} className="h-14 w-auto object-contain brightness-0 invert opacity-90" />
+              <img src={footerLogo} alt={siteName} className="h-14 w-auto object-contain brightness-0 invert opacity-90" />
             </Link>
             <p className="text-emerald-200/80 leading-relaxed text-sm">
               {siteTagline.replace(/Less\.?$/i, '').trimEnd()}{' '}
@@ -122,7 +155,9 @@ export default function Footer() {
               {[
                 { link: socialInstagram, icon: 'ri-instagram-line' },
                 { link: socialFacebook, icon: 'ri-facebook-fill' },
-                { link: socialTwitter, icon: 'ri-twitter-x-fill' }
+                { link: socialTwitter, icon: 'ri-twitter-x-fill' },
+                { link: socialTiktok, icon: 'ri-tiktok-fill' },
+                { link: socialYoutube, icon: 'ri-youtube-fill' }
               ].map((social, i) => social.link && (
                 <a
                   key={i}
@@ -155,30 +190,27 @@ export default function Footer() {
           {/* Links Sections (Accordion on Mobile) */}
           <div className="lg:col-span-3 grid lg:grid-cols-3 gap-8 lg:gap-12">
 
-            <FooterSection title="Shop">
+            <FooterSection title={col1Title}>
               <ul className="space-y-4 text-emerald-100/80">
-                <li><Link href="/shop" className="hover:text-emerald-300 transition-colors flex items-center gap-2"><i className="ri-arrow-right-s-line opacity-50"></i> All Products</Link></li>
-                <li><Link href="/categories" className="hover:text-emerald-300 transition-colors flex items-center gap-2"><i className="ri-arrow-right-s-line opacity-50"></i> Categories</Link></li>
-                <li><Link href="/shop?sort=newest" className="hover:text-emerald-300 transition-colors flex items-center gap-2"><i className="ri-arrow-right-s-line opacity-50"></i> New Arrivals</Link></li>
-                <li><Link href="/shop?sort=bestsellers" className="hover:text-emerald-300 transition-colors flex items-center gap-2"><i className="ri-arrow-right-s-line opacity-50"></i> Best Sellers</Link></li>
+                {col1Links.map((link, i) => (
+                  <li key={i}><Link href={link.href} className="hover:text-emerald-300 transition-colors flex items-center gap-2"><i className="ri-arrow-right-s-line opacity-50"></i> {link.label}</Link></li>
+                ))}
               </ul>
             </FooterSection>
 
-            <FooterSection title="Customer Care">
+            <FooterSection title={col2Title}>
               <ul className="space-y-4 text-emerald-100/80">
-                <li><Link href="/contact" className="hover:text-emerald-300 transition-colors flex items-center gap-2"><i className="ri-arrow-right-s-line opacity-50"></i> Contact Us</Link></li>
-                <li><Link href="/order-tracking" className="hover:text-emerald-300 transition-colors flex items-center gap-2"><i className="ri-arrow-right-s-line opacity-50"></i> Track My Order</Link></li>
-                <li><Link href="/shipping" className="hover:text-emerald-300 transition-colors flex items-center gap-2"><i className="ri-arrow-right-s-line opacity-50"></i> Shipping Info</Link></li>
-                <li><Link href="/returns" className="hover:text-emerald-300 transition-colors flex items-center gap-2"><i className="ri-arrow-right-s-line opacity-50"></i> Returns Policy</Link></li>
+                {col2Links.map((link, i) => (
+                  <li key={i}><Link href={link.href} className="hover:text-emerald-300 transition-colors flex items-center gap-2"><i className="ri-arrow-right-s-line opacity-50"></i> {link.label}</Link></li>
+                ))}
               </ul>
             </FooterSection>
 
-            <FooterSection title="Company">
+            <FooterSection title={col3Title}>
               <ul className="space-y-4 text-emerald-100/80">
-                <li><Link href="/about" className="hover:text-emerald-300 transition-colors flex items-center gap-2"><i className="ri-arrow-right-s-line opacity-50"></i> Our Story</Link></li>
-                <li><Link href="/blog" className="hover:text-emerald-300 transition-colors flex items-center gap-2"><i className="ri-arrow-right-s-line opacity-50"></i> Blog</Link></li>
-                <li><Link href="/privacy" className="hover:text-emerald-300 transition-colors flex items-center gap-2"><i className="ri-arrow-right-s-line opacity-50"></i> Privacy Policy</Link></li>
-                <li><Link href="/terms" className="hover:text-emerald-300 transition-colors flex items-center gap-2"><i className="ri-arrow-right-s-line opacity-50"></i> Terms of Service</Link></li>
+                {col3Links.map((link, i) => (
+                  <li key={i}><Link href={link.href} className="hover:text-emerald-300 transition-colors flex items-center gap-2"><i className="ri-arrow-right-s-line opacity-50"></i> {link.label}</Link></li>
+                ))}
               </ul>
             </FooterSection>
 
@@ -186,7 +218,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-emerald-800/50 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-emerald-400/60">
-          <p>&copy; {new Date().getFullYear()} {siteName}. All rights reserved. | Powered by <a href="https://doctorbarns.com" target="_blank" rel="noopener noreferrer" className="text-emerald-300 hover:text-white transition-colors">Doctor Barns Tech</a></p>
+          <p>&copy; {new Date().getFullYear()} {siteName}. All rights reserved.{poweredBy && <> | Powered by <a href={poweredByLink} target="_blank" rel="noopener noreferrer" className="text-emerald-300 hover:text-white transition-colors">{poweredBy}</a></>}</p>
           <div className="flex gap-4 grayscale opacity-50">
             <i className="ri-visa-line text-2xl"></i>
             <i className="ri-mastercard-line text-2xl"></i>

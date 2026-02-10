@@ -7,10 +7,15 @@ import PageHero from '@/components/PageHero';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 
+interface TeamContact {
+  name: string;
+  phone: string;
+  role: string;
+}
+
 export default function ContactPage() {
   usePageTitle('Contact Us');
-  const { getSetting } = useCMS();
-  const [pageContent, setPageContent] = useState<any>(null);
+  const { getSetting, getSettingJSON } = useCMS();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -21,22 +26,6 @@ export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const { getToken, verifying } = useRecaptcha();
-
-  useEffect(() => {
-    async function fetchContactContent() {
-      const { data } = await supabase
-        .from('cms_content')
-        .select('*')
-        .eq('section', 'contact')
-        .eq('block_key', 'main')
-        .single();
-
-      if (data) {
-        setPageContent(data);
-      }
-    }
-    fetchContactContent();
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,7 +53,6 @@ export default function ContactPage() {
         });
 
       if (error) {
-        // Table might not exist, still show success
         console.log('Note: contact_submissions table may not exist');
       }
 
@@ -87,20 +75,15 @@ export default function ContactPage() {
     }
   };
 
-  // Get contact details from CMS settings
+  // CMS-driven config
   const contactEmail = getSetting('contact_email') || 'support@standardstore.com';
   const contactPhone = getSetting('contact_phone') || '0546014734';
   const contactAddress = getSetting('contact_address') || 'Accra, Ghana';
-
-  const heroTitle = pageContent?.title || 'Get In Touch';
-  const heroSubtitle = pageContent?.subtitle || 'Have a question or need assistance?';
-  const heroContent = pageContent?.content || 'Our friendly team is here to help. Reach out through any of our contact channels.';
-
-  const teamContacts = [
-    { name: 'Main Line', phone: '0546014734', role: '' },
-    { name: 'David', phone: '0598922769', role: 'Manager' },
-    { name: 'Caleb', phone: '0592028581', role: 'PR' },
-  ];
+  const heroTitle = getSetting('contact_hero_title') || 'Get In Touch';
+  const heroSubtitle = getSetting('contact_hero_subtitle') || 'Have a question or need assistance? Our friendly team is here to help.';
+  const contactHours = getSetting('contact_hours') || 'Mon-Fri, 8am-6pm GMT';
+  const contactMapLink = getSetting('contact_map_link') || 'https://maps.google.com';
+  const teamContacts = getSettingJSON<TeamContact[]>('contact_team_json', []);
 
   const contactMethods = [
     {
@@ -108,7 +91,7 @@ export default function ContactPage() {
       title: 'Call Us',
       value: contactPhone,
       link: `tel:${contactPhone.replace(/\s/g, '')}`,
-      description: 'Mon-Fri, 8am-6pm GMT'
+      description: contactHours
     },
     {
       icon: 'ri-mail-line',
@@ -128,7 +111,7 @@ export default function ContactPage() {
       icon: 'ri-map-pin-line',
       title: 'Visit Us',
       value: contactAddress,
-      link: 'https://maps.google.com',
+      link: contactMapLink,
       description: 'Mon-Sat, 9am-6pm'
     }
   ];
@@ -151,8 +134,8 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-white">
       <PageHero
-        title="Get In Touch"
-        subtitle="Have a question or need assistance? Our friendly team is here to help."
+        title={heroTitle}
+        subtitle={heroSubtitle}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -175,43 +158,45 @@ export default function ContactPage() {
           ))}
         </div>
 
-        {/* Direct Phone Lines */}
-        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 rounded-2xl p-8 mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Reach Our Team Directly</h2>
-          <p className="text-gray-600 mb-6">Call or WhatsApp any of our team members</p>
-          <div className="grid sm:grid-cols-3 gap-4">
-            {teamContacts.map((contact, index) => (
-              <div key={index} className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
-                    <i className={`${index === 0 ? 'ri-phone-line' : 'ri-user-line'} text-lg text-emerald-700`}></i>
+        {/* Direct Phone Lines - Only show if contacts exist */}
+        {teamContacts.length > 0 && (
+          <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 rounded-2xl p-8 mb-16">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Reach Our Team Directly</h2>
+            <p className="text-gray-600 mb-6">Call or WhatsApp any of our team members</p>
+            <div className="grid sm:grid-cols-3 gap-4">
+              {teamContacts.map((contact: TeamContact, index: number) => (
+                <div key={index} className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
+                      <i className={`${index === 0 ? 'ri-phone-line' : 'ri-user-line'} text-lg text-emerald-700`}></i>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900">{contact.name}</p>
+                      {contact.role && <p className="text-xs text-emerald-600 font-medium">{contact.role}</p>}
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">{contact.name}</p>
-                    {contact.role && <p className="text-xs text-emerald-600 font-medium">{contact.role}</p>}
+                  <p className="text-gray-800 font-medium mb-3">{contact.phone}</p>
+                  <div className="flex gap-2">
+                    <a
+                      href={`tel:${contact.phone}`}
+                      className="flex-1 flex items-center justify-center gap-1.5 bg-emerald-700 text-white py-2 rounded-lg text-sm font-medium hover:bg-emerald-800 transition-colors"
+                    >
+                      <i className="ri-phone-line"></i> Call
+                    </a>
+                    <a
+                      href={`https://wa.me/233${contact.phone.replace(/^0/, '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 flex items-center justify-center gap-1.5 bg-green-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+                    >
+                      <i className="ri-whatsapp-line"></i> WhatsApp
+                    </a>
                   </div>
                 </div>
-                <p className="text-gray-800 font-medium mb-3">{contact.phone}</p>
-                <div className="flex gap-2">
-                  <a
-                    href={`tel:${contact.phone}`}
-                    className="flex-1 flex items-center justify-center gap-1.5 bg-emerald-700 text-white py-2 rounded-lg text-sm font-medium hover:bg-emerald-800 transition-colors"
-                  >
-                    <i className="ri-phone-line"></i> Call
-                  </a>
-                  <a
-                    href={`https://wa.me/233${contact.phone.replace(/^0/, '')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 flex items-center justify-center gap-1.5 bg-green-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
-                  >
-                    <i className="ri-whatsapp-line"></i> WhatsApp
-                  </a>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="grid lg:grid-cols-2 gap-12">
           <div>
@@ -351,7 +336,7 @@ export default function ContactPage() {
               </div>
               <h3 className="text-2xl font-bold mb-3">Need Immediate Help?</h3>
               <p className="text-emerald-100 mb-6 leading-relaxed">
-                Our customer support team is available Monday to Friday, 8am-6pm GMT. For urgent matters, reach out via WhatsApp.
+                Our customer support team is available {contactHours}. For urgent matters, reach out via WhatsApp.
               </p>
               <a
                 href={`https://wa.me/233${contactPhone.replace(/^0/, '')}`}

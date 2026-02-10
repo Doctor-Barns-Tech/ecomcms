@@ -4,49 +4,21 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
+import { useCMS } from '@/context/CMSContext';
 import ProductCard, { type ColorVariant, getColorHex } from '@/components/ProductCard';
 import AnimatedSection, { AnimatedGrid } from '@/components/AnimatedSection';
 import { usePageTitle } from '@/hooks/usePageTitle';
 
 export default function Home() {
   usePageTitle('');
+  const { getSetting, getActiveBanners } = useCMS();
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Config State - Managed in Code
-  const config: {
-    hero: {
-      headline: string;
-      subheadline: string;
-      primaryButtonText: string;
-      primaryButtonLink: string;
-      secondaryButtonText: string;
-      secondaryButtonLink: string;
-      backgroundImage?: string;
-    };
-    banners?: Array<{ text: string; active: boolean }>;
-  } = {
-    hero: {
-      headline: 'Mannequins, Kitchen Essentials, Electronics & Dresses — All In One Store',
-      subheadline: 'Verified quality China-sourced products at unbeatable prices. Perfect for homes, businesses, and resellers.',
-      primaryButtonText: 'Shop Collections',
-      primaryButtonLink: '/shop',
-      secondaryButtonText: 'Our Story',
-      secondaryButtonLink: '/about',
-      // backgroundImage: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop' // Optional override
-    },
-    banners: [
-      { text: '🚚 Free delivery on orders over GH₵ 500 within Accra!', active: false },
-      { text: '✨ New stock arriving this weekend - Pre-order now!', active: false },
-      { text: '💳 Secure payments via Mobile Money & Card', active: false }
-    ]
-  };
-
   useEffect(() => {
     async function fetchData() {
       try {
-        // Fetch featured products directly from Supabase
         const { data: productsData, error: productsError } = await supabase
           .from('products')
           .select('*, product_variants(*), product_images(*)')
@@ -58,7 +30,6 @@ export default function Home() {
         if (productsError) throw productsError;
         setFeaturedProducts(productsData || []);
 
-        // Fetch featured categories (featured is stored in metadata JSONB)
         const { data: categoriesData, error: categoriesError } = await supabase
           .from('categories')
           .select('id, name, slug, image_url, metadata')
@@ -67,7 +38,6 @@ export default function Home() {
 
         if (categoriesError) throw categoriesError;
 
-        // Filter by metadata.featured = true on client side
         const featuredCategories = (categoriesData || []).filter(
           (cat: any) => cat.metadata?.featured === true
         );
@@ -82,28 +52,43 @@ export default function Home() {
     fetchData();
   }, []);
 
+  // ── CMS-driven config ────────────────────────────────────────────
+  const heroHeadline = getSetting('hero_headline');
+  const heroSubheadline = getSetting('hero_subheadline');
+  const heroImage = getSetting('hero_image') || '/sarah-lawson.jpeg';
+  const heroPrimaryText = getSetting('hero_primary_btn_text');
+  const heroPrimaryLink = getSetting('hero_primary_btn_link') || '/shop';
+  const heroSecondaryText = getSetting('hero_secondary_btn_text');
+  const heroSecondaryLink = getSetting('hero_secondary_btn_link') || '/about';
+  const heroTagText = getSetting('hero_tag_text');
+  const heroBadgeLabel = getSetting('hero_badge_label');
+  const heroBadgeText = getSetting('hero_badge_text');
+  const heroBadgeSubtext = getSetting('hero_badge_subtext');
+
   const features = [
-    { icon: 'ri-store-2-line', title: 'Free Store Pickup', desc: 'Pick up at our store' },
-    { icon: 'ri-arrow-left-right-line', title: 'Easy Returns', desc: '30-day return policy' },
-    { icon: 'ri-customer-service-2-line', title: '24/7 Support', desc: 'Dedicated service' },
-    { icon: 'ri-shield-check-line', title: 'Secure Payment', desc: 'Safe checkout' },
+    { icon: getSetting('feature1_icon'), title: getSetting('feature1_title'), desc: getSetting('feature1_desc') },
+    { icon: getSetting('feature2_icon'), title: getSetting('feature2_title'), desc: getSetting('feature2_desc') },
+    { icon: getSetting('feature3_icon'), title: getSetting('feature3_title'), desc: getSetting('feature3_desc') },
+    { icon: getSetting('feature4_icon'), title: getSetting('feature4_title'), desc: getSetting('feature4_desc') },
   ];
 
-  const getHeroImage = () => {
-    if (config.hero.backgroundImage) return config.hero.backgroundImage;
-    return "/sarah-lawson.jpeg";
-  };
+  const stat1Title = getSetting('hero_stat1_title');
+  const stat1Desc = getSetting('hero_stat1_desc');
+  const stat2Title = getSetting('hero_stat2_title');
+  const stat2Desc = getSetting('hero_stat2_desc');
+  const stat3Title = getSetting('hero_stat3_title');
+  const stat3Desc = getSetting('hero_stat3_desc');
+
+  const activeBanners = getActiveBanners('top');
 
   const renderBanners = () => {
-    const activeBanners = config.banners?.filter(b => b.active) || [];
     if (activeBanners.length === 0) return null;
-
     return (
       <div className="bg-emerald-900 text-white py-2 overflow-hidden relative">
         <div className="flex animate-marquee whitespace-nowrap">
           {activeBanners.concat(activeBanners).map((banner, index) => (
             <span key={index} className="mx-8 text-sm font-medium tracking-wide flex items-center">
-              {banner.text}
+              {banner.title}
             </span>
           ))}
         </div>
@@ -121,7 +106,7 @@ export default function Home() {
         {/* Mobile: Full Background Image with Gradient Overlay */}
         <div className="absolute inset-0 lg:hidden z-0">
           <Image
-            src={getHeroImage()}
+            src={heroImage}
             fill
             className="object-cover transition-opacity duration-1000"
             alt="Hero Background"
@@ -145,7 +130,7 @@ export default function Home() {
             <div className="hidden lg:block order-last relative">
               <div className="relative aspect-[3/4] lg:aspect-auto lg:h-[650px] overflow-hidden rounded-[2rem] shadow-xl">
                 <Image
-                  src={getHeroImage()}
+                  src={heroImage}
                   alt="Hero Image"
                   fill
                   className="object-cover object-top hover:scale-105 transition-transform duration-1000"
@@ -155,57 +140,61 @@ export default function Home() {
                 />
 
                 {/* Floating Badge (Desktop Only) */}
-                <div className="absolute bottom-10 left-10 bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-2xl max-w-xs z-20 border border-white/50">
-                  <p className="font-serif text-emerald-800 text-lg italic mb-1">Exclusive Offer</p>
-                  <p className="text-3xl font-bold text-gray-900 mb-1">25% Off</p>
-                  <p className="text-sm text-gray-600 font-medium">On your first dedicated order</p>
-                </div>
+                {heroBadgeLabel && (
+                  <div className="absolute bottom-10 left-10 bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-2xl max-w-xs z-20 border border-white/50">
+                    <p className="font-serif text-emerald-800 text-lg italic mb-1">{heroBadgeLabel}</p>
+                    <p className="text-3xl font-bold text-gray-900 mb-1">{heroBadgeText}</p>
+                    <p className="text-sm text-gray-600 font-medium">{heroBadgeSubtext}</p>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Content Column - Adapts color for Mobile (White) vs Desktop (Dark) */}
+            {/* Content Column */}
             <div className="relative z-10 text-center lg:text-left transition-colors duration-300">
 
-              <div className="inline-flex items-center space-x-2 mb-4 lg:mb-6 justify-center lg:justify-start animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-                <span className="h-px w-8 bg-white/70 lg:bg-emerald-800"></span>
-                <span className="text-white lg:text-emerald-800 text-sm font-semibold tracking-widest uppercase drop-shadow-sm lg:drop-shadow-none">
-                  New Collection
-                </span>
-                <span className="h-px w-8 bg-white/70 lg:hidden"></span>
-              </div>
+              {heroTagText && (
+                <div className="inline-flex items-center space-x-2 mb-4 lg:mb-6 justify-center lg:justify-start animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+                  <span className="h-px w-8 bg-white/70 lg:bg-emerald-800"></span>
+                  <span className="text-white lg:text-emerald-800 text-sm font-semibold tracking-widest uppercase drop-shadow-sm lg:drop-shadow-none">
+                    {heroTagText}
+                  </span>
+                  <span className="h-px w-8 bg-white/70 lg:hidden"></span>
+                </div>
+              )}
 
               <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[3.2rem] xl:text-5xl text-white lg:text-gray-900 leading-[1.15] mb-4 lg:mb-6 drop-shadow-lg lg:drop-shadow-none animate-fade-in-up max-w-xl mx-auto lg:mx-0" style={{ animationDelay: '0.2s' }}>
-                {config.hero.headline}
+                {heroHeadline}
               </h1>
 
               <p className="text-lg text-white/90 lg:text-gray-600 leading-relaxed max-w-md mx-auto lg:mx-0 font-light mb-8 lg:mb-10 drop-shadow-md lg:drop-shadow-none animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-                {config.hero.subheadline}
+                {heroSubheadline}
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start px-4 lg:px-0 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-                <Link href={config.hero.primaryButtonLink || '/shop'} className="inline-flex items-center justify-center bg-white lg:bg-gray-900 text-gray-900 lg:text-white hover:bg-emerald-50 lg:hover:bg-emerald-800 px-10 py-4 rounded-full font-medium transition-all text-lg shadow-xl hover:shadow-2xl hover:-translate-y-1 btn-animate">
-                  {config.hero.primaryButtonText}
+                <Link href={heroPrimaryLink} className="inline-flex items-center justify-center bg-white lg:bg-gray-900 text-gray-900 lg:text-white hover:bg-emerald-50 lg:hover:bg-emerald-800 px-10 py-4 rounded-full font-medium transition-all text-lg shadow-xl hover:shadow-2xl hover:-translate-y-1 btn-animate">
+                  {heroPrimaryText}
                 </Link>
-                {config.hero.secondaryButtonText && (
-                  <Link href={config.hero.secondaryButtonLink || '/shop'} className="inline-flex items-center justify-center bg-white/20 backdrop-blur-md border border-white/50 lg:bg-white lg:border-gray-200 text-white lg:text-gray-900 hover:bg-white/30 lg:hover:text-emerald-800 lg:hover:border-emerald-800 px-10 py-4 rounded-full font-medium transition-colors text-lg btn-animate">
-                    {config.hero.secondaryButtonText}
+                {heroSecondaryText && (
+                  <Link href={heroSecondaryLink} className="inline-flex items-center justify-center bg-white/20 backdrop-blur-md border border-white/50 lg:bg-white lg:border-gray-200 text-white lg:text-gray-900 hover:bg-white/30 lg:hover:text-emerald-800 lg:hover:border-emerald-800 px-10 py-4 rounded-full font-medium transition-colors text-lg btn-animate">
+                    {heroSecondaryText}
                   </Link>
                 )}
               </div>
 
-              {/* Stats - Visible on Desktop, Hidden on Mobile Hero */}
+              {/* Stats - Desktop Only */}
               <div className="mt-12 pt-8 border-t border-gray-200 hidden lg:grid grid-cols-3 gap-6">
                 <div className="flex flex-col items-start text-left">
-                  <p className="font-serif font-bold text-gray-900 text-lg">Direct Import</p>
-                  <p className="text-sm text-gray-500">Sourced from China</p>
+                  <p className="font-serif font-bold text-gray-900 text-lg">{stat1Title}</p>
+                  <p className="text-sm text-gray-500">{stat1Desc}</p>
                 </div>
                 <div className="flex flex-col items-start text-left">
-                  <p className="font-serif font-bold text-gray-900 text-lg">Verified Quality</p>
-                  <p className="text-sm text-gray-500">Inspected by hand</p>
+                  <p className="font-serif font-bold text-gray-900 text-lg">{stat2Title}</p>
+                  <p className="text-sm text-gray-500">{stat2Desc}</p>
                 </div>
                 <div className="flex flex-col items-start text-left">
-                  <p className="font-serif font-bold text-gray-900 text-lg">Best Prices</p>
-                  <p className="text-sm text-gray-500">Unbeatable value</p>
+                  <p className="font-serif font-bold text-gray-900 text-lg">{stat3Title}</p>
+                  <p className="text-sm text-gray-500">{stat3Desc}</p>
                 </div>
               </div>
 
@@ -249,7 +238,7 @@ export default function Home() {
               </Link>
             ))}
           </AnimatedGrid>
-          
+
           <div className="mt-8 text-center md:hidden">
             <Link href="/categories" className="inline-flex items-center text-emerald-800 font-medium hover:text-emerald-900 transition-colors">
               View All <i className="ri-arrow-right-line ml-2"></i>
@@ -285,7 +274,6 @@ export default function Home() {
                 const totalVariantStock = hasVariants ? variants.reduce((sum: number, v: any) => sum + (v.quantity || 0), 0) : 0;
                 const effectiveStock = hasVariants ? totalVariantStock : product.quantity;
 
-                // Extract unique colors from option2
                 const colorVariants: ColorVariant[] = [];
                 const seenColors = new Set<string>();
                 for (const v of variants) {
@@ -333,7 +321,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
 
       {/* Trust Features */}
       <section className="py-16 bg-white border-t border-gray-100">

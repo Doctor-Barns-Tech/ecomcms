@@ -16,9 +16,20 @@ export default function Header() {
   const [user, setUser] = useState<any>(null);
 
   const { cartCount, isCartOpen, setIsCartOpen } = useCart();
-  const { getSetting } = useCMS();
+  const { getSetting, getSettingJSON } = useCMS();
 
   const siteName = getSetting('site_name') || 'StandardStore';
+  const siteLogo = getSetting('site_logo') || '/sarahlogo.png';
+  const showSearch = getSetting('header_show_search') !== 'false';
+  const showWishlist = getSetting('header_show_wishlist') !== 'false';
+  const showCart = getSetting('header_show_cart') !== 'false';
+  const showAccount = getSetting('header_show_account') !== 'false';
+  const navLinks = getSettingJSON<{ label: string; href: string }[]>('header_nav_links_json', [
+    { label: 'Shop', href: '/shop' },
+    { label: 'Categories', href: '/categories' },
+    { label: 'About', href: '/about' },
+    { label: 'Contact', href: '/contact' }
+  ]);
 
   useEffect(() => {
     // Wishlist logic
@@ -76,113 +87,104 @@ export default function Header() {
                   className="flex items-center"
                   aria-label="Go to homepage"
                 >
-                  <img src="/sarahlogo.png" alt={siteName} className="h-8 md:h-10 w-auto object-contain" />
+                  <img src={siteLogo} alt={siteName} className="h-8 md:h-10 w-auto object-contain" />
                 </Link>
               </div>
 
               <div className="hidden lg:flex items-center space-x-8">
-                <Link
-                  href="/shop"
-                  className="text-gray-700 hover:text-emerald-700 font-medium transition-colors whitespace-nowrap"
-                  aria-label="Shop all products"
-                >
-                  Shop
-                </Link>
-                <Link
-                  href="/categories"
-                  className="text-gray-700 hover:text-emerald-700 font-medium transition-colors whitespace-nowrap"
-                  aria-label="Browse categories"
-                >
-                  Categories
-                </Link>
-                <Link
-                  href="/about"
-                  className="text-gray-700 hover:text-emerald-700 font-medium transition-colors whitespace-nowrap"
-                  aria-label="Learn about us"
-                >
-                  About
-                </Link>
-                <Link
-                  href="/contact"
-                  className="text-gray-700 hover:text-emerald-700 font-medium transition-colors whitespace-nowrap"
-                  aria-label="Contact us"
-                >
-                  Contact
-                </Link>
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="text-gray-700 hover:text-emerald-700 font-medium transition-colors whitespace-nowrap"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
               </div>
 
               <div className="flex items-center space-x-4">
-                <button
-                  className="w-10 h-10 flex items-center justify-center text-gray-700 hover:text-emerald-700 transition-colors lg:hidden"
-                  onClick={() => setIsSearchOpen(true)}
-                  aria-label="Open search"
-                >
-                  <i className="ri-search-line text-2xl"></i>
-                </button>
-
-                <div className="hidden lg:block relative">
-                  <input
-                    type="search"
-                    placeholder="Search products..."
-                    className="w-80 pl-10 pr-4 py-2 border-2 border-gray-300 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all text-sm"
-                    aria-label="Search products"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSearch(e)}
-                  />
-                  <i className="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
-                </div>
-
-                <Link
-                  href="/wishlist"
-                  className="w-10 h-10 flex items-center justify-center text-gray-700 hover:text-emerald-700 transition-colors relative"
-                  aria-label={`Wishlist, ${wishlistCount} items`}
-                >
-                  <i className="ri-heart-line text-2xl"></i>
-                  {wishlistCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-700 text-white text-xs rounded-full flex items-center justify-center" aria-hidden="true">
-                      {wishlistCount}
-                    </span>
-                  )}
-                </Link>
-
-                <div className="relative">
+                {showSearch && (
                   <button
-                    className="w-10 h-10 flex items-center justify-center text-gray-700 hover:text-emerald-700 transition-colors relative"
-                    onClick={() => setIsCartOpen(!isCartOpen)}
-                    aria-label={`Shopping cart, ${cartCount} items`}
-                    aria-expanded={isCartOpen}
-                    aria-controls="mini-cart"
+                    className="w-10 h-10 flex items-center justify-center text-gray-700 hover:text-emerald-700 transition-colors lg:hidden"
+                    onClick={() => setIsSearchOpen(true)}
+                    aria-label="Open search"
                   >
-                    <i className="ri-shopping-cart-line text-2xl"></i>
-                    {cartCount > 0 && (
+                    <i className="ri-search-line text-2xl"></i>
+                  </button>
+                )}
+
+                {showSearch && (
+                  <div className="hidden lg:block relative">
+                    <input
+                      type="search"
+                      placeholder="Search products..."
+                      className="w-80 pl-10 pr-4 py-2 border-2 border-gray-300 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all text-sm"
+                      aria-label="Search products"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleSearch(e)}
+                    />
+                    <i className="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+                  </div>
+                )}
+
+                {showWishlist && (
+                  <Link
+                    href="/wishlist"
+                    className="w-10 h-10 flex items-center justify-center text-gray-700 hover:text-emerald-700 transition-colors relative"
+                    aria-label={`Wishlist, ${wishlistCount} items`}
+                  >
+                    <i className="ri-heart-line text-2xl"></i>
+                    {wishlistCount > 0 && (
                       <span className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-700 text-white text-xs rounded-full flex items-center justify-center" aria-hidden="true">
-                        {cartCount}
+                        {wishlistCount}
                       </span>
                     )}
-                  </button>
-
-                  <MiniCart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
-                </div>
-
-                {user ? (
-                  <Link
-                    href="/account"
-                    className="hidden lg:flex w-10 h-10 items-center justify-center text-emerald-700 hover:text-emerald-900 transition-colors bg-emerald-50 rounded-full"
-                    aria-label="My account"
-                    title="Account"
-                  >
-                    <i className="ri-user-fill text-2xl"></i>
                   </Link>
-                ) : (
-                  <Link
-                    href="/auth/login"
-                    className="hidden lg:flex w-10 h-10 items-center justify-center text-gray-700 hover:text-emerald-700 transition-colors"
-                    aria-label="Login"
-                    title="Login"
-                  >
-                    <i className="ri-user-line text-2xl"></i>
-                  </Link>
+                )}
+
+                {showCart && (
+                  <div className="relative">
+                    <button
+                      className="w-10 h-10 flex items-center justify-center text-gray-700 hover:text-emerald-700 transition-colors relative"
+                      onClick={() => setIsCartOpen(!isCartOpen)}
+                      aria-label={`Shopping cart, ${cartCount} items`}
+                      aria-expanded={isCartOpen}
+                      aria-controls="mini-cart"
+                    >
+                      <i className="ri-shopping-cart-line text-2xl"></i>
+                      {cartCount > 0 && (
+                        <span className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-700 text-white text-xs rounded-full flex items-center justify-center" aria-hidden="true">
+                          {cartCount}
+                        </span>
+                      )}
+                    </button>
+
+                    <MiniCart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+                  </div>
+                )}
+
+                {showAccount && (
+                  user ? (
+                    <Link
+                      href="/account"
+                      className="hidden lg:flex w-10 h-10 items-center justify-center text-emerald-700 hover:text-emerald-900 transition-colors bg-emerald-50 rounded-full"
+                      aria-label="My account"
+                      title="Account"
+                    >
+                      <i className="ri-user-fill text-2xl"></i>
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/auth/login"
+                      className="hidden lg:flex w-10 h-10 items-center justify-center text-gray-700 hover:text-emerald-700 transition-colors"
+                      aria-label="Login"
+                      title="Login"
+                    >
+                      <i className="ri-user-line text-2xl"></i>
+                    </Link>
+                  )
                 )}
               </div>
             </div>
@@ -238,7 +240,7 @@ export default function Header() {
           <div className="absolute top-0 left-0 bottom-0 w-4/5 max-w-xs bg-white shadow-xl flex flex-col animate-in slide-in-from-left duration-300">
             <div className="p-4 border-b border-gray-100 flex items-center justify-between">
               <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
-                <img src="/sarahlogo.png" alt={siteName} className="h-8 w-auto object-contain" />
+                <img src={siteLogo} alt={siteName} className="h-8 w-auto object-contain" />
               </Link>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -250,13 +252,7 @@ export default function Header() {
             </div>
 
             <nav className="flex-1 overflow-y-auto p-4 space-y-2">
-              {[
-                { label: 'Home', href: '/' },
-                { label: 'Shop', href: '/shop' },
-                { label: 'Categories', href: '/categories' },
-                { label: 'About', href: '/about' },
-                { label: 'Contact', href: '/contact' },
-              ].map((link) => (
+              {[{ label: 'Home', href: '/' }, ...navLinks].map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}

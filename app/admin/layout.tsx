@@ -205,6 +205,11 @@ export default function AdminLayout({
       icon: 'ri-puzzle-line',
       path: '/admin/modules'
     },
+    {
+      title: 'Settings',
+      icon: 'ri-settings-3-line',
+      path: '/admin/settings'
+    },
   ];
 
   const visibleMenuItems = menuItems.filter(item => {
