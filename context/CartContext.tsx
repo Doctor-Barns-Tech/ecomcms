@@ -14,7 +14,7 @@ export type CartItem = {
     moq?: number; // Minimum Order Quantity
 };
 
-type CartContextType = {
+export type CartContextType = {
     cart: CartItem[];
     addToCart: (item: CartItem) => void;
     removeFromCart: (itemId: string, variant?: string) => void;
@@ -22,6 +22,11 @@ type CartContextType = {
     clearCart: () => void;
     cartCount: number;
     subtotal: number;
+    shipping: number;
+    total: number;
+    coupon: { code: string; amount: number } | null;
+    applyCoupon: (code: string) => void;
+    removeCoupon: () => void;
     isCartOpen: boolean;
     setIsCartOpen: (isOpen: boolean) => void;
 };
@@ -31,51 +36,24 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: ReactNode }) {
     const [cart, setCart] = useState<CartItem[]>([]);
     const [isCartOpen, setIsCartOpen] = useState(false);
-    const [isInitialized, setIsInitialized] = useState(false);
+    const [coupon, setCoupon] = useState<{ code: string; amount: number } | null>(null);
 
-    // Load cart from localStorage on mount, with migration for legacy items
+    // Initial Load
     useEffect(() => {
         const savedCart = localStorage.getItem('cart');
         if (savedCart) {
             try {
-                const parsed: CartItem[] = JSON.parse(savedCart);
-                // Migrate legacy cart items: if `id` is not a UUID, it's likely a slug
-                const isValidUUID = (str: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
-                const migratedCart = parsed.filter(item => {
-                    if (!item.id || !item.name || !item.price) return false; // Remove corrupted items
-                    if (!isValidUUID(item.id)) {
-                        // Legacy item with slug as id - ensure slug is set, then clear
-                        // These items will be resolved at checkout via the slug fallback
-                        // But best to remove them so users re-add with correct UUIDs
-                        console.warn(`Removing legacy cart item with non-UUID id: ${item.id}`);
-                        return false;
-                    }
-                    // Ensure slug field exists
-                    if (!item.slug) {
-                        item.slug = item.id;
-                    }
-                    return true;
-                });
-                setCart(migratedCart);
-                // If items were removed, update localStorage immediately
-                if (migratedCart.length !== parsed.length) {
-                    localStorage.setItem('cart', JSON.stringify(migratedCart));
-                }
+                setCart(JSON.parse(savedCart));
             } catch (e) {
                 console.error('Failed to parse cart:', e);
-                localStorage.removeItem('cart');
             }
         }
-        setIsInitialized(true);
     }, []);
 
-    // Save cart to localStorage whenever it changes
+    // Save cart
     useEffect(() => {
-        if (isInitialized) {
-            localStorage.setItem('cart', JSON.stringify(cart));
-            window.dispatchEvent(new Event('cartUpdated')); // Keep compatibility with legacy listeners if any
-        }
-    }, [cart, isInitialized]);
+        localStorage.setItem('cart', JSON.stringify(cart));
+    }, [cart]);
 
     const addToCart = (newItem: CartItem) => {
         setCart((prevCart) => {
@@ -85,70 +63,66 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
             if (existingItemIndex > -1) {
                 const newCart = [...prevCart];
-                const existingItem = newCart[existingItemIndex];
-                // Ensure we don't exceed max stock
-                const newQuantity = Math.min(
-                    existingItem.quantity + newItem.quantity,
-                    existingItem.maxStock
-                );
-                newCart[existingItemIndex] = { ...existingItem, quantity: newQuantity };
+                newCart[existingItemIndex].quantity += newItem.quantity;
                 return newCart;
             } else {
                 return [...prevCart, newItem];
             }
         });
-
-        setIsCartOpen(true); // Open cart when item is added
+        setIsCartOpen(true);
     };
 
     const removeFromCart = (itemId: string, variant?: string) => {
-        setCart((prevCart) =>
-            prevCart.filter((item) => !(item.id === itemId && item.variant === variant))
-        );
+        setCart((prevCart) => prevCart.filter((item) => !(item.id === itemId && item.variant === variant)));
     };
 
     const updateQuantity = (itemId: string, quantity: number, variant?: string) => {
-        setCart((prevCart) => {
-            const item = prevCart.find(i => i.id === itemId && i.variant === variant);
-            if (!item) return prevCart;
-
-            const minQty = item.moq || 1;
-            
-            // If trying to reduce below MOQ, remove the item
-            if (quantity < minQty) {
-                return prevCart.filter(i => !(i.id === itemId && i.variant === variant));
-            }
-
-            // Clamp quantity between MOQ and maxStock
-            const clampedQty = Math.min(Math.max(quantity, minQty), item.maxStock);
-
-            return prevCart.map((i) =>
-                i.id === itemId && i.variant === variant
-                    ? { ...i, quantity: clampedQty }
-                    : i
-            );
-        });
+        setCart((prevCart) =>
+            prevCart.map((item) =>
+                item.id === itemId && item.variant === variant
+                    ? { ...item, quantity: Math.max(0, quantity) }
+                    : item
+            )
+        );
     };
 
-    const clearCart = () => {
-        setCart([]);
+    const clearCart = () => setCart([]);
+
+    const applyCoupon = (code: string) => {
+        // Mock coupon logic
+        if (code === 'WELCOME20') {
+            setCoupon({ code, amount: 20 });
+        } else {
+            alert('Invalid coupon code');
+        }
     };
+
+    const removeCoupon = () => setCoupon(null);
 
     const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const shipping = subtotal > 500 ? 0 : 50; // Free shipping over 500
+    const total = subtotal + shipping - (coupon?.amount || 0);
 
     return (
-        <CartContext.Provider value={{
-            cart,
-            addToCart,
-            removeFromCart,
-            updateQuantity,
-            clearCart,
-            cartCount,
-            subtotal,
-            isCartOpen,
-            setIsCartOpen
-        }}>
+        <CartContext.Provider
+            value={{
+                cart,
+                addToCart,
+                removeFromCart,
+                updateQuantity,
+                clearCart,
+                cartCount,
+                subtotal,
+                shipping,
+                total,
+                coupon,
+                applyCoupon,
+                removeCoupon,
+                isCartOpen,
+                setIsCartOpen,
+            }}
+        >
             {children}
         </CartContext.Provider>
     );
