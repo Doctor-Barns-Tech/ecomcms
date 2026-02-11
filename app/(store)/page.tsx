@@ -239,23 +239,7 @@ export default function Home() {
 
 
 
-      {/* Newsletter - Minimalist */}
-      <section className="py-24 bg-white text-center">
-        <div className="max-w-xl mx-auto px-4">
-          <h2 className="font-serif text-3xl text-gray-900 mb-4">Join the Inner Circle</h2>
-          <p className="text-gray-500 mb-8 font-light">Subscribe to receive exclusive offers, early access to new collections, and beauty tips.</p>
-          <form className="flex flex-col sm:flex-row gap-4">
-            <input
-              type="email"
-              placeholder="Enter your email address"
-              className="flex-1 bg-stone-50 border-b border-black/10 px-4 py-3 text-sm focus:outline-none focus:border-black transition-colors"
-            />
-            <button type="submit" className="bg-black text-white px-8 py-3 text-xs font-bold uppercase tracking-widest hover:bg-emerald-900 transition-colors">
-              Subscribe
-            </button>
-          </form>
-        </div>
-      </section>
+      {/* Newsletter removed (duplicate) */}
     </main>
   );
 }
