@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import Link from 'next/link';
 import { useState } from 'react';
@@ -9,13 +9,13 @@ function FooterSection({ title, children }: { title: string, children: React.Rea
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="border-b border-emerald-800/50 lg:border-none last:border-0">
+    <div className="border-b border-gray-800 lg:border-none last:border-0">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between py-4 text-left lg:py-0 lg:cursor-default lg:mb-6"
+        className="w-full flex items-center justify-between py-6 text-left lg:py-0 lg:cursor-default lg:mb-8"
       >
-        <h4 className="font-bold text-lg text-white">{title}</h4>
-        <i className={`ri-arrow-down-s-line text-emerald-400 text-xl transition-transform duration-300 lg:hidden ${isOpen ? 'rotate-180' : ''}`}></i>
+        <h4 className="font-bold text-xs uppercase tracking-[0.15em] text-white">{title}</h4>
+        <i className={`ri-arrow-down-s-line text-gray-500 text-lg transition-transform duration-300 lg:hidden ${isOpen ? 'rotate-180' : ''}`}></i>
       </button>
       <div className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-96 pb-6' : 'max-h-0 lg:max-h-full lg:overflow-visible'}`}>
         {children}
@@ -57,172 +57,168 @@ export default function Footer() {
   };
 
   const siteName = getSetting('site_name') || 'StandardStore';
-  const siteTagline = getSetting('site_tagline') || 'Premium Shopping Experience';
+  const siteTagline = getSetting('site_tagline') || 'Uncompromising Quality.';
   const contactEmail = getSetting('contact_email') || '';
   const contactPhone = getSetting('contact_phone') || '';
-  const socialFacebook = getSetting('social_facebook') || '';
-  const socialInstagram = getSetting('social_instagram') || '';
-  const socialTwitter = getSetting('social_twitter') || '';
-  const socialTiktok = getSetting('social_tiktok') || '';
-  const socialYoutube = getSetting('social_youtube') || '';
 
   // CMS-driven footer config
   const footerLogo = getSetting('footer_logo') || getSetting('site_logo') || '/logo.png';
   const showNewsletter = getSetting('footer_show_newsletter') !== 'false';
-  const newsletterTitle = getSetting('footer_newsletter_title') || 'Join Our Community';
-  const newsletterSubtitle = getSetting('footer_newsletter_subtitle') || 'Get exclusive access to new arrivals, secret sales, and more.';
+  const newsletterTitle = getSetting('footer_newsletter_title') || 'Stay Connected';
+  const newsletterSubtitle = getSetting('footer_newsletter_subtitle') || 'Join our exclusive list for early access to new collections and events.';
   const poweredBy = getSetting('footer_powered_by') || 'Doctor Barns Tech';
   const poweredByLink = getSetting('footer_powered_by_link') || 'https://doctorbarns.com';
 
   const col1Title = getSetting('footer_col1_title') || 'Shop';
   const col1Links = getSettingJSON<{ label: string; href: string }[]>('footer_col1_links_json', [
     { label: 'All Products', href: '/shop' },
-    { label: 'Categories', href: '/categories' },
     { label: 'New Arrivals', href: '/shop?sort=newest' },
-    { label: 'Best Sellers', href: '/shop?sort=bestsellers' }
+    { label: 'Best Sellers', href: '/shop?sort=popular' },
+    { label: 'Collections', href: '/shop' }
   ]);
-  const col2Title = getSetting('footer_col2_title') || 'Customer Care';
+  const col2Title = getSetting('footer_col2_title') || 'Support';
   const col2Links = getSettingJSON<{ label: string; href: string }[]>('footer_col2_links_json', [
     { label: 'Contact Us', href: '/contact' },
-    { label: 'Track My Order', href: '/order-tracking' },
-    { label: 'Shipping Info', href: '/shipping' },
-    { label: 'Returns Policy', href: '/returns' }
+    { label: 'Shipping & Delivery', href: '/shipping' },
+    { label: 'Returns & Exchanges', href: '/returns' },
+    { label: 'FAQ', href: '/faq' },
+    { label: 'Track Order', href: '/order-tracking' }
   ]);
-  const col3Title = getSetting('footer_col3_title') || 'Company';
+  const col3Title = getSetting('footer_col3_title') || 'Legal';
   const col3Links = getSettingJSON<{ label: string; href: string }[]>('footer_col3_links_json', [
-    { label: 'Our Story', href: '/about' },
-    { label: 'Blog', href: '/blog' },
     { label: 'Privacy Policy', href: '/privacy' },
-    { label: 'Terms of Service', href: '/terms' }
+    { label: 'Terms of Service', href: '/terms' },
+    { label: 'Accessibility', href: '/accessibility' }
   ]);
 
   return (
-    <footer className="bg-emerald-950 text-white rounded-t-[2.5rem] mt-8 lg:mt-0 overflow-hidden">
+    <footer className="bg-black text-white pt-20 pb-8 border-t border-gray-900">
 
-      {/* Newsletter Section */}
+      {/* Newsletter - Top Bordered Section */}
       {showNewsletter && (
-        <div className="bg-emerald-900/30 py-12 md:py-16 px-4">
-          <div className="max-w-7xl mx-auto text-center">
-            <div className="w-16 h-16 bg-emerald-800/50 rounded-2xl flex items-center justify-center mx-auto mb-6 rotate-3">
-              <i className="ri-mail-star-line text-3xl text-emerald-300"></i>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-20">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-12 border-b border-gray-800 pb-20">
+            <div className="max-w-xl text-center lg:text-left">
+              <h3 className="font-serif text-3xl mb-4 text-white">{newsletterTitle}</h3>
+              <p className="text-gray-400 font-light text-sm leading-relaxed">{newsletterSubtitle}</p>
+              {submitStatus === 'success' && (
+                <p className="text-emerald-500 text-xs mt-4 uppercase tracking-wider">
+                  You have successfully joined the list.
+                </p>
+              )}
+              {submitStatus === 'error' && (
+                <p className="text-red-500 text-xs mt-4 uppercase tracking-wider">
+                  Something went wrong. Please try again.
+                </p>
+              )}
             </div>
-            <h3 className="text-2xl md:text-3xl font-bold mb-3 font-serif">{newsletterTitle}</h3>
-            <p className="text-emerald-200 mb-8 max-w-md mx-auto leading-relaxed">
-              {newsletterSubtitle}
-            </p>
 
-            <form onSubmit={handleSubmit} className="max-w-md mx-auto relative">
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
-                className="w-full pl-6 pr-32 py-4 bg-white/10 border border-emerald-500/30 rounded-full text-white placeholder-emerald-200/50 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:bg-white/20 transition-all backdrop-blur-sm"
-              />
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="absolute right-1.5 top-1.5 bottom-1.5 bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold px-6 rounded-full transition-all disabled:opacity-75 disabled:cursor-not-allowed shadow-lg"
-              >
-                {isSubmitting ? '...' : 'Join'}
-              </button>
-            </form>
-
-            {submitStatus === 'success' && (
-              <p className="text-emerald-300 text-sm mt-4 animate-in fade-in slide-in-from-bottom-2">
-                <i className="ri-checkbox-circle-line mr-1 align-middle"></i> You're on the list!
-              </p>
-            )}
+            <div className="w-full max-w-md">
+              <form onSubmit={handleSubmit} className="relative">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email address"
+                  className="w-full bg-transparent border-b border-gray-700 py-4 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors text-lg font-light"
+                  required
+                />
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-white transition-colors disabled:opacity-50"
+                >
+                  {isSubmitting ? '...' : 'Subscribe'}
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-6 py-12 lg:py-16">
-        <div className="grid lg:grid-cols-4 gap-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-8">
 
           {/* Brand Column */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-4 space-y-8">
             <Link href="/" className="inline-block">
-              <img src={footerLogo} alt={siteName} className="h-14 w-auto object-contain brightness-0 invert opacity-90" />
+              {/* Using CSS filter to make logo white if needed, or rely on white version */}
+              <img src={footerLogo} alt={siteName} className="h-20 w-auto object-contain brightness-0 invert opacity-90" />
             </Link>
-            <p className="text-emerald-200/80 leading-relaxed text-sm">
-              {siteTagline.replace(/Less\.?$/i, '').trimEnd()}{' '}
-              <Link href="/admin" className="text-inherit hover:text-inherit no-underline">Less.</Link>
+
+            <p className="text-gray-400 text-sm font-light leading-relaxed max-w-xs">
+              {siteTagline}
             </p>
 
-            <div className="flex gap-4 pt-2">
+            <div className="flex gap-6">
               {[
-                { link: socialInstagram, icon: 'ri-instagram-line' },
-                { link: socialFacebook, icon: 'ri-facebook-fill' },
-                { link: socialTwitter, icon: 'ri-twitter-x-fill' },
-                { link: socialTiktok, icon: 'ri-tiktok-fill' },
-                { link: socialYoutube, icon: 'ri-youtube-fill' }
-              ].map((social, i) => social.link && (
-                <a
-                  key={i}
-                  href={social.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-emerald-900/50 rounded-full flex items-center justify-center text-emerald-300 hover:bg-emerald-500 hover:text-emerald-950 transition-all hover:-translate-y-1"
-                >
-                  <i className={social.icon}></i>
+                { icon: 'ri-instagram-line', href: '#' },
+                { icon: 'ri-facebook-fill', href: '#' },
+                { icon: 'ri-twitter-x-line', href: '#' },
+                { icon: 'ri-pinterest-line', href: '#' }
+              ].map((social, i) => (
+                <a key={i} href={social.href} className="text-gray-500 hover:text-white transition-colors">
+                  <i className={`${social.icon} text-xl`}></i>
                 </a>
               ))}
             </div>
-
-            <div className="space-y-3 pt-4 border-t border-emerald-800/50">
-              {contactPhone && (
-                <div className="flex flex-col gap-2">
-                  <a href={`tel:${contactPhone}`} className="flex items-center gap-3 text-emerald-200 hover:text-white transition-colors text-sm">
-                    <i className="ri-phone-line"></i> {contactPhone}
-                  </a>
-                </div>
-              )}
-              {contactEmail && (
-                <a href={`mailto:${contactEmail}`} className="flex items-center gap-3 text-emerald-200 hover:text-white transition-colors text-sm">
-                  <i className="ri-mail-line"></i> {contactEmail}
-                </a>
-              )}
-            </div>
           </div>
 
-          {/* Links Sections (Accordion on Mobile) */}
-          <div className="lg:col-span-3 grid lg:grid-cols-3 gap-8 lg:gap-12">
+          {/* Spacer */}
+          <div className="hidden lg:block lg:col-span-2"></div>
 
+          {/* Links Columns */}
+          <div className="lg:col-span-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
             <FooterSection title={col1Title}>
-              <ul className="space-y-4 text-emerald-100/80">
+              <ul className="space-y-4">
                 {col1Links.map((link, i) => (
-                  <li key={i}><Link href={link.href} className="hover:text-emerald-300 transition-colors flex items-center gap-2"><i className="ri-arrow-right-s-line opacity-50"></i> {link.label}</Link></li>
+                  <li key={i}>
+                    <Link href={link.href} className="text-sm text-gray-400 hover:text-white transition-colors font-light">
+                      {link.label}
+                    </Link>
+                  </li>
                 ))}
               </ul>
             </FooterSection>
 
             <FooterSection title={col2Title}>
-              <ul className="space-y-4 text-emerald-100/80">
+              <ul className="space-y-4">
                 {col2Links.map((link, i) => (
-                  <li key={i}><Link href={link.href} className="hover:text-emerald-300 transition-colors flex items-center gap-2"><i className="ri-arrow-right-s-line opacity-50"></i> {link.label}</Link></li>
+                  <li key={i}>
+                    <Link href={link.href} className="text-sm text-gray-400 hover:text-white transition-colors font-light">
+                      {link.label}
+                    </Link>
+                  </li>
                 ))}
               </ul>
             </FooterSection>
 
             <FooterSection title={col3Title}>
-              <ul className="space-y-4 text-emerald-100/80">
+              <ul className="space-y-4">
                 {col3Links.map((link, i) => (
-                  <li key={i}><Link href={link.href} className="hover:text-emerald-300 transition-colors flex items-center gap-2"><i className="ri-arrow-right-s-line opacity-50"></i> {link.label}</Link></li>
+                  <li key={i}>
+                    <Link href={link.href} className="text-sm text-gray-400 hover:text-white transition-colors font-light">
+                      {link.label}
+                    </Link>
+                  </li>
                 ))}
               </ul>
             </FooterSection>
-
           </div>
         </div>
 
-        <div className="border-t border-emerald-800/50 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-emerald-400/60">
-          <p>&copy; {new Date().getFullYear()} {siteName}. All rights reserved.{poweredBy && <> | Powered by <a href={poweredByLink} target="_blank" rel="noopener noreferrer" className="text-emerald-300 hover:text-white transition-colors">{poweredBy}</a></>}</p>
-          <div className="flex gap-4 grayscale opacity-50">
-            <i className="ri-visa-line text-2xl"></i>
-            <i className="ri-mastercard-line text-2xl"></i>
-            <i className="ri-paypal-line text-2xl"></i>
+        {/* Bottom Bar */}
+        <div className="border-t border-gray-900 mt-20 pt-8 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] uppercase tracking-wider text-gray-600">
+          <p>&copy; {new Date().getFullYear()} {siteName}. All rights reserved.</p>
+
+          <div className="flex items-center gap-6">
+            {poweredBy && (
+              <span className="flex items-center gap-1">
+                Powered by <a href={poweredByLink} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors">{poweredBy}</a>
+              </span>
+            )}
+            <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
           </div>
         </div>
       </div>
