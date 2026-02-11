@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { defaultSettings } from '@/context/CMSContext';
+import ImageUpload from '@/components/admin/ImageUpload';
 
 // ── Types ──────────────────────────────────────────────────────────
 type TabId = 'general' | 'appearance' | 'homepage' | 'pages' | 'header-footer' | 'seo' | 'integrations';
@@ -236,8 +237,8 @@ export default function SettingsPage() {
                             <div className="grid md:grid-cols-2 gap-5">
                                 <FieldGroup label="Store Name"><input type="text" value={val('site_name')} onChange={e => set('site_name', e.target.value)} className={inputClass} /></FieldGroup>
                                 <FieldGroup label="Tagline / Slogan"><input type="text" value={val('site_tagline')} onChange={e => set('site_tagline', e.target.value)} className={inputClass} /></FieldGroup>
-                                <FieldGroup label="Store Logo URL"><input type="text" value={val('site_logo')} onChange={e => set('site_logo', e.target.value)} className={inputClass} placeholder="/logo.png" /></FieldGroup>
-                                <FieldGroup label="Favicon URL"><input type="text" value={val('site_favicon')} onChange={e => set('site_favicon', e.target.value)} className={inputClass} placeholder="/favicon.ico" /></FieldGroup>
+                                <ImageUpload label="Store Logo" description="Your store's main logo" value={val('site_logo')} onChange={(url) => set('site_logo', url)} folder="branding" previewHeight={80} />
+                                <ImageUpload label="Favicon" description="Browser tab icon (ICO, PNG, SVG)" value={val('site_favicon')} onChange={(url) => set('site_favicon', url)} folder="branding" accept="image/x-icon,image/vnd.microsoft.icon,image/png,image/svg+xml" previewHeight={48} />
                             </div>
                             <div className="grid md:grid-cols-2 gap-5">
                                 <FieldGroup label="Currency Code"><input type="text" value={val('currency')} onChange={e => set('currency', e.target.value)} className={inputClass} placeholder="GHS" /></FieldGroup>
@@ -300,7 +301,7 @@ export default function SettingsPage() {
                             <FieldGroup label="Tag Line" description="Small text above the headline"><input type="text" value={val('hero_tag_text')} onChange={e => set('hero_tag_text', e.target.value)} className={inputClass} /></FieldGroup>
                             <FieldGroup label="Headline"><input type="text" value={val('hero_headline')} onChange={e => set('hero_headline', e.target.value)} className={inputClass} /></FieldGroup>
                             <FieldGroup label="Sub-headline"><textarea rows={2} value={val('hero_subheadline')} onChange={e => set('hero_subheadline', e.target.value)} className={textareaClass} /></FieldGroup>
-                            <FieldGroup label="Background Image URL"><input type="text" value={val('hero_image')} onChange={e => set('hero_image', e.target.value)} className={inputClass} placeholder="/hero.jpg" /></FieldGroup>
+                            <ImageUpload label="Background Image" description="Hero section background (recommended: 1920×1080)" value={val('hero_image')} onChange={(url) => set('hero_image', url)} folder="homepage" previewHeight={140} />
 
                             <div className="grid md:grid-cols-2 gap-5">
                                 <FieldGroup label="Primary Button Text"><input type="text" value={val('hero_primary_btn_text')} onChange={e => set('hero_primary_btn_text', e.target.value)} className={inputClass} /></FieldGroup>
@@ -350,7 +351,7 @@ export default function SettingsPage() {
                             </div>
                             <FieldGroup label="Story Title"><input type="text" value={val('about_story_title')} onChange={e => set('about_story_title', e.target.value)} className={inputClass} /></FieldGroup>
                             <FieldGroup label="Story Content" description="The main story paragraphs. Use line breaks to separate."><textarea rows={6} value={val('about_story_content')} onChange={e => set('about_story_content', e.target.value)} className={textareaClass} /></FieldGroup>
-                            <FieldGroup label="Story Image URL"><input type="text" value={val('about_story_image')} onChange={e => set('about_story_image', e.target.value)} className={inputClass} /></FieldGroup>
+                            <ImageUpload label="Story Image" description="Image displayed alongside your story" value={val('about_story_image')} onChange={(url) => set('about_story_image', url)} folder="pages" previewHeight={120} />
                             <div className="grid md:grid-cols-2 gap-5">
                                 <FieldGroup label="Founder Name"><input type="text" value={val('about_founder_name')} onChange={e => set('about_founder_name', e.target.value)} className={inputClass} /></FieldGroup>
                                 <FieldGroup label="Founder Title"><input type="text" value={val('about_founder_title')} onChange={e => set('about_founder_title', e.target.value)} className={inputClass} /></FieldGroup>
@@ -416,7 +417,7 @@ export default function SettingsPage() {
 
                         <SectionCard title="Footer" icon="ri-layout-bottom-line" description="Configure footer content, newsletter, and link columns">
                             <div className="grid md:grid-cols-2 gap-5">
-                                <FieldGroup label="Footer Logo URL"><input type="text" value={val('footer_logo')} onChange={e => set('footer_logo', e.target.value)} className={inputClass} /></FieldGroup>
+                                <ImageUpload label="Footer Logo" description="Logo displayed in the footer" value={val('footer_logo')} onChange={(url) => set('footer_logo', url)} folder="branding" previewHeight={80} />
                                 <FieldGroup label="Footer Logo Height (px)"><input type="number" value={val('footer_logo_height')} onChange={e => set('footer_logo_height', e.target.value)} className={inputClass} /></FieldGroup>
                             </div>
 
@@ -468,7 +469,7 @@ export default function SettingsPage() {
                             <FieldGroup label="Site Title" description="The default <title> tag when no page-specific title exists"><input type="text" value={val('seo_title')} onChange={e => set('seo_title', e.target.value)} className={inputClass} placeholder="My Store - Premium Products" /></FieldGroup>
                             <FieldGroup label="Meta Description" description="Default meta description shown in search results (max 160 characters)"><textarea rows={3} value={val('seo_description')} onChange={e => set('seo_description', e.target.value)} className={textareaClass} maxLength={160} /></FieldGroup>
                             <FieldGroup label="Keywords" description="Comma-separated keywords for search engines"><input type="text" value={val('seo_keywords')} onChange={e => set('seo_keywords', e.target.value)} className={inputClass} placeholder="keyword1, keyword2, keyword3" /></FieldGroup>
-                            <FieldGroup label="Default OG Image URL" description="Image shown when your site is shared on social media"><input type="text" value={val('seo_og_image')} onChange={e => set('seo_og_image', e.target.value)} className={inputClass} placeholder="/og-image.jpg" /></FieldGroup>
+                            <ImageUpload label="Default OG Image" description="Image shown when your site is shared on social media (recommended: 1200×630)" value={val('seo_og_image')} onChange={(url) => set('seo_og_image', url)} folder="seo" previewHeight={100} />
                         </SectionCard>
                         <SectionCard title="Analytics" icon="ri-line-chart-line" description="Track your site visitors">
                             <FieldGroup label="Google Analytics Measurement ID" description="e.g. G-XXXXXXXXXX"><input type="text" value={val('seo_google_analytics')} onChange={e => set('seo_google_analytics', e.target.value)} className={inputClass} placeholder="G-XXXXXXXXXX" /></FieldGroup>
