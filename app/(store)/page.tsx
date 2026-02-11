@@ -10,7 +10,6 @@ import AnimatedSection, { AnimatedGrid } from '@/components/AnimatedSection';
 import { usePageTitle } from '@/hooks/usePageTitle';
 
 export default function Home() {
-  usePageTitle('StandardStore - Luxury Wigs & Extensions');
   const { getSetting, getActiveBanners } = useCMS();
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
@@ -53,13 +52,17 @@ export default function Home() {
   }, []);
 
   // ── CMS-driven config ────────────────────────────────────────────
-  const heroHeadline = getSetting('hero_headline');
-  const heroSubheadline = getSetting('hero_subheadline');
+  const siteName = getSetting('site_name')?.trim() || 'Premium Collection';
+  const heroHeadline = getSetting('hero_headline')?.trim() || `${siteName} – Premium Products`;
+  const heroSubheadline =
+    getSetting('hero_subheadline')?.trim() || 'Verified quality products at unbeatable prices.';
   const heroImage = getSetting('hero_image') || '/hero.jpg';
   const heroPrimaryText = getSetting('hero_primary_btn_text');
   const heroPrimaryLink = getSetting('hero_primary_btn_link') || '/shop';
   const heroSecondaryText = getSetting('hero_secondary_btn_text');
   const heroSecondaryLink = getSetting('hero_secondary_btn_link') || '/about';
+
+  usePageTitle(heroHeadline);
 
   const activeBanners = getActiveBanners('top');
 
