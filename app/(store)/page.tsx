@@ -83,11 +83,11 @@ export default function Home() {
       {renderBanners()}
 
       {/* Hero Section - Immersive */}
-      <section className="relative w-full h-[90vh] overflow-hidden">
+      <section className="relative w-full min-h-[75vh] md:h-[90vh] overflow-hidden">
         <Image
           src={heroImage}
           fill
-          className="object-cover object-center"
+          className="object-cover object-[20%_center] sm:object-center"
           alt="Luxury Wigs"
           priority
           sizes="100vw"
