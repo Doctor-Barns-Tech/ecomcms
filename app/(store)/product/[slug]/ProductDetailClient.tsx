@@ -52,6 +52,8 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   const [selectedSize, setSelectedSize] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
+  const [isBuying, setIsBuying] = useState(false);
+  const [selectionHint, setSelectionHint] = useState('');
 
   // Accordion State
   const [openAccordions, setOpenAccordions] = useState<Record<string, boolean>>({ description: true });
@@ -203,12 +205,22 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   const activePrice = selectedVariant?.price ?? product?.price ?? 0;
   const activeStock = selectedVariant ? (selectedVariant.stock ?? selectedVariant.quantity ?? product?.stockCount ?? 0) : (product?.stockCount ?? 0);
 
-  const handleAddToCart = () => {
-    if (!product) return;
-    if (needsVariantSelection && !needsColorSelection) return;
-    if (needsColorSelection) return;
+  const validateSelections = () => {
+    if (needsColorSelection) {
+      setSelectionHint('Please select a color to continue.');
+      return false;
+    }
+    if (needsVariantSelection) {
+      setSelectionHint('Please select a size to continue.');
+      return false;
+    }
+    setSelectionHint('');
+    return true;
+  };
 
-    setIsAdding(true);
+  const addProductToCart = () => {
+    if (!product) return false;
+    if (!validateSelections()) return false;
 
     let variantLabel: string | undefined;
     if (selectedVariant) {
@@ -233,11 +245,22 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
       moq: product.moq || 1
     });
 
+    return true;
+  };
+
+  const handleAddToCart = () => {
+    if (activeStock === 0 || isAdding) return;
+    const added = addProductToCart();
+    if (!added) return;
+    setIsAdding(true);
     setTimeout(() => setIsAdding(false), 1000);
   };
 
   const handleBuyNow = () => {
-    handleAddToCart();
+    if (activeStock === 0 || isBuying) return;
+    const added = addProductToCart();
+    if (!added) return;
+    setIsBuying(true);
     window.location.href = '/checkout';
   };
 
@@ -356,6 +379,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                               setSelectedVariant(null);
                               setSelectedSize('');
                             }
+                            setSelectionHint('');
                           }}
                           className={`w-12 h-12 rounded-full relative transition-all duration-300 ${selectedColor === color ? 'ring-1 ring-offset-4 ring-black scale-110' : 'hover:scale-105 opacity-80 hover:opacity-100'}`}
                           style={{ backgroundColor: product.colorHexMap[color], border: '1px solid rgba(0,0,0,0.1)' }}
@@ -384,6 +408,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                             onClick={() => {
                               setSelectedVariant(variant);
                               setSelectedSize(variant.name);
+                              setSelectionHint('');
                             }}
                             className={`py-3 text-sm font-medium transition-all ${isSelected
                               ? 'bg-black text-white'
@@ -400,11 +425,11 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                   </div>
                 )}
 
-                {/* Add to Cart */}
-                <div className="pt-4">
+                {/* Add to Cart / Buy Now */}
+                <div className="pt-4 space-y-3">
                   <button
                     onClick={handleAddToCart}
-                    disabled={activeStock === 0 || needsVariantSelection || needsColorSelection || isAdding}
+                    disabled={activeStock === 0 || isAdding}
                     className="w-full bg-black text-white py-5 text-sm font-bold uppercase tracking-[0.2em] hover:bg-gray-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed group relative overflow-hidden"
                   >
                     <span className={`relative z-10 transition-transform duration-300 ${isAdding ? '-translate-y-12' : 'translate-y-0'} block`}>
@@ -414,6 +439,16 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                       Added <i className="ri-check-line ml-2"></i>
                     </span>
                   </button>
+                  <button
+                    onClick={handleBuyNow}
+                    disabled={activeStock === 0 || isBuying}
+                    className="w-full border border-gray-900 text-gray-900 py-5 text-sm font-bold uppercase tracking-[0.2em] hover:bg-gray-900 hover:text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {isBuying ? 'Preparing Checkout...' : 'Buy Now'}
+                  </button>
+                  {selectionHint && (
+                    <p className="text-center text-xs text-red-500 tracking-[0.2em] uppercase">{selectionHint}</p>
+                  )}
                   <p className="text-center text-xs text-gray-400 mt-4 uppercase tracking-wider">{activeStock > 0 ? 'In Stock & Ready to Ship' : 'Currently Unavailable'}</p>
                 </div>
               </div>
