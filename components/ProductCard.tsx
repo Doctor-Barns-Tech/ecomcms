@@ -77,70 +77,88 @@ export default function ProductCard({
   const [activeColor, setActiveColor] = useState<string | null>(null);
   const displayPrice = hasVariants && minVariantPrice ? minVariantPrice : price;
   const discount = originalPrice ? Math.round((1 - displayPrice / originalPrice) * 100) : 0;
-  const MAX_SWATCHES = 5;
+  const MAX_SWATCHES = 4;
 
-  const formatPrice = (val: number) => `GH\u20B5${val.toFixed(2)}`;
+  const formatPrice = (val: number) => `GH₵${val.toFixed(2)}`;
 
   return (
-    <div className="group bg-transparent rounded-lg h-full flex flex-col hover-lift">
-      <Link href={`/product/${slug}`} className="relative block aspect-[3/4] overflow-hidden rounded-xl bg-gray-100 mb-4 shadow-sm group-hover:shadow-xl transition-all duration-300">
-        <LazyImage
-          src={image}
-          alt={name}
-          className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
-        />
+    <div className="group relative">
+      {/* Image Container */}
+      <div className="relative aspect-[3/4] overflow-hidden bg-gray-100 mb-4">
+        <Link href={`/product/${slug}`} className="block w-full h-full">
+          <LazyImage
+            src={image}
+            alt={name}
+            className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+          />
+        </Link>
 
+        {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-2">
           {badge && (
-            <span className="bg-white/90 backdrop-blur text-gray-900 border border-gray-100 text-[10px] uppercase tracking-wider font-bold px-3 py-1.5 rounded-md shadow-sm">
+            <span className="bg-white/90 backdrop-blur text-gray-900 border border-gray-100 text-[10px] uppercase tracking-wider font-bold px-3 py-1.5 shadow-sm">
               {badge}
             </span>
           )}
           {discount > 0 && (
-            <span className="bg-red-50 text-red-700 border border-red-100 text-[10px] uppercase tracking-wider font-bold px-3 py-1.5 rounded-md shadow-sm">
+            <span className="bg-red-50 text-red-700 border border-red-100 text-[10px] uppercase tracking-wider font-bold px-3 py-1.5 shadow-sm">
               -{discount}%
             </span>
           )}
         </div>
 
+        {/* Out of Stock Overlay */}
         {!inStock && (
-          <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center">
-            <span className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Out of Stock</span>
+          <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
+            <span className="bg-gray-900 text-white px-5 py-2 text-xs uppercase tracking-widest font-medium">Sold Out</span>
           </div>
         )}
 
+        {/* Quick Add / Select Options - Desktop Slide Up */}
         {inStock && (
-          <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 hidden lg:block">
+          <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 hidden lg:block bg-gradient-to-t from-black/50 to-transparent pt-12">
             {hasVariants ? (
-              <span className="w-full bg-white text-gray-900 hover:bg-gray-900 hover:text-white py-3 rounded-lg font-medium shadow-lg transition-colors flex items-center justify-center space-x-2 text-sm">
-                <i className="ri-list-check"></i>
+              <Link
+                href={`/product/${slug}`}
+                className="w-full bg-white text-gray-900 hover:bg-gray-900 hover:text-white py-3 font-medium shadow-lg transition-colors flex items-center justify-center space-x-2 text-xs uppercase tracking-widest"
+              >
                 <span>Select Options</span>
-              </span>
+              </Link>
             ) : (
               <button
                 onClick={(e) => {
                   e.preventDefault();
                   addToCart({ id, name, price, image, quantity: moq, slug, maxStock, moq });
                 }}
-                className="w-full bg-white text-gray-900 hover:bg-gray-900 hover:text-white py-3 rounded-lg font-medium shadow-lg transition-colors flex items-center justify-center space-x-2 text-sm"
+                className="w-full bg-white text-gray-900 hover:bg-gray-900 hover:text-white py-3 font-medium shadow-lg transition-colors flex items-center justify-center space-x-2 text-xs uppercase tracking-widest"
               >
-                <i className="ri-shopping-cart-2-line"></i>
                 <span>{moq > 1 ? `Add ${moq} to Cart` : 'Quick Add'}</span>
               </button>
             )}
           </div>
         )}
-      </Link>
+      </div>
 
-      <div className="flex flex-col flex-grow">
+      {/* Product Details */}
+      <div className="text-center group-hover:-translate-y-1 transition-transform duration-300">
         <Link href={`/product/${slug}`}>
-          <h3 className="font-serif text-lg leading-tight text-gray-900 mb-1 group-hover:text-emerald-800 transition-colors line-clamp-2">
+          <h3 className="font-serif text-lg text-gray-900 mb-1 group-hover:text-emerald-800 transition-colors line-clamp-1">
             {name}
           </h3>
         </Link>
 
+        <div className="flex items-center justify-center gap-3 text-sm mb-2">
+          {originalPrice && (
+            <span className="text-gray-400 line-through decoration-1">{formatPrice(originalPrice)}</span>
+          )}
+          <span className="text-gray-900 font-medium">
+            {hasVariants && minVariantPrice ? `From ${formatPrice(minVariantPrice)}` : formatPrice(price)}
+          </span>
+        </div>
+
+        {/* Color Swatches */}
         {colorVariants.length > 0 && (
-          <div className="flex items-center gap-1.5 mb-2">
+          <div className="flex items-center justify-center gap-1.5 h-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             {colorVariants.slice(0, MAX_SWATCHES).map((color) => (
               <button
                 key={color.name}
@@ -149,39 +167,25 @@ export default function ProductCard({
                   e.preventDefault();
                   setActiveColor(activeColor === color.name ? null : color.name);
                 }}
-                className={`w-4 h-4 rounded-full border transition-all duration-200 flex-shrink-0 ${
-                  activeColor === color.name
-                    ? 'ring-2 ring-offset-1 ring-emerald-600 scale-110'
-                    : 'hover:scale-110'
-                } ${color.hex === '#FFFFFF' ? 'border-gray-300' : 'border-transparent'}`}
+                className={`w-3 h-3 rounded-full border border-gray-200 transition-transform hover:scale-125 ${activeColor === color.name ? 'scale-125 ring-1 ring-gray-400' : ''
+                  }`}
                 style={{ backgroundColor: color.hex }}
               />
             ))}
             {colorVariants.length > MAX_SWATCHES && (
-              <span className="text-xs text-gray-400 ml-0.5">+{colorVariants.length - MAX_SWATCHES}</span>
+              <span className="text-[10px] text-gray-400">+{colorVariants.length - MAX_SWATCHES}</span>
             )}
           </div>
         )}
 
-        <div className="flex items-baseline space-x-2 mb-2">
-          {hasVariants && minVariantPrice ? (
-            <span className="text-gray-900 font-semibold">From {formatPrice(minVariantPrice)}</span>
-          ) : (
-            <span className="text-gray-900 font-semibold">{formatPrice(price)}</span>
-          )}
-          {originalPrice && (
-            <span className="text-sm text-gray-400 line-through">{formatPrice(originalPrice)}</span>
-          )}
-        </div>
-
-        <div className="mt-auto pt-2 lg:hidden">
+        {/* Mobile Add Button */}
+        <div className="mt-2 lg:hidden">
           {hasVariants ? (
             <Link
               href={`/product/${slug}`}
-              className="w-full border border-gray-200 text-gray-900 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-50 active:bg-gray-100 transition-colors flex items-center justify-center space-x-1"
+              className="w-full block border border-gray-900 text-gray-900 py-2 text-xs uppercase tracking-widest font-medium hover:bg-gray-900 hover:text-white transition-colors"
             >
-              <i className="ri-list-check text-sm"></i>
-              <span>Select Options</span>
+              Select Options
             </Link>
           ) : (
             <button
@@ -190,9 +194,9 @@ export default function ProductCard({
                 addToCart({ id, name, price, image, quantity: moq, slug, maxStock, moq });
               }}
               disabled={!inStock}
-              className="w-full border border-gray-200 text-gray-900 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-50 active:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full border border-gray-900 text-gray-900 py-2 text-xs uppercase tracking-widest font-medium hover:bg-gray-900 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {moq > 1 ? `Add ${moq} to Cart` : 'Add to Cart'}
+              {moq > 1 ? `Add ${moq}` : 'Add to Cart'}
             </button>
           )}
         </div>

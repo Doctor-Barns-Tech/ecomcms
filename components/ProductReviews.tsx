@@ -43,6 +43,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
     });
 
     fetchReviews();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId]);
 
   const fetchReviews = async () => {
@@ -62,13 +63,9 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
       if (error) throw error;
 
       if (data) {
-        // We need to fetch user names if possible. Since we don't have public profiles easily accessible 
-        // without complicated RLS/joins in client, we might fallback to generic name or metadata if stored.
-        // For this demo, we'll try to use a "clean" name or just "Verified Customer"
-
         const formattedReviews = data.map((r: any) => ({
           id: r.id,
-          author: 'Verified Customer', // or fetch from profiles if we had it joined
+          author: 'Verified Customer',
           rating: r.rating,
           date: r.created_at,
           verified: r.verified_purchase,
@@ -110,7 +107,6 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
       return;
     }
 
-    // reCAPTCHA verification
     const isHuman = await getToken('review');
     if (!isHuman) {
       alert('Security verification failed. Please try again.');
@@ -127,7 +123,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
         title: reviewForm.title,
         content: reviewForm.content,
         status: 'approved', // Auto-approve for demo
-        verified_purchase: false // We could check orders here but keeping it simple
+        verified_purchase: false
       }]);
 
       if (error) throw error;
@@ -135,8 +131,8 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
       alert('Review submitted successfully!');
       setShowReviewForm(false);
       setReviewForm({ rating: 5, title: '', content: '' });
-      invalidateCache(`reviews:${productId}`); // Clear cache so fresh data is fetched
-      fetchReviews(); // Refresh list
+      invalidateCache(`reviews:${productId}`);
+      fetchReviews();
 
     } catch (err: any) {
       console.error('Submit review error:', err);
@@ -146,208 +142,178 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
     }
   };
 
-  if (loading) return <div className="py-8 text-center text-gray-500">Loading reviews...</div>;
+  if (loading) return <div className="py-8 text-center text-gray-500 font-light">Loading reviews...</div>;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-8">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Customer Reviews</h2>
-
+    <div className="bg-white">
       {reviews.length === 0 && !showReviewForm ? (
-        <div className="text-center py-8 mb-8 border-b border-gray-200">
-          <p className="text-gray-500 mb-4">No reviews yet. Be the first to review!</p>
+        <div className="text-center py-12 border border-dashed border-gray-200">
+          <p className="text-gray-500 mb-6 font-light">No reviews yet. Be the first to verify this quality.</p>
           <button
             onClick={() => setShowReviewForm(true)}
-            className="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-2 rounded-lg font-semibold transition-colors"
+            className="border border-black text-black px-8 py-3 text-xs uppercase tracking-widest font-bold hover:bg-black hover:text-white transition-colors"
           >
             Write a Review
           </button>
         </div>
       ) : (
         <>
-          <div className="grid md:grid-cols-3 gap-8 mb-8 pb-8 border-b border-gray-200">
-            <div className="text-center">
-              <div className="text-5xl font-bold text-gray-900 mb-2">{averageRating.toFixed(1)}</div>
-              <div className="flex items-center justify-center mb-2">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <i
-                    key={star}
-                    className={`ri-star-${star <= Math.round(averageRating) ? 'fill' : 'line'} text-xl ${star <= Math.round(averageRating) ? 'text-yellow-400' : 'text-gray-300'
-                      }`}
-                  ></i>
-                ))}
+          {!showReviewForm && (
+            <div className="grid md:grid-cols-12 gap-12 mb-16 pb-12 border-b border-gray-100">
+              <div className="md:col-span-4 text-center md:text-left">
+                <div className="text-6xl font-serif text-gray-900 mb-2">{averageRating.toFixed(1)}</div>
+                <div className="flex items-center justify-center md:justify-start gap-1 mb-4 text-amber-400">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <i
+                      key={star}
+                      className={`ri-star-${star <= Math.round(averageRating) ? 'fill' : 'line'} text-xl`}
+                    ></i>
+                  ))}
+                </div>
+                <p className="text-sm text-gray-500 uppercase tracking-wide">{reviews.length} Reviews</p>
               </div>
-              <p className="text-gray-600">Based on {reviews.length} reviews</p>
-            </div>
 
-            <div className="md:col-span-2">
-              <div className="space-y-2">
-                {ratingDistribution.map((dist) => (
-                  <div key={dist.star} className="flex items-center space-x-3">
+              <div className="md:col-span-8">
+                <div className="space-y-3">
+                  {ratingDistribution.map((dist) => (
                     <button
+                      key={dist.star}
                       onClick={() => setFilter(dist.star.toString())}
-                      className="flex items-center space-x-1 hover:text-emerald-700 transition-colors"
+                      className="flex items-center w-full group"
                     >
-                      <span className="text-sm font-medium w-6">{dist.star}</span>
-                      <i className="ri-star-fill text-yellow-400 text-sm"></i>
+                      <span className="text-xs font-medium w-8 text-gray-500">{dist.star} ★</span>
+                      <div className="flex-1 h-1.5 bg-gray-100 mx-3 relative overflow-hidden">
+                        <div
+                          className="absolute left-0 top-0 h-full bg-gray-900 transition-all duration-500"
+                          style={{ width: `${dist.percentage}%` }}
+                        ></div>
+                      </div>
+                      <span className="text-xs text-gray-400 w-8 text-right underline opacity-0 group-hover:opacity-100 transition-opacity">Filter</span>
                     </button>
-                    <div className="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-yellow-400 transition-all duration-300"
-                        style={{ width: `${dist.percentage}%` }}
-                      ></div>
-                    </div>
-                    <span className="text-sm text-gray-600 w-8">{dist.count}</span>
-                  </div>
-                ))}
+                  ))}
+                </div>
+                <div className="mt-8 flex justify-end gap-4">
+                  {filter !== 'all' && (
+                    <button
+                      onClick={() => setFilter('all')}
+                      className="text-xs text-gray-500 underline hover:text-black"
+                    >
+                      Clear Filter
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setShowReviewForm(true)}
+                    className="text-xs font-bold uppercase tracking-widest border-b border-black pb-1 hover:text-gray-600 transition-colors"
+                  >
+                    Write a Review
+                  </button>
+                </div>
               </div>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => setFilter('all')}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${filter === 'all'
-                  ? 'bg-emerald-700 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-              >
-                All Reviews ({reviews.length})
-              </button>
-              {/* Simplified filter buttons for brevity */}
-            </div>
-
-            {!showReviewForm && (
-              <button
-                onClick={() => setShowReviewForm(true)}
-                className="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-2 rounded-lg font-semibold transition-colors whitespace-nowrap"
-              >
-                Write a Review
-              </button>
-            )}
-          </div>
-        </>
-      )}
-
-      {showReviewForm && (
-        <form onSubmit={handleSubmitReview} className="bg-gray-50 rounded-xl p-6 mb-8">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Write Your Review</h3>
-
-          <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-900 mb-2">Your Rating *</label>
-            <div className="flex space-x-2">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  type="button"
-                  onClick={() => setReviewForm({ ...reviewForm, rating: star })}
-                  className="w-10 h-10 flex items-center justify-center"
-                >
-                  <i
-                    className={`ri-star-${star <= reviewForm.rating ? 'fill' : 'line'} text-3xl ${star <= reviewForm.rating ? 'text-yellow-400' : 'text-gray-300'
-                      }`}
-                  ></i>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {!user && (
-            <div className="mb-4 p-4 bg-amber-50 text-amber-800 rounded-lg">
-              You must be logged in to submit a review.
             </div>
           )}
 
-          <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-900 mb-2">Review Title *</label>
-            <input
-              type="text"
-              value={reviewForm.title}
-              onChange={(e) => setReviewForm({ ...reviewForm, title: e.target.value })}
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              placeholder="Sum up your experience"
-              required
-              disabled={!user}
-            />
-          </div>
+          {showReviewForm && (
+            <form onSubmit={handleSubmitReview} className="bg-gray-50 p-8 mb-12 border border-gray-100 max-w-2xl mx-auto">
+              <h3 className="font-serif text-2xl text-gray-900 mb-6 text-center">Share your experience</h3>
 
-          <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-900 mb-2">Your Review *</label>
-            <textarea
-              value={reviewForm.content}
-              onChange={(e) => setReviewForm({ ...reviewForm, content: e.target.value })}
-              rows={4}
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              placeholder="Share your experience with this product"
-              required
-              disabled={!user}
-            ></textarea>
-          </div>
-
-          <div className="flex space-x-3">
-            <button
-              type="submit"
-              disabled={isSubmitting || !user}
-              className="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap disabled:opacity-50"
-            >
-              {isSubmitting ? 'Submitting...' : 'Submit Review'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowReviewForm(false)}
-              className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      )}
-
-      <div className="space-y-6">
-        {filteredReviews.map((review) => (
-          <div key={review.id} className="pb-6 border-b border-gray-200 last:border-0">
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 flex items-center justify-center bg-emerald-100 rounded-full text-emerald-700 font-bold text-lg">
-                  {review.author.charAt(0)}
+              <div className="mb-6 text-center">
+                <label className="block text-xs uppercase tracking-widest text-gray-500 mb-3">Rate the Product</label>
+                <div className="flex justify-center space-x-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setReviewForm({ ...reviewForm, rating: star })}
+                      className="transition-transform hover:scale-110"
+                    >
+                      <i
+                        className={`ri-star-${star <= reviewForm.rating ? 'fill' : 'line'} text-3xl ${star <= reviewForm.rating ? 'text-amber-400' : 'text-gray-300'
+                          }`}
+                      ></i>
+                    </button>
+                  ))}
                 </div>
-                <div>
-                  <div className="flex items-center space-x-2">
-                    <span className="font-semibold text-gray-900">{review.author}</span>
+              </div>
+
+              {!user && (
+                <div className="mb-6 p-4 bg-white border border-red-100 text-red-600 text-sm text-center">
+                  You must be logged in to submit a review.
+                </div>
+              )}
+
+              <div className="mb-6">
+                <label className="block text-xs uppercase tracking-widest text-gray-500 mb-2">Title</label>
+                <input
+                  type="text"
+                  value={reviewForm.title}
+                  onChange={(e) => setReviewForm({ ...reviewForm, title: e.target.value })}
+                  className="w-full px-4 py-3 bg-white border border-gray-200 focus:outline-none focus:border-black transition-colors"
+                  placeholder="Review Title"
+                  required
+                  disabled={!user}
+                />
+              </div>
+
+              <div className="mb-8">
+                <label className="block text-xs uppercase tracking-widest text-gray-500 mb-2">Review</label>
+                <textarea
+                  value={reviewForm.content}
+                  onChange={(e) => setReviewForm({ ...reviewForm, content: e.target.value })}
+                  rows={5}
+                  className="w-full px-4 py-3 bg-white border border-gray-200 focus:outline-none focus:border-black transition-colors resize-none"
+                  placeholder="Tell us what you think..."
+                  required
+                  disabled={!user}
+                ></textarea>
+              </div>
+
+              <div className="flex gap-4 justify-center">
+                <button
+                  type="button"
+                  onClick={() => setShowReviewForm(false)}
+                  className="px-8 py-3 text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting || !user}
+                  className="bg-black text-white px-8 py-3 text-xs font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors disabled:opacity-50"
+                >
+                  {isSubmitting ? 'Submitting...' : 'Post Review'}
+                </button>
+              </div>
+            </form>
+          )}
+
+          <div className="space-y-12">
+            {filteredReviews.map((review) => (
+              <div key={review.id} className="grid md:grid-cols-12 gap-6 border-b border-gray-100 pb-12 last:border-0">
+                <div className="md:col-span-3">
+                  <div className="flex flex-col">
+                    <span className="font-serif text-lg text-gray-900 mb-1">{review.author}</span>
                     {review.verified && (
-                      <span className="flex items-center text-xs text-emerald-700 bg-emerald-50 px-2 py-1 rounded">
-                        <i className="ri-checkbox-circle-fill mr-1"></i>
-                        Verified Must Have
+                      <span className="text-[10px] uppercase tracking-wider text-emerald-700 font-medium mb-2">
+                        Verified Buyer
                       </span>
                     )}
+                    <span className="text-xs text-gray-400">{new Date(review.date).toLocaleDateString()}</span>
                   </div>
-                  <p className="text-sm text-gray-600">{new Date(review.date).toLocaleDateString()}</p>
+                </div>
+                <div className="md:col-span-9">
+                  <div className="flex mb-3 text-amber-400 text-sm">
+                    {[...Array(5)].map((_, i) => (
+                      <i key={i} className={i < review.rating ? "ri-star-fill" : "ri-star-line text-gray-200"}></i>
+                    ))}
+                  </div>
+                  <h4 className="font-bold text-gray-900 mb-2">{review.title}</h4>
+                  <p className="text-gray-600 leading-relaxed max-w-3xl font-light">{review.content}</p>
                 </div>
               </div>
-
-              <div className="flex items-center space-x-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <i
-                    key={star}
-                    className={`ri-star-${star <= review.rating ? 'fill' : 'line'} text-lg ${star <= review.rating ? 'text-yellow-400' : 'text-gray-300'
-                      }`}
-                  ></i>
-                ))}
-              </div>
-            </div>
-
-            <h4 className="font-semibold text-gray-900 mb-2">{review.title}</h4>
-            <p className="text-gray-700 mb-4">{review.content}</p>
-
-            <div className="flex items-center space-x-4 text-sm">
-              <button className="flex items-center space-x-1 text-gray-600 hover:text-emerald-700 transition-colors">
-                <i className="ri-thumb-up-line"></i>
-                <span>Helpful ({review.helpful})</span>
-              </button>
-            </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </>
+      )}
     </div>
   );
 }

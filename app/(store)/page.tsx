@@ -10,7 +10,7 @@ import AnimatedSection, { AnimatedGrid } from '@/components/AnimatedSection';
 import { usePageTitle } from '@/hooks/usePageTitle';
 
 export default function Home() {
-  usePageTitle('');
+  usePageTitle('StandardStore - Luxury Wigs & Extensions');
   const { getSetting, getActiveBanners } = useCMS();
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
@@ -60,34 +60,16 @@ export default function Home() {
   const heroPrimaryLink = getSetting('hero_primary_btn_link') || '/shop';
   const heroSecondaryText = getSetting('hero_secondary_btn_text');
   const heroSecondaryLink = getSetting('hero_secondary_btn_link') || '/about';
-  const heroTagText = getSetting('hero_tag_text');
-  const heroBadgeLabel = getSetting('hero_badge_label');
-  const heroBadgeText = getSetting('hero_badge_text');
-  const heroBadgeSubtext = getSetting('hero_badge_subtext');
-
-  const features = [
-    { icon: getSetting('feature1_icon'), title: getSetting('feature1_title'), desc: getSetting('feature1_desc') },
-    { icon: getSetting('feature2_icon'), title: getSetting('feature2_title'), desc: getSetting('feature2_desc') },
-    { icon: getSetting('feature3_icon'), title: getSetting('feature3_title'), desc: getSetting('feature3_desc') },
-    { icon: getSetting('feature4_icon'), title: getSetting('feature4_title'), desc: getSetting('feature4_desc') },
-  ];
-
-  const stat1Title = getSetting('hero_stat1_title');
-  const stat1Desc = getSetting('hero_stat1_desc');
-  const stat2Title = getSetting('hero_stat2_title');
-  const stat2Desc = getSetting('hero_stat2_desc');
-  const stat3Title = getSetting('hero_stat3_title');
-  const stat3Desc = getSetting('hero_stat3_desc');
 
   const activeBanners = getActiveBanners('top');
 
   const renderBanners = () => {
     if (activeBanners.length === 0) return null;
     return (
-      <div className="bg-emerald-900 text-white py-2 overflow-hidden relative">
+      <div className="bg-black text-white py-2.5 overflow-hidden relative z-50">
         <div className="flex animate-marquee whitespace-nowrap">
           {activeBanners.concat(activeBanners).map((banner, index) => (
-            <span key={index} className="mx-8 text-sm font-medium tracking-wide flex items-center">
+            <span key={index} className="mx-12 text-xs uppercase tracking-[0.2em] font-medium flex items-center">
               {banner.title}
             </span>
           ))}
@@ -97,177 +79,110 @@ export default function Home() {
   };
 
   return (
-    <main className="flex-col items-center justify-between min-h-screen">
+    <main className="flex-col min-h-screen bg-white text-gray-900 selection:bg-black selection:text-white">
       {renderBanners()}
 
-      {/* Hero Section */}
-      <section className="relative w-full overflow-hidden lg:bg-gradient-to-b lg:from-stone-50 lg:via-white lg:to-cream-50">
+      {/* Hero Section - Immersive */}
+      <section className="relative w-full h-[90vh] overflow-hidden">
+        <Image
+          src={heroImage}
+          fill
+          className="object-cover object-center"
+          alt="Luxury Wigs"
+          priority
+          sizes="100vw"
+          quality={90}
+        />
+        <div className="absolute inset-0 bg-black/20" /> {/* Subtle overlay for text readability */}
 
-        {/* Mobile: Full Background Image with Gradient Overlay */}
-        <div className="absolute inset-0 lg:hidden z-0">
-          <Image
-            src={heroImage}
-            fill
-            className="object-cover transition-opacity duration-1000"
-            alt="Hero Background"
-            priority
-            sizes="100vw"
-            quality={75}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10"></div>
-        </div>
-
-        {/* Desktop Blobs */}
-        <div className="hidden lg:block absolute inset-0 opacity-30 pointer-events-none">
-          <div className="absolute -top-20 -right-20 w-96 h-96 bg-emerald-100/50 rounded-full blur-3xl"></div>
-          <div className="absolute top-40 -left-20 w-72 h-72 bg-amber-50 rounded-full blur-3xl"></div>
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 h-[85vh] lg:h-auto lg:py-24 flex flex-col justify-end lg:block pb-16 lg:pb-0">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-
-            {/* Desktop: Image Layout (Hidden on Mobile) */}
-            <div className="hidden lg:block order-last relative">
-              <div className="relative aspect-[3/4] lg:aspect-auto lg:h-[650px] overflow-hidden rounded-[2rem] shadow-xl">
-                <Image
-                  src={heroImage}
-                  alt="Hero Image"
-                  fill
-                  className="object-cover object-top hover:scale-105 transition-transform duration-1000"
-                  priority
-                  sizes="50vw"
-                  quality={80}
-                />
-
-                {/* Floating Badge (Desktop Only) */}
-                {heroBadgeLabel && (
-                  <div className="absolute bottom-10 left-10 bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-2xl max-w-xs z-20 border border-white/50">
-                    <p className="font-serif text-emerald-800 text-lg italic mb-1">{heroBadgeLabel}</p>
-                    <p className="text-3xl font-bold text-gray-900 mb-1">{heroBadgeText}</p>
-                    <p className="text-sm text-gray-600 font-medium">{heroBadgeSubtext}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Content Column */}
-            <div className="relative z-10 text-center lg:text-left transition-colors duration-300">
-
-              {heroTagText && (
-                <div className="inline-flex items-center space-x-2 mb-4 lg:mb-6 justify-center lg:justify-start animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-                  <span className="h-px w-8 bg-white/70 lg:bg-emerald-800"></span>
-                  <span className="text-white lg:text-emerald-800 text-sm font-semibold tracking-widest uppercase drop-shadow-sm lg:drop-shadow-none">
-                    {heroTagText}
-                  </span>
-                  <span className="h-px w-8 bg-white/70 lg:hidden"></span>
-                </div>
-              )}
-
-              <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[3.2rem] xl:text-5xl text-white lg:text-gray-900 leading-[1.15] mb-4 lg:mb-6 drop-shadow-lg lg:drop-shadow-none animate-fade-in-up max-w-xl mx-auto lg:mx-0" style={{ animationDelay: '0.2s' }}>
-                {heroHeadline}
-              </h1>
-
-              <p className="text-lg text-white/90 lg:text-gray-600 leading-relaxed max-w-md mx-auto lg:mx-0 font-light mb-8 lg:mb-10 drop-shadow-md lg:drop-shadow-none animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-                {heroSubheadline}
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start px-4 lg:px-0 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-                <Link href={heroPrimaryLink} className="inline-flex items-center justify-center bg-white lg:bg-gray-900 text-gray-900 lg:text-white hover:bg-emerald-50 lg:hover:bg-emerald-800 px-10 py-4 rounded-full font-medium transition-all text-lg shadow-xl hover:shadow-2xl hover:-translate-y-1 btn-animate">
-                  {heroPrimaryText}
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+          <AnimatedSection className="max-w-4xl mx-auto space-y-8">
+            <span className="inline-block py-1 px-3 border border-white/30 text-white text-[10px] uppercase tracking-[0.3em] backdrop-blur-sm">
+              The Premium Collection
+            </span>
+            <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl text-white leading-tight drop-shadow-sm">
+              {heroHeadline}
+            </h1>
+            <p className="text-lg md:text-xl text-white/90 font-light max-w-xl mx-auto tracking-wide">
+              {heroSubheadline}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
+              <Link href={heroPrimaryLink} className="bg-white text-black px-10 py-4 text-xs font-bold uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors duration-300 min-w-[200px]">
+                {heroPrimaryText}
+              </Link>
+              {heroSecondaryText && (
+                <Link href={heroSecondaryLink} className="bg-transparent border border-white text-white px-10 py-4 text-xs font-bold uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-colors duration-300 min-w-[200px]">
+                  {heroSecondaryText}
                 </Link>
-                {heroSecondaryText && (
-                  <Link href={heroSecondaryLink} className="inline-flex items-center justify-center bg-white/20 backdrop-blur-md border border-white/50 lg:bg-white lg:border-gray-200 text-white lg:text-gray-900 hover:bg-white/30 lg:hover:text-emerald-800 lg:hover:border-emerald-800 px-10 py-4 rounded-full font-medium transition-colors text-lg btn-animate">
-                    {heroSecondaryText}
-                  </Link>
-                )}
-              </div>
-
-              {/* Stats - Desktop Only */}
-              <div className="mt-12 pt-8 border-t border-gray-200 hidden lg:grid grid-cols-3 gap-6">
-                <div className="flex flex-col items-start text-left">
-                  <p className="font-serif font-bold text-gray-900 text-lg">{stat1Title}</p>
-                  <p className="text-sm text-gray-500">{stat1Desc}</p>
-                </div>
-                <div className="flex flex-col items-start text-left">
-                  <p className="font-serif font-bold text-gray-900 text-lg">{stat2Title}</p>
-                  <p className="text-sm text-gray-500">{stat2Desc}</p>
-                </div>
-                <div className="flex flex-col items-start text-left">
-                  <p className="font-serif font-bold text-gray-900 text-lg">{stat3Title}</p>
-                  <p className="text-sm text-gray-500">{stat3Desc}</p>
-                </div>
-              </div>
-
+              )}
             </div>
-
-          </div>
+          </AnimatedSection>
         </div>
       </section>
 
-      {/* Categories Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <AnimatedSection className="flex items-end justify-between mb-12">
-            <div>
-              <h2 className="font-serif text-4xl md:text-5xl text-gray-900 mb-4">Shop by Category</h2>
-              <p className="text-gray-600 text-lg max-w-md">Explore our carefully curated collections</p>
-            </div>
-            <Link href="/categories" className="hidden md:flex items-center text-emerald-800 font-medium hover:text-emerald-900 transition-colors">
-              View All <i className="ri-arrow-right-line ml-2"></i>
-            </Link>
-          </AnimatedSection>
+      {/* Texture/Category Shop - Minimalist Grid */}
+      <section className="py-24 px-4 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16 space-y-4">
+            <h2 className="font-serif text-3xl md:text-4xl">Shop by Collection</h2>
+            <div className="w-12 h-0.5 bg-black mx-auto"></div>
+          </div>
 
-          <AnimatedGrid className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-            {categories.map((category) => (
-              <Link href={`/shop?category=${category.slug}`} key={category.id} className="group cursor-pointer block">
-                <div className="aspect-[3/4] rounded-2xl overflow-hidden mb-4 relative shadow-md">
-                  <Image
-                    src={category.image || category.image_url || 'https://via.placeholder.com/600x800?text=' + encodeURIComponent(category.name)}
-                    alt={category.name}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                    sizes="(max-width: 768px) 50vw, 25vw"
-                    quality={75}
-                  />
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
-                  <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm p-4 rounded-xl text-center transform translate-y-2 opacity-90 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                    <h3 className="font-serif font-bold text-gray-900 text-lg">{category.name}</h3>
-                    <span className="text-xs text-emerald-800 font-medium uppercase tracking-wider mt-1 block">View Collection</span>
-                  </div>
+          <AnimatedGrid className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {categories.slice(0, 3).map((category, idx) => (
+              <Link href={`/shop?category=${category.slug}`} key={category.id} className="group block relative aspect-[4/5] overflow-hidden bg-gray-100">
+                <Image
+                  src={category.image || category.image_url || 'https://via.placeholder.com/600x800'}
+                  alt={category.name}
+                  fill
+                  className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                />
+                <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
+                <div className="absolute bottom-8 left-8 text-white">
+                  <h3 className="font-serif text-3xl mb-2">{category.name}</h3>
+                  <span className="text-[10px] uppercase tracking-widest border-b border-transparent group-hover:border-white transition-colors pb-1">Explore</span>
                 </div>
               </Link>
             ))}
           </AnimatedGrid>
 
-          <div className="mt-8 text-center md:hidden">
-            <Link href="/categories" className="inline-flex items-center text-emerald-800 font-medium hover:text-emerald-900 transition-colors">
-              View All <i className="ri-arrow-right-line ml-2"></i>
+          <div className="text-center mt-12">
+            <Link href="/categories" className="text-xs font-bold uppercase tracking-[0.2em] border-b border-black pb-1 hover:text-gray-600 hover:border-gray-600 transition-colors">
+              View All Collections
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Featured Products */}
+      {/* New Arrivals - Horizontal Scroll or Grid */}
       <section className="py-24 bg-stone-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimatedSection className="text-center mb-16">
-            <h2 className="font-serif text-4xl md:text-5xl text-gray-900 mb-4">Featured Products</h2>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">Handpicked for you</p>
-          </AnimatedSection>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex justify-between items-end mb-12">
+            <div>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-2 block">Fresh Drops</span>
+              <h2 className="font-serif text-3xl md:text-4xl text-gray-900">New Arrivals</h2>
+            </div>
+            <Link href="/shop?sort=new" className="hidden md:block text-xs uppercase tracking-widest border-b border-gray-300 pb-1 hover:border-black transition-colors">
+              View All
+            </Link>
+          </div>
 
           {loading ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10">
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="animate-pulse">
-                  <div className="bg-gray-200 aspect-[3/4] rounded-xl mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                  <div className="bg-gray-200 aspect-[3/4] mb-4"></div>
+                  <div className="h-4 bg-gray-200 w-3/4 mb-2"></div>
+                  <div className="h-3 bg-gray-200 w-1/2"></div>
                 </div>
               ))}
             </div>
           ) : (
-            <AnimatedGrid className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
+            <AnimatedGrid className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12">
               {featuredProducts.map((product) => {
+                // Format product for ProductCard
+                // Copied logic from previous file to ensure compatibility
                 const variants = product.product_variants || [];
                 const hasVariants = variants.length > 0;
                 const minVariantPrice = hasVariants ? Math.min(...variants.map((v: any) => v.price || product.price)) : undefined;
@@ -298,7 +213,7 @@ export default function Home() {
                     image={product.product_images?.[0]?.url || 'https://via.placeholder.com/400x500'}
                     rating={product.rating_avg || 5}
                     reviewCount={product.review_count || 0}
-                    badge={product.featured ? 'Featured' : undefined}
+                    badge={product.featured ? 'New' : undefined}
                     inStock={effectiveStock > 0}
                     maxStock={effectiveStock || 50}
                     moq={product.moq || 1}
@@ -311,31 +226,88 @@ export default function Home() {
             </AnimatedGrid>
           )}
 
-          <div className="text-center mt-16">
-            <Link
-              href="/shop"
-              className="inline-flex items-center justify-center bg-gray-900 text-white px-10 py-4 rounded-full font-medium hover:bg-emerald-800 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 btn-animate"
-            >
-              View All Products
+          <div className="mt-12 text-center md:hidden">
+            <Link href="/shop" className="text-xs uppercase tracking-widest border-b border-gray-300 pb-1">
+              Shop All
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Trust Features */}
-      <section className="py-16 bg-white border-t border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {features.map((feature, i) => (
-              <AnimatedSection key={i} delay={i * 100} className="flex flex-col items-center text-center p-4">
-                <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mb-4 text-emerald-700">
-                  <i className={`${feature.icon} text-3xl`}></i>
+      {/* The Experience / Why Choose Us - Editorial Style */}
+      <section className="py-24 bg-zinc-900 text-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          {/* Optional abstract pattern or dimmed image */}
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            <div className="space-y-8">
+              <span className="text-[10px] uppercase tracking-[0.3em] text-white/60">The Standard</span>
+              <h2 className="font-serif text-4xl md:text-5xl leading-tight">
+                Uncompromising Quality. <br />
+                <span className="text-white/50 italic">Naturally Yours.</span>
+              </h2>
+              <div className="space-y-6 pt-4">
+                <div className="flex gap-6">
+                  <span className="text-3xl font-serif text-white/30">01</span>
+                  <div>
+                    <h4 className="text-lg font-medium mb-1">Ethically Sourced</h4>
+                    <p className="text-white/60 font-light leading-relaxed text-sm">Every strand is sourced with integrity and respect, ensuring 100% human hair of the highest caliber.</p>
+                  </div>
                 </div>
-                <h3 className="font-bold text-gray-900 mb-1">{feature.title}</h3>
-                <p className="text-gray-500 text-sm">{feature.desc}</p>
-              </AnimatedSection>
-            ))}
+                <div className="flex gap-6">
+                  <span className="text-3xl font-serif text-white/30">02</span>
+                  <div>
+                    <h4 className="text-lg font-medium mb-1">Expertly Crafted</h4>
+                    <p className="text-white/60 font-light leading-relaxed text-sm">Hand-tied lace fronts and durable wefts created by master artisans.</p>
+                  </div>
+                </div>
+                <div className="flex gap-6">
+                  <span className="text-3xl font-serif text-white/30">03</span>
+                  <div>
+                    <h4 className="text-lg font-medium mb-1">Perfect Match</h4>
+                    <p className="text-white/60 font-light leading-relaxed text-sm">Our diverse color range ensures a seamless blend with your natural hair.</p>
+                  </div>
+                </div>
+              </div>
+              <div className="pt-8">
+                <Link href="/about" className="inline-block py-3 px-8 border border-white/30 hover:bg-white hover:text-black transition-colors text-xs uppercase tracking-widest font-medium">
+                  Our Story
+                </Link>
+              </div>
+            </div>
+            <div className="relative aspect-[3/4] md:aspect-square bg-zinc-800">
+              {/* Editorial Image Placeholder - Ideally this would be a high fashion shot */}
+              <Image
+                src="https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?q=80&w=1287&auto=format&fit=crop"
+                alt="Quality Hair Extensions"
+                fill
+                className="object-cover opacity-80"
+              />
+              <div className="absolute -bottom-6 -left-6 bg-white text-black p-8 max-w-xs shadow-xl hidden lg:block">
+                <p className="font-serif italic text-lg mb-4">"The most realistic wig I've ever worn. I feel confident and beautiful."</p>
+                <p className="text-xs font-bold uppercase tracking-widest">— Sarah, Verified Buyer</p>
+              </div>
+            </div>
           </div>
+        </div>
+      </section>
+
+      {/* Newsletter - Minimalist */}
+      <section className="py-24 bg-white text-center">
+        <div className="max-w-xl mx-auto px-4">
+          <h2 className="font-serif text-3xl text-gray-900 mb-4">Join the Inner Circle</h2>
+          <p className="text-gray-500 mb-8 font-light">Subscribe to receive exclusive offers, early access to new collections, and beauty tips.</p>
+          <form className="flex flex-col sm:flex-row gap-4">
+            <input
+              type="email"
+              placeholder="Enter your email address"
+              className="flex-1 bg-stone-50 border-b border-black/10 px-4 py-3 text-sm focus:outline-none focus:border-black transition-colors"
+            />
+            <button type="submit" className="bg-black text-white px-8 py-3 text-xs font-bold uppercase tracking-widest hover:bg-emerald-900 transition-colors">
+              Subscribe
+            </button>
+          </form>
         </div>
       </section>
     </main>
