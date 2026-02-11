@@ -214,6 +214,8 @@ export default function Header() {
           </nav>
         </div>
 
+      </header>
+
       {isSearchOpen && (
         <div className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm flex items-start justify-center pt-20 px-4">
           <div className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl border border-slate-100">
