@@ -307,7 +307,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
       <StructuredData data={productSchema} />
       <StructuredData data={breadcrumbSchema} />
 
-      <main className="min-h-screen bg-white text-black selection:bg-black selection:text-white">
+      <main className="min-h-screen bg-white text-black selection:bg-black selection:text-white pt-28 lg:pt-0">
 
         {/* Breadcrumb */}
         <div className="absolute top-24 left-0 w-full z-10 px-6 hidden lg:block">
@@ -322,9 +322,9 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
 
         <div className="grid lg:grid-cols-2">
           {/* Left Column: Vertical Scroll Gallery */}
-          <div className="bg-gray-50 flex flex-col gap-1 lg:pt-0 pt-20">
+          <div className="bg-gray-50 flex flex-col gap-1 lg:pt-0 pt-8 px-4 lg:px-0">
             {product.images.map((img: string, i: number) => (
-              <div key={i} className="relative w-full aspect-[4/5] lg:aspect-auto lg:h-screen">
+              <div key={i} className="relative w-full aspect-[4/5] lg:aspect-auto lg:h-screen rounded-3xl overflow-hidden">
                 <Image
                   src={img}
                   alt={`${product.name} - View ${i + 1}`}
@@ -338,14 +338,14 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
           </div>
 
           {/* Right Column: Sticky Details */}
-          <div className="lg:h-screen lg:sticky lg:top-0 lg:overflow-y-auto custom-scrollbar bg-white">
-            <div className="px-6 py-12 lg:p-24 max-w-xl mx-auto flex flex-col justify-center min-h-full">
+          <div className="lg:h-screen lg:sticky lg:top-0 lg:overflow-y-auto custom-scrollbar bg-white px-4 lg:px-0">
+            <div className="px-0 sm:px-6 py-12 lg:p-24 max-w-xl mx-auto flex flex-col justify-center min-h-full">
 
               {/* Header */}
               <div className="mb-10">
                 <span className="text-xs font-bold uppercase tracking-[0.2em] text-gray-300 mb-4 block">{product.category}</span>
                 <h1 className="font-serif text-4xl md:text-6xl text-black mb-6 leading-tight">{product.name}</h1>
-                <div className="flex items-baseline gap-4">
+                <div className="flex items-baseline gap-4 flex-wrap">
                   <span className="text-2xl font-light">
                     {hasVariants && !selectedVariant ? (
                       <span>From GH₵{minVariantPrice.toFixed(2)}</span>

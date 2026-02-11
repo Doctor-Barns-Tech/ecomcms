@@ -325,7 +325,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-emerald-50/40 via-white to-white py-10">
+    <main className="min-h-screen bg-gradient-to-b from-emerald-50/40 via-white to-white py-10 pt-28 lg:pt-12 overflow-x-hidden">
       <div className="max-w-6xl mx-auto px-4 space-y-8">
         <div className="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
           <Link
@@ -348,7 +348,7 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        <section className="bg-white/95 border border-emerald-100 rounded-3xl shadow-xl shadow-emerald-100/50 p-6 sm:p-8">
+        <section className="bg-white/95 border border-emerald-100 rounded-3xl shadow-xl shadow-emerald-100/50 p-5 sm:p-8">
           <div className="flex flex-col gap-3">
             <p className="text-xs uppercase tracking-[0.5em] text-emerald-500">Step {currentStep} of 2</p>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -363,8 +363,10 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          <div className="mt-8">
-            <CheckoutSteps currentStep={currentStep} />
+          <div className="mt-8 overflow-x-auto">
+            <div className="min-w-[320px]">
+              <CheckoutSteps currentStep={currentStep} />
+            </div>
           </div>
         </section>
 
