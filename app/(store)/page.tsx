@@ -234,64 +234,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* The Experience / Why Choose Us - Editorial Style */}
-      <section className="py-24 bg-zinc-900 text-white relative overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          {/* Optional abstract pattern or dimmed image */}
-        </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
-            <div className="space-y-8">
-              <span className="text-[10px] uppercase tracking-[0.3em] text-white/60">The Standard</span>
-              <h2 className="font-serif text-4xl md:text-5xl leading-tight">
-                Uncompromising Quality. <br />
-                <span className="text-white/50 italic">Naturally Yours.</span>
-              </h2>
-              <div className="space-y-6 pt-4">
-                <div className="flex gap-6">
-                  <span className="text-3xl font-serif text-white/30">01</span>
-                  <div>
-                    <h4 className="text-lg font-medium mb-1">Ethically Sourced</h4>
-                    <p className="text-white/60 font-light leading-relaxed text-sm">Every strand is sourced with integrity and respect, ensuring 100% human hair of the highest caliber.</p>
-                  </div>
-                </div>
-                <div className="flex gap-6">
-                  <span className="text-3xl font-serif text-white/30">02</span>
-                  <div>
-                    <h4 className="text-lg font-medium mb-1">Expertly Crafted</h4>
-                    <p className="text-white/60 font-light leading-relaxed text-sm">Hand-tied lace fronts and durable wefts created by master artisans.</p>
-                  </div>
-                </div>
-                <div className="flex gap-6">
-                  <span className="text-3xl font-serif text-white/30">03</span>
-                  <div>
-                    <h4 className="text-lg font-medium mb-1">Perfect Match</h4>
-                    <p className="text-white/60 font-light leading-relaxed text-sm">Our diverse color range ensures a seamless blend with your natural hair.</p>
-                  </div>
-                </div>
-              </div>
-              <div className="pt-8">
-                <Link href="/about" className="inline-block py-3 px-8 border border-white/30 hover:bg-white hover:text-black transition-colors text-xs uppercase tracking-widest font-medium">
-                  Our Story
-                </Link>
-              </div>
-            </div>
-            <div className="relative aspect-[3/4] md:aspect-square bg-zinc-800">
-              {/* Editorial Image Placeholder - Ideally this would be a high fashion shot */}
-              <Image
-                src="https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?q=80&w=1287&auto=format&fit=crop"
-                alt="Quality Hair Extensions"
-                fill
-                className="object-cover opacity-80"
-              />
-              <div className="absolute -bottom-6 -left-6 bg-white text-black p-8 max-w-xs shadow-xl hidden lg:block">
-                <p className="font-serif italic text-lg mb-4">"The most realistic wig I've ever worn. I feel confident and beautiful."</p>
-                <p className="text-xs font-bold uppercase tracking-widest">— Sarah, Verified Buyer</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+
 
       {/* Newsletter - Minimalist */}
       <section className="py-24 bg-white text-center">
