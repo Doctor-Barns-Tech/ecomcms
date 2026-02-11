@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import CheckoutSteps from '@/components/CheckoutSteps';
 import OrderSummary from '@/components/OrderSummary';
 import { useCart } from '@/context/CartContext';
+import { useCMS } from '@/context/CMSContext';
 import { supabase } from '@/lib/supabase';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
@@ -14,6 +15,7 @@ export default function CheckoutPage() {
   usePageTitle('Checkout');
   const router = useRouter();
   const { cart, subtotal: cartSubtotal, clearCart } = useCart();
+  const { getSetting } = useCMS();
 
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,6 +24,7 @@ export default function CheckoutPage() {
   const [savePayment, setSavePayment] = useState(false);
   const [user, setUser] = useState<any>(null);
   const { getToken, verifying } = useRecaptcha();
+  const contactPhoneSetting = getSetting('contact_phone') || '+233 546 014 734';
 
   const [shippingData, setShippingData] = useState({
     firstName: '',
@@ -322,98 +325,139 @@ export default function CheckoutPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <Link href="/cart" className="text-gray-600 hover:text-gray-900 font-medium inline-flex items-center whitespace-nowrap">
-            <i className="ri-arrow-left-line mr-2"></i>
-            Back to Cart
+    <main className="min-h-screen bg-gradient-to-b from-emerald-50/40 via-white to-white py-10">
+      <div className="max-w-6xl mx-auto px-4 space-y-8">
+        <div className="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
+          <Link
+            href="/cart"
+            className="inline-flex items-center text-sm font-semibold text-slate-600 hover:text-emerald-700 transition-colors"
+          >
+            <i className="ri-arrow-left-line mr-2 text-base" />
+            Back to cart
           </Link>
+          <div className="flex flex-wrap items-center gap-3 text-[11px] uppercase tracking-[0.4em] text-slate-400">
+            <span className="inline-flex items-center gap-2">
+              <i className="ri-shield-check-line text-emerald-600 text-base" />
+              Secure Checkout
+            </span>
+            <span className="hidden sm:inline-block h-3 w-px bg-slate-200" />
+            <span className="inline-flex items-center gap-2">
+              <i className="ri-time-line text-emerald-600 text-base" />
+              2-Step Process
+            </span>
+          </div>
         </div>
 
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Checkout</h1>
+        <section className="bg-white/95 border border-emerald-100 rounded-3xl shadow-xl shadow-emerald-100/50 p-6 sm:p-8">
+          <div className="flex flex-col gap-3">
+            <p className="text-xs uppercase tracking-[0.5em] text-emerald-500">Step {currentStep} of 2</p>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h1 className="text-3xl font-serif text-slate-900">Complete your order</h1>
+                <p className="text-sm text-slate-500">Shipping, delivery, and secure payment in one elegant flow.</p>
+              </div>
+              <div className="hidden sm:flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-slate-400 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2">
+                <i className="ri-customer-service-2-line text-emerald-600 text-lg" />
+                Need help? {contactPhoneSetting}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8">
+            <CheckoutSteps currentStep={currentStep} />
+          </div>
+        </section>
 
         {currentStep === 1 && (
-          <div className="mb-8 bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Checkout As</h2>
+          <div className="bg-white border border-slate-200 rounded-3xl shadow-sm p-6 sm:p-8">
+            <h2 className="text-lg font-semibold tracking-[0.3em] uppercase text-slate-500 mb-6">Choose checkout style</h2>
             <div className="grid md:grid-cols-2 gap-4">
               <button
                 onClick={() => !user && setCheckoutType('guest')}
-                className={`p-6 rounded-xl border-2 transition-all text-left cursor-pointer ${checkoutType === 'guest'
-                  ? 'border-emerald-700 bg-emerald-50'
-                  : 'border-gray-200 hover:border-gray-300'
-                  } ${user ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`relative overflow-hidden rounded-2xl border transition-all text-left cursor-pointer bg-gradient-to-br ${checkoutType === 'guest'
+                  ? 'border-emerald-500/60 from-emerald-50 to-white shadow-lg shadow-emerald-100'
+                  : 'border-slate-200 hover:border-slate-300 from-white to-white'
+                  } ${user ? 'opacity-50 cursor-not-allowed' : ''} p-6`}
                 disabled={!!user}
               >
-                <div className="flex items-center justify-between mb-3">
-                  <i className="ri-user-line text-3xl text-emerald-700"></i>
-                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${checkoutType === 'guest' ? 'border-emerald-700 bg-emerald-700' : 'border-gray-300'
+                <span className="absolute inset-x-6 top-6 text-[10px] uppercase tracking-[0.6em] text-slate-400">Guest</span>
+                <div className="mt-8 flex items-center justify-between">
+                  <i className="ri-user-line text-3xl text-emerald-600" />
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${checkoutType === 'guest' ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-slate-300 text-transparent'
                     }`}>
-                    {checkoutType === 'guest' && <i className="ri-check-line text-white text-sm"></i>}
+                    <i className="ri-check-line text-sm" />
                   </div>
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">Guest Checkout</h3>
-                <p className="text-sm text-gray-600">Quick checkout without creating an account</p>
-                {user && <p className="text-xs text-emerald-600 mt-2">You are logged in</p>}
+                <h3 className="text-2xl font-serif text-slate-900 mt-4">Guest Checkout</h3>
+                <p className="text-sm text-slate-500">Pay in seconds without storing your details.</p>
+                {user && <p className="text-xs text-emerald-600 mt-2">You are currently logged in.</p>}
               </button>
 
               <button
                 onClick={() => setCheckoutType('account')}
-                className={`p-6 rounded-xl border-2 transition-all text-left cursor-pointer ${checkoutType === 'account'
-                  ? 'border-emerald-700 bg-emerald-50'
-                  : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                className={`relative overflow-hidden rounded-2xl border transition-all text-left cursor-pointer bg-gradient-to-br ${checkoutType === 'account'
+                  ? 'border-emerald-500/60 from-emerald-50 to-white shadow-lg shadow-emerald-100'
+                  : 'border-slate-200 hover:border-slate-300 from-white to-white'
+                  } p-6`}
               >
-                <div className="flex items-center justify-between mb-3">
-                  <i className="ri-account-circle-line text-3xl text-emerald-700"></i>
-                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${checkoutType === 'account' ? 'border-emerald-700 bg-emerald-700' : 'border-gray-300'
+                <span className="absolute inset-x-6 top-6 text-[10px] uppercase tracking-[0.6em] text-slate-400">Account</span>
+                <div className="mt-8 flex items-center justify-between">
+                  <i className="ri-account-circle-line text-3xl text-emerald-600" />
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${checkoutType === 'account' ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-slate-300 text-transparent'
                     }`}>
-                    {checkoutType === 'account' && <i className="ri-check-line text-white text-sm"></i>}
+                    <i className="ri-check-line text-sm" />
                   </div>
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">{user ? 'My Account' : 'Create Account'}</h3>
-                <p className="text-sm text-gray-600">
-                  {user ? `Logged in as ${user.email}` : 'Save info, track orders & earn loyalty points'}
+                <h3 className="text-2xl font-serif text-slate-900 mt-4">{user ? 'My Account' : 'Create Account'}</h3>
+                <p className="text-sm text-slate-500">
+                  {user ? `Logged in as ${user.email}` : 'Save addresses, track orders, and access loyalty perks.'}
                 </p>
               </button>
             </div>
           </div>
         )}
 
-        <CheckoutSteps currentStep={currentStep} />
-
-        <div className="grid lg:grid-cols-3 gap-8 mt-8">
-          <div className="lg:col-span-2">
+        <div className="grid lg:grid-cols-3 gap-8 items-start">
+          <div className="lg:col-span-2 space-y-8">
             {currentStep === 1 && (
               <>
-                <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-                  <h2 className="text-xl font-bold text-gray-900 mb-6">Shipping Information</h2>
+                <div className="bg-white border border-slate-200 rounded-3xl shadow-sm p-6 sm:p-8">
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.4em] text-slate-400">Step 1</p>
+                      <h2 className="text-2xl font-serif text-slate-900">Shipping Information</h2>
+                    </div>
+                    <span className="hidden sm:inline-flex items-center gap-2 text-xs text-slate-400 bg-slate-50 border border-slate-200 rounded-full px-3 py-1">
+                      <i className="ri-map-pin-line text-emerald-600" />
+                      Ghana Nationwide
+                    </span>
+                  </div>
 
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-semibold text-gray-900 mb-2">
+                        <label className="block text-[13px] font-semibold tracking-wide text-slate-600 mb-2">
                           First Name *
                         </label>
                         <input
                           type="text"
                           value={shippingData.firstName}
                           onChange={(e) => setShippingData({ ...shippingData, firstName: e.target.value })}
-                          className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${errors.firstName ? 'border-red-500' : 'border-gray-300'
+                          className={`w-full rounded-2xl border bg-white px-4 py-3.5 text-sm transition-all focus:ring-2 focus:ring-emerald-100 focus:border-emerald-500 ${errors.firstName ? 'border-red-400' : 'border-slate-200'
                             }`}
                           placeholder="John"
                         />
                         {errors.firstName && <p className="text-sm text-red-600 mt-1">{errors.firstName}</p>}
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-900 mb-2">
+                        <label className="block text-[13px] font-semibold tracking-wide text-slate-600 mb-2">
                           Last Name *
                         </label>
                         <input
                           type="text"
                           value={shippingData.lastName}
                           onChange={(e) => setShippingData({ ...shippingData, lastName: e.target.value })}
-                          className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${errors.lastName ? 'border-red-500' : 'border-gray-300'
+                          className={`w-full rounded-2xl border bg-white px-4 py-3.5 text-sm transition-all focus:ring-2 focus:ring-emerald-100 focus:border-emerald-500 ${errors.lastName ? 'border-red-400' : 'border-slate-200'
                             }`}
                           placeholder="Doe"
                         />
@@ -422,30 +466,30 @@ export default function CheckoutPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-semibold text-gray-900 mb-2">
+                      <label className="block text-[13px] font-semibold tracking-wide text-slate-600 mb-2">
                         Email Address *
                       </label>
                       <input
                         type="email"
                         value={shippingData.email}
-                        readOnly={!!user} // Make read-only if logged in (optional, but safer)
+                        readOnly={!!user}
                         onChange={(e) => setShippingData({ ...shippingData, email: e.target.value })}
-                        className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${errors.email ? 'border-red-500' : 'border-gray-300'
-                          } ${user ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                        className={`w-full rounded-2xl border bg-white px-4 py-3.5 text-sm transition-all focus:ring-2 focus:ring-emerald-100 focus:border-emerald-500 ${errors.email ? 'border-red-400' : 'border-slate-200'
+                          } ${user ? 'bg-slate-100 cursor-not-allowed' : ''}`}
                         placeholder="you@example.com"
                       />
                       {errors.email && <p className="text-sm text-red-600 mt-1">{errors.email}</p>}
                     </div>
 
                     <div>
-                      <label className="block text-sm font-semibold text-gray-900 mb-2">
+                      <label className="block text-[13px] font-semibold tracking-wide text-slate-600 mb-2">
                         Phone Number *
                       </label>
                       <input
                         type="tel"
                         value={shippingData.phone}
                         onChange={(e) => setShippingData({ ...shippingData, phone: e.target.value })}
-                        className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${errors.phone ? 'border-red-500' : 'border-gray-300'
+                        className={`w-full rounded-2xl border bg-white px-4 py-3.5 text-sm transition-all focus:ring-2 focus:ring-emerald-100 focus:border-emerald-500 ${errors.phone ? 'border-red-400' : 'border-slate-200'
                           }`}
                         placeholder="+233 XX XXX XXXX"
                       />
@@ -453,14 +497,14 @@ export default function CheckoutPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-semibold text-gray-900 mb-2">
+                      <label className="block text-[13px] font-semibold tracking-wide text-slate-600 mb-2">
                         Street Address *
                       </label>
                       <input
                         type="text"
                         value={shippingData.address}
                         onChange={(e) => setShippingData({ ...shippingData, address: e.target.value })}
-                        className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${errors.address ? 'border-red-500' : 'border-gray-300'
+                        className={`w-full rounded-2xl border bg-white px-4 py-3.5 text-sm transition-all focus:ring-2 focus:ring-emerald-100 focus:border-emerald-500 ${errors.address ? 'border-red-400' : 'border-slate-200'
                           }`}
                         placeholder="House number and street name"
                       />
@@ -469,27 +513,27 @@ export default function CheckoutPage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-semibold text-gray-900 mb-2">
+                        <label className="block text-[13px] font-semibold tracking-wide text-slate-600 mb-2">
                           City *
                         </label>
                         <input
                           type="text"
                           value={shippingData.city}
                           onChange={(e) => setShippingData({ ...shippingData, city: e.target.value })}
-                          className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${errors.city ? 'border-red-500' : 'border-gray-300'
+                          className={`w-full rounded-2xl border bg-white px-4 py-3.5 text-sm transition-all focus:ring-2 focus:ring-emerald-100 focus:border-emerald-500 ${errors.city ? 'border-red-400' : 'border-slate-200'
                             }`}
                           placeholder="Accra"
                         />
                         {errors.city && <p className="text-sm text-red-600 mt-1">{errors.city}</p>}
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-900 mb-2">
+                        <label className="block text-[13px] font-semibold tracking-wide text-slate-600 mb-2">
                           Region *
                         </label>
                         <select
                           value={shippingData.region}
                           onChange={(e) => setShippingData({ ...shippingData, region: e.target.value })}
-                          className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white ${errors.region ? 'border-red-500' : 'border-gray-300'
+                          className={`w-full rounded-2xl border bg-white px-4 py-3.5 text-sm transition-all focus:ring-2 focus:ring-emerald-100 focus:border-emerald-500 ${errors.region ? 'border-red-400' : 'border-slate-200'
                             }`}
                         >
                           <option value="">Select Region</option>
@@ -502,111 +546,93 @@ export default function CheckoutPage() {
                     </div>
 
                     {checkoutType === 'account' && (
-                      <label className="flex items-center space-x-3 cursor-pointer">
+                      <label className="flex items-center gap-3 cursor-pointer rounded-2xl border border-slate-200 p-4 hover:border-emerald-200 transition-colors">
                         <input
                           type="checkbox"
                           checked={saveAddress}
                           onChange={(e) => setSaveAddress(e.target.checked)}
-                          className="w-5 h-5 text-emerald-700 rounded border-gray-300 focus:ring-emerald-500"
+                          className="w-5 h-5 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500"
                         />
-                        <span className="text-sm text-gray-700">Save this address for future orders</span>
+                        <span className="text-sm text-slate-600">Save this address for future orders</span>
                       </label>
                     )}
                   </div>
 
                   <button
                     onClick={handleContinueToDelivery}
-                    className="w-full mt-6 bg-emerald-700 hover:bg-emerald-800 text-white py-4 rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer"
+                    className="w-full mt-8 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-600 hover:to-emerald-800 text-white py-4 rounded-2xl font-semibold tracking-[0.3em] uppercase transition-colors whitespace-nowrap cursor-pointer"
                   >
                     Continue to Delivery
                   </button>
                 </div>
-
-
               </>
             )}
 
             {currentStep === 2 && (
               <>
-                <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-                  <h2 className="text-xl font-bold text-gray-900 mb-6">Delivery Method</h2>
+                <div className="bg-white border border-slate-200 rounded-3xl shadow-sm p-6 sm:p-8">
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.4em] text-slate-400">Step 2</p>
+                      <h2 className="text-2xl font-serif text-slate-900">Delivery & Payment</h2>
+                    </div>
+                    <p className="hidden sm:inline-flex items-center gap-2 text-xs text-slate-400">
+                      <i className="ri-smartphone-line text-emerald-600" />
+                      Mobile Money powered by Moolre
+                    </p>
+                  </div>
                   <div className="space-y-4">
-                    <label className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-colors ${deliveryMethod === 'pickup' ? 'border-emerald-700 bg-emerald-50' : 'border-gray-300 hover:border-gray-400'
+                    <label className={`flex items-center justify-between p-5 border rounded-2xl cursor-pointer transition-all ${deliveryMethod === 'pickup' ? 'border-emerald-500 bg-emerald-50 shadow-inner shadow-emerald-100' : 'border-slate-200 hover:border-slate-300'
                       }`}>
-                      <div className="flex items-center space-x-4">
+                      <div className="flex items-center gap-4">
                         <input
                           type="radio"
                           name="delivery"
                           value="pickup"
                           checked={deliveryMethod === 'pickup'}
                           onChange={(e) => setDeliveryMethod(e.target.value)}
-                          className="w-5 h-5 text-emerald-700"
+                          className="w-5 h-5 text-emerald-600 focus:ring-emerald-500"
                         />
                         <div>
-                          <p className="font-semibold text-gray-900">Store Pickup</p>
-                          <p className="text-sm text-gray-600">Pick up from our store — Ready in 24 hours</p>
+                          <p className="font-semibold text-slate-900">Store Pickup</p>
+                          <p className="text-sm text-slate-500">Collect from our flagship store within 24 hours.</p>
                         </div>
                       </div>
-                      <p className="font-bold text-emerald-700">FREE</p>
+                      <p className="font-semibold text-emerald-700">FREE</p>
                     </label>
 
-                    <label className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-colors ${deliveryMethod === 'doorstep' ? 'border-emerald-700 bg-emerald-50' : 'border-gray-300 hover:border-gray-400'
+                    <label className={`flex items-center justify-between p-5 border rounded-2xl cursor-pointer transition-all ${deliveryMethod === 'doorstep' ? 'border-emerald-500 bg-emerald-50 shadow-inner shadow-emerald-100' : 'border-slate-200 hover:border-slate-300'
                       }`}>
-                      <div className="flex items-center space-x-4">
+                      <div className="flex items-center gap-4">
                         <input
                           type="radio"
                           name="delivery"
                           value="doorstep"
                           checked={deliveryMethod === 'doorstep'}
                           onChange={(e) => setDeliveryMethod(e.target.value)}
-                          className="w-5 h-5 text-emerald-700"
+                          className="w-5 h-5 text-emerald-600 focus:ring-emerald-500"
                         />
                         <div>
-                          <p className="font-semibold text-gray-900">Doorstep Delivery</p>
-                          <p className="text-sm text-gray-600">We will contact you with the delivery cost</p>
+                          <p className="font-semibold text-slate-900">Doorstep Delivery</p>
+                          <p className="text-sm text-slate-500">A concierge will confirm location & delivery cost.</p>
                         </div>
                       </div>
-                      <p className="font-semibold text-amber-600 text-sm">At a Cost</p>
+                      <p className="font-semibold text-amber-600 text-sm">At a cost</p>
                     </label>
-
-                    {/* Comprehensive delivery options - to be re-enabled later
-                    <label className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-colors ${deliveryMethod === 'accra' ? 'border-emerald-700 bg-emerald-50' : 'border-gray-300 hover:border-gray-400'
-                      }`}>
-                      <div className="flex items-center space-x-4">
-                        <input type="radio" name="delivery" value="accra" checked={deliveryMethod === 'accra'} onChange={(e) => setDeliveryMethod(e.target.value)} className="w-5 h-5 text-emerald-700" />
-                        <div>
-                          <p className="font-semibold text-gray-900">Accra Delivery</p>
-                          <p className="text-sm text-gray-600">Delivery within Accra</p>
-                        </div>
-                      </div>
-                      <p className="font-bold text-gray-900">GH₵ 40.00</p>
-                    </label>
-                    <label className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-colors ${deliveryMethod === 'outside-accra' ? 'border-emerald-700 bg-emerald-50' : 'border-gray-300 hover:border-gray-400'
-                      }`}>
-                      <div className="flex items-center space-x-4">
-                        <input type="radio" name="delivery" value="outside-accra" checked={deliveryMethod === 'outside-accra'} onChange={(e) => setDeliveryMethod(e.target.value)} className="w-5 h-5 text-emerald-700" />
-                        <div>
-                          <p className="font-semibold text-gray-900">Outside Accra Delivery</p>
-                          <p className="text-sm text-gray-600">Delivery to bus stations (VIP, OA, STC, etc.)</p>
-                        </div>
-                      </div>
-                      <p className="font-bold text-gray-900">GH₵ 30.00</p>
-                    </label>
-                    */}
                   </div>
 
-                  <div className="flex flex-col-reverse md:flex-row gap-4 mt-6">
+                  <div className="flex flex-col-reverse md:flex-row gap-4 mt-8">
                     <button
                       onClick={() => setCurrentStep(1)}
                       disabled={isLoading}
-                      className="flex-1 border-2 border-gray-300 hover:border-gray-400 text-gray-700 py-4 rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer disabled:opacity-50"
+                      className="flex-1 border border-slate-200 hover:border-slate-300 text-slate-600 py-4 rounded-2xl font-semibold transition-colors whitespace-nowrap cursor-pointer disabled:opacity-50"
                     >
                       Back
                     </button>
                     <button
                       onClick={handleContinueToPayment}
                       disabled={isLoading}
-                      className="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white py-4 rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer disabled:opacity-70 flex items-center justify-center"
+                      className="flex-1 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-4 rounded-2xl font-semibold tracking-[0.2em] uppercase transition-colors whitespace-nowrap cursor-pointer disabled:opacity-70 flex items-center justify-center"
                     >
                       {isLoading ? (
                         <>
@@ -622,8 +648,6 @@ export default function CheckoutPage() {
                     </button>
                   </div>
                 </div>
-
-
               </>
             )}
 
@@ -631,13 +655,25 @@ export default function CheckoutPage() {
           </div>
 
           <div className="lg:col-span-1">
-            <OrderSummary
-              items={cart}
-              subtotal={subtotal}
-              shipping={shippingCost}
-              tax={tax}
-              total={total}
-            />
+            <div className="sticky top-8">
+              <div className="bg-white border border-slate-200 rounded-3xl shadow-lg shadow-emerald-50/40 p-6 sm:p-8">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-semibold tracking-[0.3em] uppercase text-slate-500">Order Summary</h3>
+                  <span className="text-xs text-slate-400">{cart.length} items</span>
+                </div>
+                <OrderSummary
+                  items={cart}
+                  subtotal={subtotal}
+                  shipping={shippingCost}
+                  tax={tax}
+                  total={total}
+                />
+                <div className="mt-6 text-xs text-slate-400 uppercase tracking-[0.4em] flex items-center gap-2">
+                  <i className="ri-lock-2-line text-emerald-600 text-base" />
+                  Payments encrypted via SSL
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
