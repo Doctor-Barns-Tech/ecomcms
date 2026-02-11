@@ -68,8 +68,7 @@ function ShopContent() {
 
   // Filter States
   const [openFilters, setOpenFilters] = useState({ category: true, price: true, sort: false });
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);
+  const [_priceRange, _setPriceRange] = useState<[number, number]>([0, 5000]);
 
   // Read URL params
   const categoryParam = searchParams.get('category');
