@@ -14,7 +14,6 @@ type Category = {
   count?: number;
 };
 
-// Define ColorVariant here to match what ProductCard expects or just for internal use
 export type ColorVariant = {
   name: string;
   hex: string;
@@ -40,15 +39,95 @@ type Product = {
 
 // ── Components ────────────────────────────────────────────────────────
 
-function FilterAccordion({ title, isOpen, onToggle, children }: { title: string, isOpen: boolean, onToggle: () => void, children: React.ReactNode }) {
+function FilterDrawer({
+  isOpen,
+  onClose,
+  categories,
+  activeCategory,
+  onSelectCategory,
+  activeSort,
+  onSelectSort
+}: {
+  isOpen: boolean,
+  onClose: () => void,
+  categories: Category[],
+  activeCategory: string | null,
+  onSelectCategory: (slug: string) => void,
+  activeSort: string,
+  onSelectSort: (val: string) => void
+}) {
   return (
-    <div className="border-b border-gray-200 py-4">
-      <button onClick={onToggle} className="flex justify-between items-center w-full text-left group">
-        <span className="font-medium text-sm uppercase tracking-widest text-gray-900 group-hover:text-gray-600 transition-colors">{title}</span>
-        <i className={`ri-arrow-down-s-line transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}></i>
-      </button>
-      <div className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-96 opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
-        {children}
+    <div className={`fixed inset-0 z-50 transition-visibility duration-300 ${isOpen ? 'visible' : 'invisible'}`}>
+      {/* Backdrop */}
+      <div
+        className={`absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}
+        onClick={onClose}
+      ></div>
+
+      {/* Drawer */}
+      <div className={`absolute right-0 top-0 bottom-0 w-full max-w-sm bg-white shadow-2xl transform transition-transform duration-500 ease-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className="h-full flex flex-col p-8">
+          <div className="flex justify-between items-center mb-12">
+            <h2 className="font-serif text-3xl">Filter & Sort</h2>
+            <button onClick={onClose} className="p-2 hover:rotate-90 transition-transform duration-300">
+              <i className="ri-close-line text-2xl"></i>
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto space-y-12 pr-4 custom-scrollbar">
+            {/* Sort Section */}
+            <div>
+              <span className="block text-xs font-bold uppercase tracking-[0.15em] mb-6 text-gray-400">Sort By</span>
+              <div className="space-y-4">
+                {[
+                  { label: 'New Arrivals', value: 'newest' },
+                  { label: 'Price: Low to High', value: 'price-low' },
+                  { label: 'Price: High to Low', value: 'price-high' },
+                  { label: 'Name: A-Z', value: 'name-asc' },
+                ].map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => onSelectSort(opt.value)}
+                    className={`block w-full text-left text-lg transition-colors ${activeSort === opt.value ? 'font-serif italic text-black' : 'font-light text-gray-500 hover:text-black'}`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Categories Section */}
+            <div>
+              <span className="block text-xs font-bold uppercase tracking-[0.15em] mb-6 text-gray-400">Collections</span>
+              <div className="space-y-4">
+                <button
+                  onClick={() => onSelectCategory('')}
+                  className={`block w-full text-left text-lg transition-colors ${!activeCategory ? 'font-serif italic text-black' : 'font-light text-gray-500 hover:text-black'}`}
+                >
+                  All Products
+                </button>
+                {categories.map(cat => (
+                  <button
+                    key={cat.id}
+                    onClick={() => onSelectCategory(cat.slug)}
+                    className={`block w-full text-left text-lg transition-colors ${activeCategory === cat.slug ? 'font-serif italic text-black' : 'font-light text-gray-500 hover:text-black'}`}
+                  >
+                    {cat.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-8 border-t border-gray-100">
+            <button
+              onClick={onClose}
+              className="w-full bg-black text-white py-4 text-xs font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors"
+            >
+              View Results
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -64,11 +143,7 @@ function ShopContent() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalProducts, setTotalProducts] = useState(0);
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
-
-  // Filter States
-  const [openFilters, setOpenFilters] = useState({ category: true, price: true, sort: false });
-  const [_priceRange, _setPriceRange] = useState<[number, number]>([0, 5000]);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Read URL params
   const categoryParam = searchParams.get('category');
@@ -153,7 +228,7 @@ function ShopContent() {
             name: p.name,
             price: p.price,
             compare_at_price: p.compare_at_price,
-            image: p.product_images?.[0]?.url || 'https://via.placeholder.com/800?text=No+Image',
+            image: p.product_images?.[0]?.url || 'https://images.unsplash.com/photo-1550995054-9f89920155b8?q=80&w=2670&auto=format&fit=crop', // Fallback to luxury placeholder
             rating: p.rating_avg || 0,
             reviewCount: p.review_count || 0,
             inStock: effectiveStock > 0,
@@ -186,179 +261,104 @@ function ShopContent() {
     router.push(`/shop?${params.toString()}`);
   };
 
+  const getActiveCategoryName = () => {
+    if (!categoryParam) return 'All Products';
+    return categories.find(c => c.slug === categoryParam)?.name || 'Collection';
+  };
+
   return (
-    <div className="bg-white min-h-screen">
-      {/* Mobile Filters Drawer */}
-      <div className={`fixed inset-0 z-50 bg-white transform transition-transform duration-300 lg:hidden ${showMobileFilters ? 'translate-x-0' : 'translate-x-full'}`}>
-        <div className="p-4 flex items-center justify-between border-b border-gray-100">
-          <h2 className="font-serif text-xl">Filters</h2>
-          <button onClick={() => setShowMobileFilters(false)} className="p-2"><i className="ri-close-line text-2xl"></i></button>
-        </div>
-        <div className="p-6 overflow-y-auto h-[calc(100vh-80px)]">
-          <div className="space-y-8">
-            <div>
-              <h3 className="font-bold text-sm uppercase tracking-widest mb-4">Categories</h3>
-              <ul className="space-y-3">
-                <li>
-                  <button
-                    onClick={() => { updateFilter('category', ''); setShowMobileFilters(false); }}
-                    className={`text-sm ${!categoryParam ? 'font-bold text-black' : 'text-gray-600'}`}
-                  >
-                    All Products
-                  </button>
-                </li>
-                {categories.map(cat => (
-                  <li key={cat.id}>
-                    <button
-                      onClick={() => { updateFilter('category', cat.slug); setShowMobileFilters(false); }}
-                      className={`text-sm ${categoryParam === cat.slug ? 'font-bold text-black' : 'text-gray-600'}`}
-                    >
-                      {cat.name}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
+    <div className="bg-white min-h-screen text-black selection:bg-black selection:text-white">
+
+      {/* Filter Drawer */}
+      <FilterDrawer
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        categories={categories}
+        activeCategory={categoryParam}
+        onSelectCategory={(slug) => { updateFilter('category', slug); setIsFilterOpen(false); }}
+        activeSort={sortParam}
+        onSelectSort={(val) => { updateFilter('sort', val); setIsFilterOpen(false); }}
+      />
+
+      {/* Hero / Header */}
+      <div className="pt-32 pb-12 px-4 text-center">
+        <h1 className="font-serif text-5xl md:text-6xl mb-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          {getActiveCategoryName()}
+        </h1>
+        <p className="text-gray-500 font-light text-sm uppercase tracking-widest animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
+          {totalProducts} Items
+        </p>
+      </div>
+
+      {/* Sticky Toolbar */}
+      <div className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-gray-100 mb-12">
+        <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-16">
+          <div className="hidden md:flex gap-8">
+            {/* Quick Categories */}
+            <button onClick={() => updateFilter('category', '')} className={`text-xs uppercase tracking-widest hover:text-gray-500 transition-colors ${!categoryParam ? 'font-bold' : ''}`}>All</button>
+            {categories.slice(0, 4).map(cat => (
+              <button key={cat.id} onClick={() => updateFilter('category', cat.slug)} className={`text-xs uppercase tracking-widest hover:text-gray-500 transition-colors ${categoryParam === cat.slug ? 'font-bold' : ''}`}>
+                {cat.name}
+              </button>
+            ))}
           </div>
+
+          <button
+            onClick={() => setIsFilterOpen(true)}
+            className="ml-auto flex items-center gap-2 text-xs font-bold uppercase tracking-widest hover:text-gray-600 transition-colors"
+          >
+            <span className="md:hidden">Filter & Sort</span>
+            <span className="hidden md:inline">Filter</span>
+            <i className="ri-sound-module-line text-lg"></i>
+          </button>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-12 pb-24">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2 block">Shop All</span>
-            <h1 className="font-serif text-4xl text-gray-900">
-              {categoryParam ? categories.find(c => c.slug === categoryParam)?.name || 'Collection' : 'All Products'}
-            </h1>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-32">
+        {loading ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-12">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="animate-pulse">
+                <div className="bg-gray-100 aspect-[3/4] mb-4"></div>
+                <div className="h-4 bg-gray-100 w-2/3 mb-2"></div>
+                <div className="h-3 bg-gray-100 w-1/3"></div>
+              </div>
+            ))}
           </div>
+        ) : products.length === 0 ? (
+          <div className="text-center py-20">
+            <h3 className="font-serif text-2xl mb-4">No products found</h3>
+            <p className="text-gray-500 mb-8">Try adjusting your filters.</p>
+            <button onClick={() => updateFilter('category', '')} className="border-b border-black pb-1 hover:text-gray-600">View All Products</button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-16">
+            {products.map(product => (
+              <ProductCard key={product.id} {...product} />
+            ))}
+          </div>
+        )}
 
-          <div className="flex items-center gap-4">
-            {/* Mobile Filter Toggle */}
-            <button onClick={() => setShowMobileFilters(true)} className="lg:hidden flex items-center gap-2 text-sm font-medium uppercase tracking-widest border-b border-gray-300 pb-1">
-              <i className="ri-filter-3-line"></i> Filter
+        {/* Pagination - Minimalist */}
+        {!loading && totalProducts > limit && (
+          <div className="mt-24 flex justify-center gap-12 items-center">
+            <button
+              disabled={pageParam <= 1}
+              onClick={() => updateFilter('page', (pageParam - 1).toString())}
+              className="text-2xl hover:scale-110 transition-transform disabled:opacity-20"
+            >
+              <i className="ri-arrow-left-line"></i>
             </button>
-
-            {/* Sort Dropdown */}
-            <div className="relative group">
-              <button className="flex items-center gap-2 text-sm font-medium uppercase tracking-widest hover:text-gray-600 transition-colors">
-                Sort By <i className="ri-arrow-down-s-line"></i>
-              </button>
-              <div className="absolute right-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20">
-                <div className="bg-white border border-gray-100 shadow-xl py-2 w-48 rounded-sm">
-                  {[
-                    { label: 'Newest', value: 'newest' },
-                    { label: 'Price: Low to High', value: 'price-low' },
-                    { label: 'Price: High to Low', value: 'price-high' },
-                    { label: 'Name: A-Z', value: 'name-asc' },
-                  ].map(opt => (
-                    <button
-                      key={opt.value}
-                      onClick={() => updateFilter('sort', opt.value)}
-                      className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${sortParam === opt.value ? 'font-bold text-black' : 'text-gray-500'}`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex gap-12">
-          {/* Sidebar - Desktop */}
-          <aside className="hidden lg:block w-64 flex-shrink-0">
-            <FilterAccordion
-              title="Categories"
-              isOpen={openFilters.category}
-              onToggle={() => setOpenFilters(prev => ({ ...prev, category: !prev.category }))}
+            <span className="font-serif italic text-lg">{pageParam} <span className="text-gray-300 mx-2">/</span> {Math.ceil(totalProducts / limit)}</span>
+            <button
+              disabled={pageParam * limit >= totalProducts}
+              onClick={() => updateFilter('page', (pageParam + 1).toString())}
+              className="text-2xl hover:scale-110 transition-transform disabled:opacity-20"
             >
-              <ul className="space-y-3 pb-2">
-                <li>
-                  <button
-                    onClick={() => updateFilter('category', '')}
-                    className={`text-sm hover:text-emerald-800 transition-colors ${!categoryParam ? 'font-bold text-black' : 'text-gray-500'}`}
-                  >
-                    All Products
-                  </button>
-                </li>
-                {categories.map(cat => (
-                  <li key={cat.id}>
-                    <button
-                      onClick={() => updateFilter('category', cat.slug)}
-                      className={`text-sm hover:text-emerald-800 transition-colors ${categoryParam === cat.slug ? 'font-bold text-black' : 'text-gray-500'}`}
-                    >
-                      {cat.name}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </FilterAccordion>
-
-            <FilterAccordion
-              title="Price Range"
-              isOpen={openFilters.price}
-              onToggle={() => setOpenFilters(prev => ({ ...prev, price: !prev.price }))}
-            >
-              <div className="py-4 px-1">
-                <p className="text-xs text-gray-500 mb-4">Select a price range to filter products.</p>
-                {/* Placeholder for dual slider - implementation would require more complex state/component */}
-                <div className="flex gap-4">
-                  <button onClick={() => updateFilter('sort', 'price-low')} className="text-xs border border-gray-200 px-3 py-1 hover:border-black transition-colors">Low - High</button>
-                  <button onClick={() => updateFilter('sort', 'price-high')} className="text-xs border border-gray-200 px-3 py-1 hover:border-black transition-colors">High - Low</button>
-                </div>
-              </div>
-            </FilterAccordion>
-          </aside>
-
-          {/* Grid */}
-          <div className="flex-1">
-            {loading ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-10">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="animate-pulse">
-                    <div className="bg-gray-100 aspect-[3/4] mb-4"></div>
-                    <div className="h-4 bg-gray-100 w-2/3 mb-2"></div>
-                    <div className="h-3 bg-gray-100 w-1/3"></div>
-                  </div>
-                ))}
-              </div>
-            ) : products.length === 0 ? (
-              <div className="text-center py-20">
-                <h3 className="font-serif text-xl mb-2">No products found</h3>
-                <p className="text-gray-500">Try adjusting your filters.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-12">
-                {products.map(product => (
-                  <ProductCard key={product.id} {...product} />
-                ))}
-              </div>
-            )}
-
-            {/* Pagination */}
-            {!loading && totalProducts > limit && (
-              <div className="mt-16 flex justify-center gap-4">
-                <button
-                  disabled={pageParam <= 1}
-                  onClick={() => updateFilter('page', (pageParam - 1).toString())}
-                  className="px-6 py-3 border border-gray-200 text-xs font-bold uppercase tracking-widest hover:bg-black hover:text-white hover:border-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Previous
-                </button>
-                <span className="flex items-center text-sm font-medium px-4">Page {pageParam}</span>
-                <button
-                  disabled={pageParam * limit >= totalProducts}
-                  onClick={() => updateFilter('page', (pageParam + 1).toString())}
-                  className="px-6 py-3 border border-gray-200 text-xs font-bold uppercase tracking-widest hover:bg-black hover:text-white hover:border-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Next
-                </button>
-              </div>
-            )}
+              <i className="ri-arrow-right-line"></i>
+            </button>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
@@ -366,7 +366,7 @@ function ShopContent() {
 
 export default function ShopPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center"><div className="w-8 h-8 border-2 border-gray-200 border-t-black rounded-full animate-spin"></div></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center"><div className="w-8 h-8 border-2 border-gray-100 border-t-black rounded-full animate-spin"></div></div>}>
       <ShopContent />
     </Suspense>
   );

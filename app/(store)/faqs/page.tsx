@@ -3,17 +3,35 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
+function MinimalAccordion({ question, answer }: { question: string, answer: string }) {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div className="border-b border-gray-200 py-6 group">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex justify-between items-center text-left focus:outline-none"
+      >
+        <span className="font-serif text-lg md:text-xl text-gray-900 group-hover:text-gray-600 transition-colors">{question}</span>
+        <i className={`ri-arrow-down-s-line text-2xl text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}></i>
+      </button>
+      <div className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-40 opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
+        <p className="text-gray-500 font-light leading-relaxed">{answer}</p>
+      </div>
+    </div>
+  );
+}
+
 export default function FAQsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
 
   const categories = [
-    { id: 'all', name: 'All Questions', icon: 'ri-question-line' },
-    { id: 'orders', name: 'Orders', icon: 'ri-shopping-bag-line' },
-    { id: 'shipping', name: 'Shipping', icon: 'ri-truck-line' },
-    { id: 'returns', name: 'Returns', icon: 'ri-arrow-go-back-line' },
-    { id: 'payment', name: 'Payment', icon: 'ri-bank-card-line' },
-    { id: 'account', name: 'Account', icon: 'ri-user-line' }
+    { id: 'all', name: 'All' },
+    { id: 'orders', name: 'Orders' },
+    { id: 'shipping', name: 'Shipping' },
+    { id: 'returns', name: 'Returns' },
+    { id: 'payment', name: 'Payment' },
+    { id: 'account', name: 'Account' }
   ];
 
   const faqs = [
@@ -25,259 +43,129 @@ export default function FAQsPage() {
     {
       category: 'orders',
       question: 'Can I modify or cancel my order?',
-      answer: 'You can modify or cancel your order within 1 hour of placing it. Contact our customer service immediately at +233 24 123 4567 or hello@premiumstore.com. Once an order is processed, modifications may not be possible.'
+      answer: 'You can modify or cancel your order within 1 hour of placing it. Contact our customer service immediately. Once an order is processed, modifications may not be possible.'
     },
     {
       category: 'orders',
       question: 'How do I track my order?',
-      answer: 'After your order ships, you\'ll receive a tracking number via email and SMS. Visit our Order Tracking page and enter your order number and email address to see real-time updates on your delivery status.'
+      answer: 'After your order ships, you\'ll receive a tracking number via email. Visit our Order Tracking page to see real-time updates.'
     },
     {
       category: 'orders',
       question: 'What if I receive the wrong item?',
-      answer: 'We sincerely apologise if you receive the wrong item. Contact us within 48 hours with photos of the item received. We\'ll arrange for the correct item to be sent immediately and collect the wrong item at no cost to you.'
+      answer: 'Contact us within 48 hours with photos of the item received. We\'ll arrange for the correct item to be sent immediately.'
     },
     {
       category: 'shipping',
       question: 'What are your delivery times?',
-      answer: 'Standard delivery takes 2-5 business days within Ghana. Express delivery (next-day) is available for Accra and Kumasi. Orders placed before 2pm are dispatched same day. Remote areas may take 5-7 business days.'
+      answer: 'Standard delivery takes 2-5 business days. Express delivery (next-day) is available for select cities.'
     },
     {
       category: 'shipping',
       question: 'How much does shipping cost?',
-      answer: 'Standard shipping costs GHS 20. Express delivery costs GHS 40. Orders over GHS 300 qualify for FREE standard shipping. Store pickup is also available at no charge from our Accra location.'
+      answer: 'Standard shipping costs are calculated at checkout. Orders over a certain amount qualify for complimentary shipping.'
     },
     {
       category: 'shipping',
-      question: 'Do you ship outside Ghana?',
-      answer: 'Currently, we only ship within Ghana. We\'re working on expanding to neighbouring West African countries. Sign up for our newsletter to be notified when international shipping becomes available.'
-    },
-    {
-      category: 'shipping',
-      question: 'What if nobody is home for delivery?',
-      answer: 'Our delivery partner will attempt delivery twice. If unsuccessful, the package will be held at the nearest collection point for 5 days. You\'ll receive SMS and email notifications with collection instructions.'
+      question: 'Do you ship internationally?',
+      answer: 'Currently, we ship within the country. We are working on expanding our reach.'
     },
     {
       category: 'returns',
       question: 'What is your return policy?',
-      answer: 'We offer a 14-day return policy for unused items in original packaging. Simply initiate a return from your account, print the return label, and ship it back. Refunds are processed within 5-7 business days after we receive the item.'
+      answer: 'We offer a 14-day return policy for unused items in original packaging. Refunds are processed within 5-7 business days after we receive the item.'
     },
     {
       category: 'returns',
       question: 'Which items cannot be returned?',
-      answer: 'For hygiene reasons, we cannot accept returns on opened cosmetics, intimate apparel, earrings, or perishable goods. Custom or personalised items are also non-returnable unless defective.'
-    },
-    {
-      category: 'returns',
-      question: 'Who pays for return shipping?',
-      answer: 'If you\'re returning due to a defect or our error, we cover return shipping. For change-of-mind returns, customers pay return shipping costs (GHS 15 standard rate). Free shipping on returns for defective items.'
-    },
-    {
-      category: 'returns',
-      question: 'Can I exchange an item instead of returning it?',
-      answer: 'Yes! If you need a different size or colour, select "Exchange" when initiating your return. We\'ll send the replacement as soon as we receive your original item. Exchange shipping is FREE.'
+      answer: 'For hygiene reasons, opened cosmetics, intimate apparel, and earrings are non-returnable unless defective.'
     },
     {
       category: 'payment',
       question: 'What payment methods do you accept?',
-      answer: 'We accept MTN Mobile Money, Vodafone Cash, AirtelTigo Money, Visa/Mastercard credit and debit cards, and Cash on Delivery (available for orders under GHS 1,000). All payments are processed securely.'
-    },
-    {
-      category: 'payment',
-      question: 'Is it safe to use my credit card on your site?',
-      answer: 'Absolutely. We use industry-standard SSL encryption and partner with secure payment processors (Paystack, Flutterwave). We never store your full card details on our servers. All transactions are PCI-DSS compliant.'
-    },
-    {
-      category: 'payment',
-      question: 'Can I pay in instalments?',
-      answer: 'Yes! We offer payment plans through our partners for purchases over GHS 500. Select "Pay in Instalments" at checkout to see available options. Approval is instant and no interest is charged.'
-    },
-    {
-      category: 'payment',
-      question: 'When will my payment be charged?',
-      answer: 'For card and mobile money payments, you\'re charged immediately. For Cash on Delivery, you pay when you receive your order. If an item is out of stock, we\'ll refund you within 24 hours.'
-    },
-    {
-      category: 'payment',
-      question: 'How do refunds work?',
-      answer: 'Refunds are processed to your original payment method within 5-7 business days after we receive and inspect your return. For mobile money refunds, ensure you provide correct details. You\'ll receive confirmation via email.'
+      answer: 'We accept major credit/debit cards and mobile money options. All payments are processed securely.'
     },
     {
       category: 'account',
       question: 'Do I need an account to place an order?',
-      answer: 'No, you can checkout as a guest. However, creating an account lets you track orders, save addresses, view purchase history, manage your wishlist, and receive exclusive offers. It only takes 30 seconds to sign up.'
-    },
-    {
-      category: 'account',
-      question: 'How do I reset my password?',
-      answer: 'Click "Forgot Password" on the login page, enter your email address, and we\'ll send you a reset link. The link is valid for 1 hour. If you don\'t receive it, check your spam folder or contact support.'
-    },
-    {
-      category: 'account',
-      question: 'Can I have multiple delivery addresses?',
-      answer: 'Yes! You can save multiple delivery addresses in your account. During checkout, simply select the address you want to use or add a new one. This is perfect for sending gifts or alternating between work and home.'
-    },
-    {
-      category: 'account',
-      question: 'How do I update my account information?',
-      answer: 'Log in to your account and go to "Account Settings". You can update your name, email, phone number, password, and saved addresses. Changes are saved instantly and you\'ll receive a confirmation email.'
-    },
-    {
-      category: 'account',
-      question: 'What are loyalty points and how do they work?',
-      answer: 'Earn 1 point for every GHS 10 spent. 100 points = GHS 10 discount on your next purchase. Points are automatically added to your account after each order. Check your points balance in your account dashboard.'
+      answer: 'No, you can checkout as a guest. However, an account allows you to track orders and save your details for faster checkout.'
     }
   ];
 
   const filteredFAQs = faqs.filter(faq => {
     const matchesCategory = activeCategory === 'all' || faq.category === activeCategory;
-    const matchesSearch = searchQuery === '' || 
+    const matchesSearch = searchQuery === '' ||
       faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
       faq.answer.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="bg-gradient-to-br from-emerald-50 via-white to-amber-50 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6">
-              Frequently Asked Questions
-            </h1>
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-              Find quick answers to common questions about ordering, shipping, returns, and more.
-            </p>
+    <div className="min-h-screen bg-white text-black selection:bg-black selection:text-white">
 
-            <div className="relative">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search for answers..."
-                className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-full focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm shadow-lg"
-              />
-              <i className="ri-search-line absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl"></i>
-            </div>
-          </div>
+      {/* Minimalist Header */}
+      <section className="pt-32 pb-16 text-center px-4">
+        <span className="block text-xs font-bold uppercase tracking-[0.2em] text-gray-400 mb-6">Support</span>
+        <h1 className="font-serif text-5xl md:text-6xl mb-8">Frequently Asked Questions</h1>
+
+        <div className="max-w-xl mx-auto relative border-b border-gray-300 focus-within:border-black transition-colors">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search"
+            className="w-full py-4 bg-transparent focus:outline-none text-center placeholder:text-gray-400"
+          />
+          <i className="ri-search-line absolute right-0 top-1/2 -translate-y-1/2 text-gray-400"></i>
         </div>
-      </div>
+      </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="flex flex-wrap gap-3 justify-center mb-12">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 pb-32">
+        {/* Categories as minimalist tabs */}
+        <div className="flex flex-wrap justify-center gap-6 md:gap-12 mb-16">
           {categories.map((category) => (
             <button
               key={category.id}
               onClick={() => setActiveCategory(category.id)}
-              className={`flex items-center gap-2 px-6 py-3 rounded-full font-medium transition-all whitespace-nowrap ${
-                activeCategory === category.id
-                  ? 'bg-emerald-700 text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
+              className={`text-sm uppercase tracking-widest pb-2 transition-all ${activeCategory === category.id
+                ? 'border-b border-black text-black font-bold'
+                : 'text-gray-400 hover:text-black border-transparent hover:border-gray-200'
+                }`}
             >
-              <i className={`${category.icon} text-lg`}></i>
               {category.name}
             </button>
           ))}
         </div>
 
-        {filteredFAQs.length > 0 ? (
-          <div className="max-w-4xl mx-auto space-y-4">
-            {filteredFAQs.map((faq, index) => (
-              <details
-                key={index}
-                className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow"
-              >
-                <summary className="px-6 py-5 font-medium text-gray-900 cursor-pointer hover:bg-gray-50 transition-colors flex items-center justify-between">
-                  <span className="flex-1 pr-4">{faq.question}</span>
-                  <i className="ri-arrow-down-s-line text-xl text-gray-400"></i>
-                </summary>
-                <div className="px-6 pb-5 text-gray-600 leading-relaxed border-t border-gray-100 pt-4">
-                  {faq.answer}
-                </div>
-              </details>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-16">
-            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i className="ri-search-line text-4xl text-gray-400"></i>
+        {/* FAQs List */}
+        <div className="max-w-3xl mx-auto min-h-[400px]">
+          {filteredFAQs.length > 0 ? (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+              {filteredFAQs.map((faq, index) => (
+                <MinimalAccordion key={index} {...faq} />
+              ))}
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">No results found</h3>
-            <p className="text-gray-600">
-              Try adjusting your search or browse different categories
-            </p>
-          </div>
-        )}
-      </div>
+          ) : (
+            <div className="text-center py-24 text-gray-400">
+              <p>No results found for "{searchQuery}"</p>
+            </div>
+          )}
+        </div>
 
-      <div className="bg-gradient-to-br from-emerald-700 to-emerald-900 py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <i className="ri-customer-service-2-line text-3xl text-white"></i>
-          </div>
-          <h2 className="text-3xl font-bold text-white mb-4">Still Have Questions?</h2>
-          <p className="text-xl text-emerald-100 mb-8 leading-relaxed">
-            Our customer service team is ready to help. Contact us and we'll respond within 24 hours.
-          </p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link
-              href="/contact"
-              className="inline-flex items-center gap-2 bg-white text-emerald-700 px-8 py-4 rounded-full font-medium hover:bg-emerald-50 transition-colors whitespace-nowrap"
-            >
-              <i className="ri-mail-line text-lg"></i>
-              Contact Support
+        {/* Minimalist Footer Contact */}
+        <div className="mt-32 pt-16 border-t border-gray-100 text-center">
+          <h3 className="font-serif text-3xl mb-4">Still need help?</h3>
+          <p className="text-gray-500 font-light mb-8">Our team is available Mon-Fri, 9am - 6pm.</p>
+          <div className="flex justify-center gap-8">
+            <Link href="/contact" className="text-sm font-bold uppercase tracking-widest border-b border-black pb-1 hover:text-gray-600 hover:border-gray-600 transition-colors">
+              Contact Us
             </Link>
-            <a
-              href="https://wa.me/233241234567"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-emerald-600 text-white px-8 py-4 rounded-full font-medium hover:bg-emerald-500 transition-colors whitespace-nowrap"
-            >
-              <i className="ri-whatsapp-line text-lg"></i>
-              Chat on WhatsApp
+            <a href="mailto:support@standardstore.com" className="text-sm font-bold uppercase tracking-widest border-b border-black pb-1 hover:text-gray-600 hover:border-gray-600 transition-colors">
+              Email Support
             </a>
           </div>
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Quick Links</h2>
-          <p className="text-gray-600">Explore more helpful resources</p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-6">
-          <Link href="/shipping" className="bg-gray-50 p-8 rounded-2xl hover:shadow-lg transition-all cursor-pointer">
-            <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
-              <i className="ri-truck-line text-2xl text-emerald-700"></i>
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Shipping Policy</h3>
-            <p className="text-gray-600 leading-relaxed">
-              Learn about delivery times, costs, and tracking your orders
-            </p>
-          </Link>
-
-          <Link href="/returns" className="bg-gray-50 p-8 rounded-2xl hover:shadow-lg transition-all cursor-pointer">
-            <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
-              <i className="ri-arrow-go-back-line text-2xl text-emerald-700"></i>
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Returns Policy</h3>
-            <p className="text-gray-600 leading-relaxed">
-              Understand our return process, timeframes, and refund policy
-            </p>
-          </Link>
-
-          <Link href="/privacy" className="bg-gray-50 p-8 rounded-2xl hover:shadow-lg transition-all cursor-pointer">
-            <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
-              <i className="ri-shield-check-line text-2xl text-emerald-700"></i>
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Privacy & Security</h3>
-            <p className="text-gray-600 leading-relaxed">
-              See how we protect your personal information and data
-            </p>
-          </Link>
-        </div>
       </div>
     </div>
   );

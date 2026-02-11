@@ -1,9 +1,8 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useCMS } from '@/context/CMSContext';
 import { supabase } from '@/lib/supabase';
-import PageHero from '@/components/PageHero';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 
@@ -11,6 +10,24 @@ interface TeamContact {
   name: string;
   phone: string;
   role: string;
+}
+
+function ContactAccordion({ question, answer }: { question: string, answer: string }) {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div className="border-b border-gray-200 py-6 group">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex justify-between items-center text-left focus:outline-none"
+      >
+        <span className="font-serif text-xl text-gray-900 group-hover:text-gray-600 transition-colors">{question}</span>
+        <i className={`ri-arrow-down-s-line text-2xl text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}></i>
+      </button>
+      <div className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-40 opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
+        <p className="text-gray-500 font-light leading-relaxed">{answer}</p>
+      </div>
+    </div>
+  );
 }
 
 export default function ContactPage() {
@@ -79,42 +96,10 @@ export default function ContactPage() {
   const contactEmail = getSetting('contact_email') || 'support@standardstore.com';
   const contactPhone = getSetting('contact_phone') || '0546014734';
   const contactAddress = getSetting('contact_address') || 'Accra, Ghana';
-  const heroTitle = getSetting('contact_hero_title') || 'Get In Touch';
-  const heroSubtitle = getSetting('contact_hero_subtitle') || 'Have a question or need assistance? Our friendly team is here to help.';
-  const contactHours = getSetting('contact_hours') || 'Mon-Fri, 8am-6pm GMT';
-  const contactMapLink = getSetting('contact_map_link') || 'https://maps.google.com';
+  const heroTitle = getSetting('contact_hero_title') || 'Get in Touch';
+  const heroSubtitle = getSetting('contact_hero_subtitle') || 'We are here to assist you with any inquiries.';
+  const contactHours = getSetting('contact_hours') || 'Mon-Fri, 9am - 6pm GMT';
   const teamContacts = getSettingJSON<TeamContact[]>('contact_team_json', []);
-
-  const contactMethods = [
-    {
-      icon: 'ri-phone-line',
-      title: 'Call Us',
-      value: contactPhone,
-      link: `tel:${contactPhone.replace(/\s/g, '')}`,
-      description: contactHours
-    },
-    {
-      icon: 'ri-mail-line',
-      title: 'Email Us',
-      value: contactEmail,
-      link: `mailto:${contactEmail}`,
-      description: 'We respond within 24 hours'
-    },
-    {
-      icon: 'ri-whatsapp-line',
-      title: 'WhatsApp',
-      value: contactPhone,
-      link: `https://wa.me/233${contactPhone.replace(/^0/, '')}`,
-      description: 'Chat with us instantly'
-    },
-    {
-      icon: 'ri-map-pin-line',
-      title: 'Visit Us',
-      value: contactAddress,
-      link: contactMapLink,
-      description: 'Mon-Sat, 9am-6pm'
-    }
-  ];
 
   const faqs = [
     {
@@ -127,251 +112,166 @@ export default function ContactPage() {
     },
     {
       question: 'What payment methods do you accept?',
-      answer: 'We accept mobile money (MTN, Vodafone, AirtelTigo) and credit/debit cards through our secure Moolre payment gateway.'
+      answer: 'We accept mobile money (MTN, Vodafone, AirtelTigo) and credit/debit cards through our secure payment gateway.'
     }
   ];
 
   return (
-    <div className="min-h-screen bg-white">
-      <PageHero
-        title={heroTitle}
-        subtitle={heroSubtitle}
-      />
+    <div className="min-h-screen bg-white text-black selection:bg-black selection:text-white">
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid lg:grid-cols-4 gap-6 mb-16">
-          {contactMethods.map((method, index) => (
-            <a
-              key={index}
-              href={method.link}
-              target={method.link.startsWith('http') ? '_blank' : '_self'}
-              rel={method.link.startsWith('http') ? 'noopener noreferrer' : ''}
-              className="bg-white border border-gray-200 p-6 rounded-2xl hover:shadow-lg hover:border-emerald-200 transition-all cursor-pointer"
-            >
-              <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
-                <i className={`${method.icon} text-2xl text-emerald-700`}></i>
+      {/* Minimalist Header */}
+      <section className="pt-32 pb-20 px-4 text-center">
+        <span className="block text-xs font-bold uppercase tracking-[0.2em] text-gray-400 mb-6">Customer Service</span>
+        <h1 className="font-serif text-5xl md:text-7xl mb-6">{heroTitle}</h1>
+        <p className="text-gray-500 font-light max-w-xl mx-auto text-lg">{heroSubtitle}</p>
+      </section>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-24 border-b border-gray-100">
+        <div className="grid lg:grid-cols-12 gap-16 lg:gap-24">
+
+          {/* Contact Info Side */}
+          <div className="lg:col-span-5 space-y-20">
+
+            {/* Info Block */}
+            <div className="space-y-12">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-widest mb-4 border-b border-black pb-2 inline-block">Visit Us</h3>
+                <p className="font-serif text-2xl leading-relaxed">{contactAddress}</p>
+                <a href="#" className="text-sm underline text-gray-500 hover:text-black mt-2 inline-block">View on Map</a>
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">{method.title}</h3>
-              <p className="text-emerald-700 font-medium mb-1">{method.value}</p>
-              <p className="text-sm text-gray-500">{method.description}</p>
-            </a>
-          ))}
-        </div>
 
-        {/* Direct Phone Lines - Only show if contacts exist */}
-        {teamContacts.length > 0 && (
-          <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 rounded-2xl p-8 mb-16">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Reach Our Team Directly</h2>
-            <p className="text-gray-600 mb-6">Call or WhatsApp any of our team members</p>
-            <div className="grid sm:grid-cols-3 gap-4">
-              {teamContacts.map((contact: TeamContact, index: number) => (
-                <div key={index} className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
-                      <i className={`${index === 0 ? 'ri-phone-line' : 'ri-user-line'} text-lg text-emerald-700`}></i>
-                    </div>
-                    <div>
-                      <p className="font-semibold text-gray-900">{contact.name}</p>
-                      {contact.role && <p className="text-xs text-emerald-600 font-medium">{contact.role}</p>}
-                    </div>
-                  </div>
-                  <p className="text-gray-800 font-medium mb-3">{contact.phone}</p>
-                  <div className="flex gap-2">
-                    <a
-                      href={`tel:${contact.phone}`}
-                      className="flex-1 flex items-center justify-center gap-1.5 bg-emerald-700 text-white py-2 rounded-lg text-sm font-medium hover:bg-emerald-800 transition-colors"
-                    >
-                      <i className="ri-phone-line"></i> Call
-                    </a>
-                    <a
-                      href={`https://wa.me/233${contact.phone.replace(/^0/, '')}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 flex items-center justify-center gap-1.5 bg-green-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
-                    >
-                      <i className="ri-whatsapp-line"></i> WhatsApp
-                    </a>
-                  </div>
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-widest mb-4 border-b border-black pb-2 inline-block">Contact</h3>
+                <div className="space-y-2">
+                  <p className="text-lg"><a href={`mailto:${contactEmail}`} className="hover:text-gray-600 transition-colors">{contactEmail}</a></p>
+                  <p className="text-lg"><a href={`tel:${contactPhone}`} className="hover:text-gray-600 transition-colors">{contactPhone}</a></p>
                 </div>
-              ))}
+                <p className="text-gray-500 text-sm mt-4 font-light">{contactHours}</p>
+              </div>
             </div>
+
+            {/* Team Contacts */}
+            {teamContacts.length > 0 && (
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-widest mb-6 border-b border-black pb-2 inline-block">Direct Lines</h3>
+                <div className="grid gap-6">
+                  {teamContacts.map((contact, i) => (
+                    <div key={i} className="flex justify-between items-center group">
+                      <div>
+                        <p className="font-serif text-lg">{contact.name}</p>
+                        <p className="text-xs text-gray-500 uppercase tracking-wider">{contact.role}</p>
+                      </div>
+                      <div className="flex gap-4 opacity-50 group-hover:opacity-100 transition-opacity">
+                        <a href={`tel:${contact.phone}`} className="w-8 h-8 flex items-center justify-center border border-gray-200 rounded-full hover:bg-black hover:text-white transition-colors"><i className="ri-phone-line"></i></a>
+                        <a href={`https://wa.me/233${contact.phone.replace(/^0/, '')}`} className="w-8 h-8 flex items-center justify-center border border-gray-200 rounded-full hover:bg-black hover:text-white transition-colors"><i className="ri-whatsapp-line"></i></a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
           </div>
-        )}
 
-        <div className="grid lg:grid-cols-2 gap-12">
-          <div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">Send Us a Message</h2>
-            <p className="text-gray-600 mb-8">
-              Fill out the form below and we'll get back to you as soon as possible.
-            </p>
+          {/* Form Side */}
+          <div className="lg:col-span-7 bg-gray-50 p-8 md:p-16 rounded-sm">
+            <h2 className="font-serif text-3xl mb-8">Send a Message</h2>
 
-            <form id="contactForm" onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Name *
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
-                  placeholder="John Doe"
-                />
+            <form onSubmit={handleSubmit} className="space-y-8">
+              <div className="grid md:grid-cols-2 gap-8">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.name}
+                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full bg-transparent border-b border-gray-300 py-3 focus:outline-none focus:border-black transition-colors"
+                    placeholder="Your Name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Email</label>
+                  <input
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full bg-transparent border-b border-gray-300 py-3 focus:outline-none focus:border-black transition-colors"
+                    placeholder="email@example.com"
+                  />
+                </div>
               </div>
 
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address *
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
-                  placeholder="john@example.com"
-                />
+              <div className="grid md:grid-cols-2 gap-8">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Phone</label>
+                  <input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full bg-transparent border-b border-gray-300 py-3 focus:outline-none focus:border-black transition-colors"
+                    placeholder="(Optional)"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Subject</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.subject}
+                    onChange={e => setFormData({ ...formData, subject: e.target.value })}
+                    className="w-full bg-transparent border-b border-gray-300 py-3 focus:outline-none focus:border-black transition-colors"
+                    placeholder="Inquiry Topic"
+                  />
+                </div>
               </div>
 
-              <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
-                  placeholder="+233 XX XXX XXXX"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
-                  Subject *
-                </label>
-                <input
-                  type="text"
-                  id="subject"
-                  name="subject"
-                  required
-                  value={formData.subject}
-                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
-                  placeholder="Order inquiry, product question, etc."
-                />
-              </div>
-
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                  Message *
-                </label>
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Message</label>
                 <textarea
-                  id="message"
-                  name="message"
+                  rows={5}
                   required
-                  rows={6}
-                  maxLength={500}
                   value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none text-sm"
-                  placeholder="Tell us how we can help you..."
+                  onChange={e => setFormData({ ...formData, message: e.target.value })}
+                  className="w-full bg-transparent border-b border-gray-300 py-3 focus:outline-none focus:border-black transition-colors resize-none"
+                  placeholder="How can we help?"
                 ></textarea>
-                <p className="text-xs text-gray-500 mt-1">{formData.message.length}/500 characters</p>
+              </div>
+
+              <div className="pt-4">
+                <button
+                  type="submit"
+                  disabled={isSubmitting || verifying}
+                  className="bg-black text-white px-10 py-4 text-sm font-bold uppercase tracking-widest hover:bg-gray-800 transition-all disabled:opacity-50"
+                >
+                  {isSubmitting ? 'Sending...' : 'Send Message'}
+                </button>
               </div>
 
               {submitStatus === 'success' && (
-                <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl">
-                  <i className="ri-check-line mr-2"></i>
-                  Message sent successfully! We'll respond within 24 hours.
-                </div>
+                <p className="text-emerald-600 text-sm mt-4">Message sent successfully.</p>
               )}
-
               {submitStatus === 'error' && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
-                  <i className="ri-error-warning-line mr-2"></i>
-                  Failed to send message. Please try again or contact us directly.
-                </div>
+                <p className="text-red-500 text-sm mt-4">Failed to send message. Please try again.</p>
               )}
-
-              <button
-                type="submit"
-                disabled={isSubmitting || verifying}
-                className="w-full bg-emerald-700 text-white py-4 rounded-xl font-medium hover:bg-emerald-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap cursor-pointer"
-              >
-                {isSubmitting || verifying ? (verifying ? 'Verifying...' : 'Sending...') : 'Send Message'}
-              </button>
             </form>
           </div>
 
-          <div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">Quick Answers</h2>
-            <p className="text-gray-600 mb-8">
-              Find answers to common questions before reaching out
-            </p>
-
-            <div className="space-y-4 mb-12">
-              {faqs.map((faq, index) => (
-                <details key={index} className="bg-gray-50 rounded-xl overflow-hidden">
-                  <summary className="px-6 py-4 font-medium text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors">
-                    {faq.question}
-                  </summary>
-                  <div className="px-6 pb-4 text-gray-600 leading-relaxed">
-                    {faq.answer}
-                  </div>
-                </details>
-              ))}
-            </div>
-
-            <div className="bg-gradient-to-br from-emerald-700 to-emerald-900 p-8 rounded-2xl text-white">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-4">
-                <i className="ri-customer-service-2-line text-2xl"></i>
-              </div>
-              <h3 className="text-2xl font-bold mb-3">Need Immediate Help?</h3>
-              <p className="text-emerald-100 mb-6 leading-relaxed">
-                Our customer support team is available {contactHours}. For urgent matters, reach out via WhatsApp.
-              </p>
-              <a
-                href={`https://wa.me/233${contactPhone.replace(/^0/, '')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-white text-emerald-700 px-6 py-3 rounded-full font-medium hover:bg-emerald-50 transition-colors whitespace-nowrap"
-              >
-                <i className="ri-whatsapp-line text-xl"></i>
-                Chat on WhatsApp
-              </a>
-            </div>
-          </div>
         </div>
       </div>
 
-      <div className="bg-gray-50 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Visit Our Store</h2>
-            <p className="text-gray-600 mb-6 leading-relaxed">
-              Prefer to shop in person? Visit our store. Our knowledgeable staff will be happy to assist you with product selection and answer any questions.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4 text-gray-600">
-              <div className="flex items-center gap-2">
-                <i className="ri-map-pin-2-line text-emerald-700"></i>
-                <span>{contactAddress}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <i className="ri-time-line text-emerald-700"></i>
-                <span>Mon-Sat: 9am-6pm</span>
-              </div>
-            </div>
+      {/* FAQ Section - Bottom */}
+      <section className="py-24 bg-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          <h2 className="font-serif text-3xl mb-12 text-center">Frequently Asked Questions</h2>
+          <div className="space-y-2">
+            {faqs.map((faq, i) => (
+              <ContactAccordion key={i} {...faq} />
+            ))}
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

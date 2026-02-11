@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import PageHero from '@/components/PageHero';
 
 export const revalidate = 0; // Ensure fresh data on every visit
 
@@ -18,100 +17,78 @@ export default async function CategoriesPage() {
     .eq('status', 'active')
     .order('position', { ascending: true });
 
-  // Palette to cycle through for visual variety since DB doesn't have colors
-  const palette = [
-    { color: 'from-emerald-500 to-emerald-700', icon: 'ri-store-2-line' },
-    { color: 'from-blue-500 to-blue-700', icon: 'ri-shopping-bag-3-line' },
-    { color: 'from-purple-500 to-purple-700', icon: 'ri-t-shirt-line' },
-    { color: 'from-amber-500 to-amber-700', icon: 'ri-home-smile-line' },
-    { color: 'from-rose-500 to-rose-700', icon: 'ri-heart-line' },
-    { color: 'from-indigo-500 to-indigo-700', icon: 'ri-star-smile-line' },
-  ];
-
-  const categories = categoriesData?.map((c, i) => {
-    const style = palette[i % palette.length];
-    return {
-      ...c,
-      image: c.image_url || 'https://via.placeholder.com/600x400?text=Category',
-      color: style.color,
-      icon: style.icon,
-      // Optional: Fetch product count if needed, currently skipping for performance/simplicity
-      productCount: 'Browse',
-    };
-  }) || [];
+  const categories = categoriesData?.map((c) => ({
+    ...c,
+    image: c.image_url || 'https://via.placeholder.com/600x800?text=Category',
+  })) || [];
 
   return (
-    <div className="min-h-screen bg-white">
-      <PageHero
-        title="Shop by Category"
-        subtitle="Explore our curated collections and find exactly what you're looking for"
-      />
+    <div className="min-h-screen bg-white text-black selection:bg-black selection:text-white">
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      {/* Minimalist Hero */}
+      <section className="pt-32 pb-20 px-4 text-center border-b border-gray-100">
+        <span className="block text-xs font-bold uppercase tracking-[0.2em] text-gray-400 mb-6">Collections</span>
+        <h1 className="font-serif text-5xl md:text-7xl mb-6">Shop by Category</h1>
+        <p className="text-gray-500 font-light max-w-xl mx-auto text-lg">
+          Explore our curated collections and find exactly what you're looking for.
+        </p>
+      </section>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
         {categories.length > 0 ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 row-gap-16">
             {categories.map((category) => (
               <Link
                 key={category.id}
                 href={`/shop?category=${category.slug}`}
-                className="group bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-2xl transition-all cursor-pointer"
+                className="group block cursor-pointer"
               >
-                <div className="relative h-48 overflow-hidden">
+                <div className="relative aspect-[3/4] overflow-hidden bg-gray-100 mb-6">
                   <img
                     src={category.image}
                     alt={category.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                   />
-                  <div className={`absolute inset-0 bg-gradient-to-t ${category.color} opacity-0 group-hover:opacity-20 transition-opacity`}></div>
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500"></div>
                 </div>
-                <div className="p-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className={`w-12 h-12 bg-gradient-to-br ${category.color} rounded-full flex items-center justify-center`}>
-                      <i className={`${category.icon} text-2xl text-white`}></i>
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-900">{category.name}</h3>
-                      <p className="text-sm text-gray-500">Collection</p>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 leading-relaxed text-sm mb-4 line-clamp-2">
-                    {category.description || 'Explore our exclusive collection in this category.'}
+
+                <div className="text-center">
+                  <h3 className="font-serif text-2xl mb-2 group-hover:text-gray-600 transition-colors">{category.name}</h3>
+                  <p className="text-gray-500 font-light text-sm line-clamp-2 mb-4 max-w-xs mx-auto">
+                    {category.description}
                   </p>
-                  <div className="flex items-center text-emerald-700 font-medium text-sm group-hover:gap-2 transition-all">
-                    <span>Browse Collection</span>
-                    <i className="ri-arrow-right-line ml-2"></i>
-                  </div>
+                  <span className="inline-block text-xs font-bold uppercase tracking-[0.2em] border-b border-gray-200 pb-1 group-hover:border-black transition-colors">
+                    View Collection
+                  </span>
                 </div>
               </Link>
             ))}
           </div>
         ) : (
-          <div className="text-center py-20 bg-gray-50 rounded-xl">
-            <i className="ri-inbox-line text-5xl text-gray-300 mb-4"></i>
-            <p className="text-xl text-gray-500">No categories found.</p>
+          <div className="text-center py-32 bg-gray-50">
+            <p className="font-serif text-xl text-gray-400 italic">No categories found.</p>
           </div>
         )}
       </div>
 
-      <div className="bg-gradient-to-br from-emerald-700 to-emerald-900 py-16">
+      {/* Modern CTA */}
+      <div className="bg-stone-50 py-32">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold text-white mb-4">Can't Find What You're Looking For?</h2>
-          <p className="text-xl text-emerald-100 mb-8 leading-relaxed">
-            Try our advanced search or contact our team for personalised product recommendations
+          <h2 className="font-serif text-4xl mb-6">Can't ensure what you need?</h2>
+          <p className="text-gray-500 font-light mb-12 max-w-lg mx-auto">
+            Our team is here to help you find the perfect match. Reach out for a personalised consultation.
           </p>
-          <div className="flex flex-wrap gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link
               href="/shop"
-              className="inline-flex items-center gap-2 bg-white text-emerald-700 px-8 py-4 rounded-full font-medium hover:bg-emerald-50 transition-colors whitespace-nowrap"
+              className="px-8 py-4 bg-white border border-gray-200 text-xs font-bold uppercase tracking-[0.2em] hover:border-black hover:bg-black hover:text-white transition-all"
             >
-              <i className="ri-search-line"></i>
-              Search All Products
+              Search Products
             </Link>
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-emerald-600 text-white px-8 py-4 rounded-full font-medium hover:bg-emerald-500 transition-colors whitespace-nowrap"
+              className="px-8 py-4 bg-black text-white text-xs font-bold uppercase tracking-[0.2em] hover:opacity-80 transition-opacity"
             >
-              <i className="ri-customer-service-line"></i>
               Contact Support
             </Link>
           </div>
