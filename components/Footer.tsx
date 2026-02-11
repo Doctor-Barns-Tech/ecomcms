@@ -9,15 +9,15 @@ function FooterSection({ title, children }: { title: string, children: React.Rea
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="border-b border-gray-800 lg:border-none last:border-0">
+    <div className="border-b border-slate-200 lg:border-none last:border-0">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between py-6 text-left lg:py-0 lg:cursor-default lg:mb-8"
+        className="w-full flex items-center justify-between py-5 text-left lg:py-0 lg:cursor-default lg:mb-6"
       >
-        <h4 className="font-bold text-xs uppercase tracking-[0.15em] text-white">{title}</h4>
-        <i className={`ri-arrow-down-s-line text-gray-500 text-lg transition-transform duration-300 lg:hidden ${isOpen ? 'rotate-180' : ''}`}></i>
+        <h4 className="font-semibold text-[11px] uppercase tracking-[0.25em] text-slate-600">{title}</h4>
+        <i className={`ri-arrow-down-s-line text-slate-400 text-lg transition-transform duration-300 lg:hidden ${isOpen ? 'rotate-180' : ''}`}></i>
       </button>
-      <div className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-96 pb-6' : 'max-h-0 lg:max-h-full lg:overflow-visible'}`}>
+      <div className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-96 pb-4' : 'max-h-0 lg:max-h-full lg:overflow-visible'}`}>
         {children}
       </div>
     </div>
@@ -90,45 +90,48 @@ export default function Footer() {
     { label: 'Terms of Service', href: '/terms' },
     { label: 'Accessibility', href: '/accessibility' }
   ]);
+  const socialLinks = [
+    { icon: 'ri-instagram-line', href: getSetting('social_instagram') },
+    { icon: 'ri-facebook-circle-line', href: getSetting('social_facebook') },
+    { icon: 'ri-twitter-x-line', href: getSetting('social_twitter') },
+    { icon: 'ri-tiktok-line', href: getSetting('social_tiktok') },
+    { icon: 'ri-youtube-line', href: getSetting('social_youtube') },
+    { icon: 'ri-whatsapp-line', href: getSetting('social_whatsapp') }
+  ].filter((item) => item.href);
 
   return (
-    <footer className="bg-black text-white pt-20 pb-8 border-t border-gray-900">
-
-      {/* Newsletter - Top Bordered Section */}
+    <footer className="bg-gradient-to-b from-white via-stone-50 to-stone-100 text-slate-700 pt-20 pb-10 border-t border-slate-200">
       {showNewsletter && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-20">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-12 border-b border-gray-800 pb-20">
-            <div className="max-w-xl text-center lg:text-left">
-              <h3 className="font-serif text-3xl mb-4 text-white">{newsletterTitle}</h3>
-              <p className="text-gray-400 font-light text-sm leading-relaxed">{newsletterSubtitle}</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-16">
+          <div className="bg-white border border-slate-200 rounded-3xl shadow-sm px-6 sm:px-10 py-10 flex flex-col lg:flex-row gap-10 items-center">
+            <div className="max-w-xl text-center lg:text-left space-y-4">
+              <p className="text-xs uppercase tracking-[0.4em] text-emerald-500">Stay in the loop</p>
+              <h3 className="font-serif text-3xl text-slate-900">{newsletterTitle}</h3>
+              <p className="text-slate-500 text-sm leading-relaxed">{newsletterSubtitle}</p>
               {submitStatus === 'success' && (
-                <p className="text-emerald-500 text-xs mt-4 uppercase tracking-wider">
-                  You have successfully joined the list.
-                </p>
+                <p className="text-emerald-600 text-xs uppercase tracking-[0.3em]">You are on the list ✨</p>
               )}
               {submitStatus === 'error' && (
-                <p className="text-red-500 text-xs mt-4 uppercase tracking-wider">
-                  Something went wrong. Please try again.
-                </p>
+                <p className="text-red-500 text-xs uppercase tracking-[0.3em]">Please try again.</p>
               )}
             </div>
 
             <div className="w-full max-w-md">
-              <form onSubmit={handleSubmit} className="relative">
+              <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email address"
-                  className="w-full bg-transparent border-b border-gray-700 py-4 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors text-lg font-light"
+                  className="flex-1 bg-stone-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
                   required
                 />
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-white transition-colors disabled:opacity-50"
+                  className="px-6 py-3 rounded-2xl bg-emerald-600 text-white text-xs font-semibold uppercase tracking-[0.3em] hover:bg-emerald-700 transition-colors disabled:opacity-60"
                 >
-                  {isSubmitting ? '...' : 'Subscribe'}
+                  {isSubmitting ? '...' : 'Join'}
                 </button>
               </form>
             </div>
@@ -137,43 +140,58 @@ export default function Footer() {
       )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="grid lg:grid-cols-12 gap-12 lg:gap-8">
-
-          {/* Brand Column */}
-          <div className="lg:col-span-4 space-y-8">
-            <Link href="/" className="inline-block">
-              {/* Using CSS filter to make logo white if needed, or rely on white version */}
-              <img src={footerLogo} alt={siteName} className="h-20 w-auto object-contain brightness-0 invert opacity-90" />
+        <div className="grid lg:grid-cols-12 gap-10 lg:gap-16">
+          <div className="lg:col-span-4 space-y-6">
+            <Link href="/" className="inline-flex items-center gap-4">
+              <div className="p-3 rounded-2xl bg-white shadow-sm border border-slate-100">
+                <img src={footerLogo} alt={siteName} className="h-10 w-auto object-contain" />
+              </div>
+              <div className="hidden sm:flex flex-col">
+                <span className="text-sm font-semibold tracking-[0.3em] uppercase text-slate-900">{siteName}</span>
+                <span className="text-xs tracking-[0.4em] uppercase text-slate-400">Since {new Date().getFullYear()}</span>
+              </div>
             </Link>
 
-            <p className="text-gray-400 text-sm font-light leading-relaxed max-w-xs">
-              {siteTagline}
-            </p>
+            <p className="text-sm text-slate-500 max-w-sm leading-relaxed">{siteTagline}</p>
 
-            <div className="flex gap-6">
-              {[
-                { icon: 'ri-instagram-line', href: '#' },
-                { icon: 'ri-facebook-fill', href: '#' },
-                { icon: 'ri-twitter-x-line', href: '#' },
-                { icon: 'ri-pinterest-line', href: '#' }
-              ].map((social, i) => (
-                <a key={i} href={social.href} className="text-gray-500 hover:text-white transition-colors">
-                  <i className={`${social.icon} text-xl`}></i>
+            <div className="space-y-3 text-sm text-slate-600">
+              {contactPhone && (
+                <a href={`tel:${contactPhone}`} className="flex items-center gap-3 hover:text-emerald-700 transition-colors">
+                  <i className="ri-phone-line text-emerald-600" />
+                  {contactPhone}
                 </a>
-              ))}
+              )}
+              {contactEmail && (
+                <a href={`mailto:${contactEmail}`} className="flex items-center gap-3 hover:text-emerald-700 transition-colors">
+                  <i className="ri-mail-line text-emerald-600" />
+                  {contactEmail}
+                </a>
+              )}
             </div>
+
+            {socialLinks.length > 0 && (
+              <div className="flex flex-wrap gap-3 pt-2">
+                {socialLinks.map((social) => (
+                  <a
+                    key={social.icon}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:text-emerald-600 hover:border-emerald-200 transition-colors"
+                  >
+                    <i className={`${social.icon} text-lg`}></i>
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Spacer */}
-          <div className="hidden lg:block lg:col-span-2"></div>
-
-          {/* Links Columns */}
-          <div className="lg:col-span-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-8">
             <FooterSection title={col1Title}>
-              <ul className="space-y-4">
+              <ul className="space-y-3 pb-6 lg:pb-0">
                 {col1Links.map((link, i) => (
                   <li key={i}>
-                    <Link href={link.href} className="text-sm text-gray-400 hover:text-white transition-colors font-light">
+                    <Link href={link.href} className="text-sm text-slate-500 hover:text-emerald-600 transition-colors">
                       {link.label}
                     </Link>
                   </li>
@@ -182,10 +200,10 @@ export default function Footer() {
             </FooterSection>
 
             <FooterSection title={col2Title}>
-              <ul className="space-y-4">
+              <ul className="space-y-3 pb-6 lg:pb-0">
                 {col2Links.map((link, i) => (
                   <li key={i}>
-                    <Link href={link.href} className="text-sm text-gray-400 hover:text-white transition-colors font-light">
+                    <Link href={link.href} className="text-sm text-slate-500 hover:text-emerald-600 transition-colors">
                       {link.label}
                     </Link>
                   </li>
@@ -194,10 +212,10 @@ export default function Footer() {
             </FooterSection>
 
             <FooterSection title={col3Title}>
-              <ul className="space-y-4">
+              <ul className="space-y-3">
                 {col3Links.map((link, i) => (
                   <li key={i}>
-                    <Link href={link.href} className="text-sm text-gray-400 hover:text-white transition-colors font-light">
+                    <Link href={link.href} className="text-sm text-slate-500 hover:text-emerald-600 transition-colors">
                       {link.label}
                     </Link>
                   </li>
@@ -207,18 +225,16 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-gray-900 mt-20 pt-8 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] uppercase tracking-wider text-gray-600">
+        <div className="mt-16 pt-8 border-t border-slate-200 flex flex-col md:flex-row gap-4 items-center justify-between text-xs uppercase tracking-[0.4em] text-slate-400">
           <p>&copy; {new Date().getFullYear()} {siteName}. All rights reserved.</p>
-
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
             {poweredBy && (
               <span className="flex items-center gap-1">
-                Powered by <a href={poweredByLink} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors">{poweredBy}</a>
+                Powered by <a href={poweredByLink} target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-emerald-600 transition-colors">{poweredBy}</a>
               </span>
             )}
-            <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
-            <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
+            <Link href="/privacy" className="hover:text-emerald-600 transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-emerald-600 transition-colors">Terms</Link>
           </div>
         </div>
       </div>
